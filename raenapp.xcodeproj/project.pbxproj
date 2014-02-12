@@ -19,6 +19,7 @@
 		6C5473EE188405130069E62B /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473ED188405130069E62B /* XCTest.framework */; };
 		6C5473EF188405140069E62B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473C8188405130069E62B /* Foundation.framework */; };
 		6C5473F0188405140069E62B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473CC188405130069E62B /* UIKit.framework */; };
+		6C6472CC18ABD845001028DE /* CartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C6472CB18ABD845001028DE /* CartViewController.m */; };
 		6CBAF2C118AB3FF100426647 /* CartItemModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF29C18AB3FF100426647 /* CartItemModel.m */; };
 		6CBAF2C218AB3FF100426647 /* CategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF29E18AB3FF100426647 /* CategoryModel.m */; };
 		6CBAF2C318AB3FF100426647 /* ChildrenModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2A018AB3FF100426647 /* ChildrenModel.m */; };
@@ -43,7 +44,6 @@
 		6CBAF2EC18AB401B00426647 /* GridItemsVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2E318AB401B00426647 /* GridItemsVC.m */; };
 		6CBAF2ED18AB401B00426647 /* IndexedCV.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2E518AB401B00426647 /* IndexedCV.m */; };
 		6CBAF2EE18AB401B00426647 /* ItemCardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2E718AB401B00426647 /* ItemCardViewController.m */; };
-		6CBAF2EF18AB401B00426647 /* SecondViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2E918AB401B00426647 /* SecondViewController.m */; };
 		6CBAF2F018AB401B00426647 /* TVController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2EB18AB401B00426647 /* TVController.m */; };
 		6CBF686D1890E22B003ED717 /* btnCheck.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CBF68671890E22B003ED717 /* btnCheck.png */; };
 		6CBF686E1890E22B003ED717 /* btnCheck@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = 6CBF68681890E22B003ED717 /* btnCheck@2x.png */; };
@@ -93,6 +93,8 @@
 		6C5473E6188405130069E62B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6C5473EC188405130069E62B /* raenappTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = raenappTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C5473ED188405130069E62B /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		6C6472CA18ABD845001028DE /* CartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CartViewController.h; sourceTree = "<group>"; };
+		6C6472CB18ABD845001028DE /* CartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CartViewController.m; sourceTree = "<group>"; };
 		6CBAF29B18AB3FF100426647 /* CartItemModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CartItemModel.h; sourceTree = "<group>"; };
 		6CBAF29C18AB3FF100426647 /* CartItemModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CartItemModel.m; sourceTree = "<group>"; };
 		6CBAF29D18AB3FF100426647 /* CategoryModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CategoryModel.h; sourceTree = "<group>"; };
@@ -142,8 +144,6 @@
 		6CBAF2E518AB401B00426647 /* IndexedCV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IndexedCV.m; sourceTree = "<group>"; };
 		6CBAF2E618AB401B00426647 /* ItemCardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemCardViewController.h; sourceTree = "<group>"; };
 		6CBAF2E718AB401B00426647 /* ItemCardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemCardViewController.m; sourceTree = "<group>"; };
-		6CBAF2E818AB401B00426647 /* SecondViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SecondViewController.h; sourceTree = "<group>"; };
-		6CBAF2E918AB401B00426647 /* SecondViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SecondViewController.m; sourceTree = "<group>"; };
 		6CBAF2EA18AB401B00426647 /* TVController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVController.h; sourceTree = "<group>"; };
 		6CBAF2EB18AB401B00426647 /* TVController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVController.m; sourceTree = "<group>"; };
 		6CBF68671890E22B003ED717 /* btnCheck.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = btnCheck.png; sourceTree = "<group>"; };
@@ -380,8 +380,8 @@
 				6CBAF2E718AB401B00426647 /* ItemCardViewController.m */,
 				6CBAF2EA18AB401B00426647 /* TVController.h */,
 				6CBAF2EB18AB401B00426647 /* TVController.m */,
-				6CBAF2E818AB401B00426647 /* SecondViewController.h */,
-				6CBAF2E918AB401B00426647 /* SecondViewController.m */,
+				6C6472CA18ABD845001028DE /* CartViewController.h */,
+				6C6472CB18ABD845001028DE /* CartViewController.m */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -542,7 +542,6 @@
 				6CBAF2CD18AB3FF100426647 /* JSONHTTPClient.m in Sources */,
 				6CBAF2DF18AB3FFE00426647 /* ItemCell.m in Sources */,
 				6CBAF2EC18AB401B00426647 /* GridItemsVC.m in Sources */,
-				6CBAF2EF18AB401B00426647 /* SecondViewController.m in Sources */,
 				6CBAF2EE18AB401B00426647 /* ItemCardViewController.m in Sources */,
 				6CBAF2C218AB3FF100426647 /* CategoryModel.m in Sources */,
 				6CBAF2C518AB3FF100426647 /* ImageModel.m in Sources */,
@@ -554,6 +553,7 @@
 				6CBF689C18913082003ED717 /* SDWebImageDecoder.m in Sources */,
 				6CBAF2C718AB3FF100426647 /* JSONModel.m in Sources */,
 				6C5473D9188405130069E62B /* AppDelegate.m in Sources */,
+				6C6472CC18ABD845001028DE /* CartViewController.m in Sources */,
 				6CBAF2F018AB401B00426647 /* TVController.m in Sources */,
 				6CBF68701890E22B003ED717 /* MBProgressHUD.m in Sources */,
 				6CBF68A518913082003ED717 /* UIImageView+WebCache.m in Sources */,

@@ -16,6 +16,7 @@
 #import "JSONModelLib.h"
 #import "GoodModel.h"
 #import "CategoryModel.h"
+#import "CartItemModel.h"
 
 NSString *RaenAPIFailedGetData = @"RaenAPIFailedGetData";
 
@@ -24,6 +25,7 @@ NSString *RaenAPIGotCategories = @"RaenAPIGotCategories";
 NSString *RaenAPIGotGuards = @"RaenAPIGotGuards";
 NSString *RaenAPIGotCurrentItem = @"RaenAPIGotCurrentItem";
 NSString *RaenAPIGotCurrentSubcategoryItems = @"RaenAPIGotCurrentSubcategoryItems";
+NSString *RaenAPIGorCurrentCartItems = @"RaenAPIGorCurrentCartItems";
 @implementation RaenAPI
 @synthesize ready;
 
@@ -161,5 +163,24 @@ NSString *RaenAPIGotCurrentSubcategoryItems = @"RaenAPIGotCurrentSubcategoryItem
         }
     }];
 
+}
+
+-(void)getCartItems{
+    _currentCartItems = nil;
+    
+    [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetCart
+                                  completion:^(id json, JSONModelError *err) {
+                                      
+                                      if (err) {
+                                          NSLog(@"err! %@",err.localizedDescription);
+                                          [[NSNotificationCenter defaultCenter] postNotificationName:@"failedGetCart" object:err];
+                                      }
+                                      _currentCartItems= [CartItemModel arrayOfDictionariesFromModels:json];
+                                      NSLog(@"_currentCartItems %@",_currentCartItems);
+                                      if (_currentCartItems) {
+                                          NSLog(@"_currentCArtItems ready and count %i",_currentCartItems.count);
+                                          [[NSNotificationCenter defaultCenter] postNotificationName:RaenAPIGorCurrentCartItems object:self];
+                                      }
+                                  }];
 }
 @end
