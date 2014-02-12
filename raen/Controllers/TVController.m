@@ -19,9 +19,7 @@
 
 #import "UIImageView+WebCache.h"
 
-#define kRaenUrlBikes @"http://raenshop.ru/api/catalog/goods_list/cat_id/26/" //complete bikes
-#define kRaenUrlGuardItems @"http://raenshop.ru/api/catalog/goods_list/cat_id/81/" //guard
-#define kRaenURlCategories @"http://raenshop.ru/api/catalog/categories"
+
 
 @interface TVController () {
 
@@ -55,7 +53,7 @@
     [self.raenAPI updateBikes];
 }
 -(void)bikesReady:(NSNotification*)not{
-    NSLog(@"remove observer for %@",RaenAPIGotBikes);
+    
     [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGotBikes object:self.raenAPI];
     NSIndexPath *bikesIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
     [self.tableView reloadRowsAtIndexPaths:@[bikesIndexPath] withRowAnimation:UITableViewRowAnimationFade];
@@ -65,18 +63,15 @@
 }
 -(void)categoriesReady:(NSNotification*)not{
     [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGotCategories object:self.raenAPI];
-    //[self.tableView reloadData];
+    
     NSMutableArray *muArray = [[NSMutableArray alloc] init];
     for (int i=0; i<self.raenAPI.categories.count; i++) {
-        NSLog(@"i= %i",i);
         if (i!=0 && i!=2) {
             NSIndexPath *indexPath =[NSIndexPath indexPathForRow:i inSection:0];
             [muArray addObject:indexPath];
-            NSLog(@"muarray %@",muArray);
         }
     }
     NSArray *tmpArray = [NSArray arrayWithArray:muArray];
-    NSLog(@"tmpArray %@",tmpArray);
     muArray = nil;
     [self.tableView reloadData];
     [self.tableView reloadRowsAtIndexPaths:tmpArray withRowAnimation:UITableViewRowAnimationFade];
@@ -125,7 +120,6 @@
 {
     static NSString *CellIdentifier = @"tvCell";
     TVCell *tvCell = (TVCell*)[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-    
     if (!tvCell) {
         tvCell = [[TVCell alloc] initWithStyle:UITableViewCellStyleDefault
                               reuseIdentifier:CellIdentifier];
@@ -207,32 +201,39 @@
 #pragma mark uiCollectionView delegate
 -(void)collectionView:(IndexedCV *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     NSLog(@"indexedCV #%d, did selectItem at row %d",collectionView.index,indexPath.row);
-   /*
-    CategoryModel *category=_categories[collectionView.index];
+   
+    CategoryModel *category=self.raenAPI.categories[collectionView.index];
     if ([category.id isEqualToString:@"26"])
     {
-        GoodModel *bike=_bikes[indexPath.row];
+        GoodModel *bike=self.raenAPI.bikes[indexPath.row];
         [self performSegueWithIdentifier:@"toItemCardView" sender:bike.id];
     }else if([category.id isEqualToString:@"74"])
     {
-        GoodModel *guardItem = _guardItems[indexPath.row];
+        GoodModel *guardItem = self.raenAPI.guards[indexPath.row];
         [self performSegueWithIdentifier:@"toItemCardView" sender:guardItem.id];
     }else
     {
         ChildrenModel *subCategory = category.childrens[indexPath.row];
-        [self performSegueWithIdentifier:@"toGridItemsVC" sender:subCategory];
+        [self performSegueWithIdentifier:@"toGridItemsVC" sender:subCategory.id];
     }
-    */
+    
 }
 #pragma mark -
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     if ([segue.identifier isEqualToString:@"toItemCardView"]) {
+    
         ItemCardViewController *itemCardVC=segue.destinationViewController;
-        itemCardVC.itemID = sender;
+        //itemCardVC.itemID = sender;
+         
+        [self.raenAPI getItemCardWithId:sender];
+        [[NSNotificationCenter defaultCenter] addObserver:itemCardVC selector:@selector(showItem) name:RaenAPIGotCurrentItem object:self.raenAPI];
+       
     }
     if ([segue.identifier isEqualToString:@"toGridItemsVC"]) {
         GridItemsVC *gridItemsVC = segue.destinationViewController;
-        gridItemsVC.subcategory = sender;
+        //gridItemsVC.subcategory = sender;
+        [self.raenAPI getSubcategoryWithId:sender];
+        [[NSNotificationCenter defaultCenter] addObserver:gridItemsVC selector:@selector(showItems) name:RaenAPIGotCurrentSubcategoryItems object:self.raenAPI];
     }
 }
 

@@ -378,10 +378,10 @@
 				6CBAF2E518AB401B00426647 /* IndexedCV.m */,
 				6CBAF2E618AB401B00426647 /* ItemCardViewController.h */,
 				6CBAF2E718AB401B00426647 /* ItemCardViewController.m */,
-				6CBAF2E818AB401B00426647 /* SecondViewController.h */,
-				6CBAF2E918AB401B00426647 /* SecondViewController.m */,
 				6CBAF2EA18AB401B00426647 /* TVController.h */,
 				6CBAF2EB18AB401B00426647 /* TVController.m */,
+				6CBAF2E818AB401B00426647 /* SecondViewController.h */,
+				6CBAF2E918AB401B00426647 /* SecondViewController.m */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";

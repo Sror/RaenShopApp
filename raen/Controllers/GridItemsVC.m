@@ -16,64 +16,41 @@
 #define kRaenApiItemsLink @"http://raenshop.ru/api/catalog/goods_list/cat_id/"
 
 @interface GridItemsVC (){
-    NSArray *_items;
+    //NSArray *_items;
 }
 
 @end
 
 @implementation GridItemsVC
 
--(void)viewDidAppear:(BOOL)animated{
-    [HUD showUIBlockingIndicatorWithText:@"Fetching JSON"];
-    NSLog(@"viewDidAppear");
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        //code executed in the background
-        //2
-        NSLog(@"subcategory %@",self.subcategory);
-        if (!self.subcategory.id.length>0) {
-            NSLog(@"error:categoryId is nil!");
-            return ;
-        }
-        
-       
-        NSString *fullUrl = [kRaenApiItemsLink stringByAppendingString:self.subcategory.id];
-        NSLog(@"fullUrl %@",fullUrl);
-        NSData* itemsData = [NSData dataWithContentsOfURL:
-                            [NSURL URLWithString:fullUrl]
-                            ];
-        //3
-        NSDictionary* itemsJson = [NSJSONSerialization
-                                  JSONObjectWithData:itemsData
-                                  options:kNilOptions
-                                  error:nil];
-        //4
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error;
-            _items = [GoodModel arrayOfModelsFromDictionaries:itemsJson[@"goods"]];
-            if (error) {
-                NSLog(@"ItemModel initWithDictionary error %@",error.localizedDescription);
-            }
-            [HUD hideUIBlockingIndicator];
-            if (_items) {
-                
-                [self.collectionView reloadData];
-            } else {
-                [HUD showAlertWithTitle:@"Error" text:@"Sorry, invalid JSON data"];
-            }
-        });
-        
-    });
-}
+
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    NSLog(@"viewDidLoad");
-    NSLog(@"subcategory.title %@",self.subcategory.title);
-    self.navigationItem.title = self.subcategory.title;
-	// Do any additional setup after loading the view.
+    self.raenAPI = [[AppDelegate instance] raenAPI];
+    [HUD showUIBlockingIndicatorWithText:@"Fetching JSON"];
+    JSONModelError *err;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(failedGetJsonWithJSONError:) name:RaenAPIFailedGetData object:err];
 }
-
+-(void)failedGetJsonWithJSONError:(JSONModelError*)err{
+    
+    [HUD hideUIBlockingIndicator];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:err.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
+    [alert show];
+    
+}
+-(void)viewWillDisappear:(BOOL)animated{
+    //self.raenAPI.currentSubcategoryItems = nil;
+}
+-(void)showItems{
+    NSLog(@"showItems");
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGotCurrentSubcategoryItems object:self.raenAPI];
+    [HUD hideUIBlockingIndicator];
+    [HUD showTimedAlertWithTitle:@"Succes" text:@"to get item" withTimeout:1];
+    
+    [self.collectionView reloadData];
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -85,14 +62,14 @@
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return _items.count;
+    return self.raenAPI.currentSubcategoryItems.count;
 };
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *CollectionViewCellIdentifier = @"itemCell";
     ItemCell *itemCell = (ItemCell*)[collectionView dequeueReusableCellWithReuseIdentifier:CollectionViewCellIdentifier forIndexPath:indexPath];
-    GoodModel *item = _items[indexPath.row];
+    GoodModel *item = self.raenAPI.currentSubcategoryItems[indexPath.row];
     itemCell.titleLabel.text = item.title;
     [itemCell.activityIndicator startAnimating];
     if (![item.priceNew isEqualToString:@"0"]) {
@@ -113,14 +90,17 @@
 }
 #pragma  mark -UiCollectionViewDelegate
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    GoodModel *item = _items[indexPath.row];
+    GoodModel *item = self.raenAPI.currentSubcategoryItems[indexPath.row];
     [self performSegueWithIdentifier:@"toItemCardView" sender:item.id];
 }
 #pragma mark - 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     if ([segue.identifier isEqualToString:@"toItemCardView"]) {
         ItemCardViewController *itemCardVC =[segue destinationViewController];
-        itemCardVC.itemID = sender;
+       // itemCardVC.itemID = sender;
+        [self.raenAPI getItemCardWithId:sender];
+        [[NSNotificationCenter defaultCenter] addObserver:itemCardVC selector:@selector(showItem) name:RaenAPIGotCurrentItem object:self.raenAPI];
+        
     }
 }
 

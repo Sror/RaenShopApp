@@ -17,7 +17,7 @@
 #define kRaenItemLink @"http://raenshop.ru/api/catalog/goods/id/"
 
 @interface ItemCardViewController () {
-    ItemModel *item;
+   // ItemModel *item;
     NSMutableArray *imageViews;
 }
 
@@ -27,43 +27,28 @@
 
 
 -(void)viewDidAppear:(BOOL)animated{
-    [HUD showUIBlockingIndicatorWithText:@"Fetching JSON"];
-    //1
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        //code executed in the background
-        //2
-        NSString *fullUrl = [kRaenItemLink stringByAppendingString:self.itemID];
-        NSLog(@"fullUrl %@",fullUrl);
-        NSData* itemData = [NSData dataWithContentsOfURL:
-                             [NSURL URLWithString:fullUrl]
-                             ];
-        //3
-        NSDictionary* itemJson = [NSJSONSerialization
-                                   JSONObjectWithData:itemData
-                                   options:kNilOptions
-                                   error:nil];
-        //4
-        dispatch_async(dispatch_get_main_queue(), ^{
-            NSError *error;
-            item = [[ItemModel alloc] initWithDictionary:itemJson error:&error];
-            if (error) {
-                NSLog(@"ItemModel initWithDictionary error %@",error.localizedDescription);
-            }
-            [HUD hideUIBlockingIndicator];
-            if (item) {
-               // NSLog(@"item %@",item);
-                self.navigationItem.title = item.title;
-                [self.tableView setHidden:NO];
-                [self.tableView reloadData];
-            } else {
-                [HUD showAlertWithTitle:@"Error" text:@"Sorry, invalid JSON data"];
-            }
-        });
-        
-    });
+    NSLog(@"ItemCardVC viewDid Appear");
+    
+    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showItem) name:RaenAPIGotCurrentItem object:self.raenAPI];
+   
+}
+-(void)showItem{
+    NSLog(@"showItem");
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGotCurrentItem object:self.raenAPI];
+    [HUD hideUIBlockingIndicator];
+    [HUD showTimedAlertWithTitle:@"Succes" text:@"to get item" withTimeout:1];
+    [self.tableView setHidden:NO];
+    [self.tableView reloadData];
+}
+-(void)failedGetJsonWithJSONError:(JSONModelError*)err{
+    
+    [HUD hideUIBlockingIndicator];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:err.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
+    [alert show];
+    
 }
 -(void)loadPage:(NSInteger)page forScrollView:(UIScrollView*)scrollView {
-    NSLog(@"loadPage %i",page);
+    
     CGRect frame = scrollView.bounds;
     frame.origin.x = frame.size.width * page;
     frame.origin.y = 0.0f;
@@ -71,7 +56,7 @@
     //NSLog(@"current imageView frame x=%f , y=%f",frame.origin.x,frame.origin.y);
     imageView.contentMode = UIViewContentModeScaleAspectFit;
     [scrollView addSubview:imageView];
-    ImageModel *image = item.images[page];
+    ImageModel *image = self.raenAPI.currentItem.images[page];
     [imageView setImageWithURL:[NSURL URLWithString:image.big] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
         //  [self.view reloadInputViews];
         
@@ -81,9 +66,15 @@
 {
     [super viewDidLoad];
     [self.tableView setHidden:YES];
+    self.raenAPI = [[AppDelegate instance] raenAPI];
+    [HUD showUIBlockingIndicatorWithText:@"Fetching JSON"];
+    JSONModelError *err;
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(failedGetJsonWithJSONError:) name:RaenAPIFailedGetData object:err];
    	// Do any additional setup after loading the view.
 }
-
+-(void)viewWillDisappear:(BOOL)animated{
+    
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -95,6 +86,7 @@
     
 }
 #pragma mark - UITableViewDataSource
+/*
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     
@@ -124,6 +116,7 @@
     }
     return 44;
 }
+ */
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     return 1;
 }
@@ -132,26 +125,25 @@
     ItemCardCell *cell =[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     
     // Set up the content size of the scroll view
-    [self setScrollViewSize:cell.scrollView withPages:item.images.count];
-    cell.pageControl.numberOfPages = item.images.count;
+    [self setScrollViewSize:cell.scrollView withPages:self.raenAPI.currentItem.images.count];
+    cell.pageControl.numberOfPages = self.raenAPI.currentItem.images.count;
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     
     if (cell == nil) {
         ItemCardCell *cell =[[ItemCardCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
     //load images for scrollview
-    for (NSInteger i=0; i<item.images.count; i++) {
+    for (NSInteger i=0; i<self.raenAPI.currentItem.images.count; i++) {
         [self loadPage:i forScrollView:cell.scrollView];
     }
-    cell.nameLabel.text = item.title;
-    NSString *price =item.priceNew.length >0 ? item.priceNew :item.price;
+    cell.nameLabel.text = self.raenAPI.currentItem.title;
+    NSString *price =self.raenAPI.currentItem.priceNew.length >0 ? self.raenAPI.currentItem.priceNew :self.raenAPI.currentItem.price;
     cell.priceLabel.text =  [NSString stringWithFormat:@"%@ Руб.",price];
-    cell.weightLabel.text = item.weight;
-    NSString *itemDescription =[item.desc stringByReplacingOccurrencesOfString:@"<br>" withString:@"//n"];
+    cell.weightLabel.text = self.raenAPI.currentItem.weight;
+    NSString *itemDescription =[self.raenAPI.currentItem.desc stringByReplacingOccurrencesOfString:@"<br>" withString:@"//n"];
     itemDescription = [itemDescription stringByReplacingOccurrencesOfString:@"<br />" withString:@""];
     //
-    
-    
+
     cell.textView.text = itemDescription;
     return cell;
 }

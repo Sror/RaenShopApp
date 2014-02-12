@@ -7,10 +7,15 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "RaenAPI.h"
+#import "AppDelegate.h"
 
 @interface ItemCardViewController : UIViewController <UIScrollViewDelegate,UITableViewDataSource,UITableViewDelegate>
-@property (nonatomic,strong) NSString *itemID;
+//@property (nonatomic,strong) NSString *itemID;
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (nonatomic,strong) RaenAPI *raenAPI;
+
+-(void)showItem;
 
 @end
