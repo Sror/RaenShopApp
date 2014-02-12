@@ -15,7 +15,7 @@
                                     @"cat_id":@"catId",
                                     @"brand_id":@"brandId",
                                     @"new_price":@"priceNew",
-                                    @"spec_items":@"specItems",
+                                    //@"spec_items":@"specItems",
                                     @"image_main":@"imagesMainLink",
                                     @"image_big":@"imageBigLink",
                                     @"dop_images":@"images"

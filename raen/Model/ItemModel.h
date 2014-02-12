@@ -7,7 +7,7 @@
 //
 
 #import "JSONModel.h"
-#import "specItem.h"
+
 #import "ImageModel.h"
 
 @interface ItemModel : JSONModel
@@ -25,6 +25,6 @@
 @property (nonatomic, strong) NSString <Optional> *video;
 @property (nonatomic, strong) NSString <Optional> *imageMainLink;
 @property (nonatomic, strong) NSString <Optional> *imageBigLink;
-@property (nonatomic, strong) NSArray <specItem> *specItems;
+
 @property (nonatomic, strong) NSArray <ImageModel,Optional> *images;
 @end
