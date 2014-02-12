@@ -21,18 +21,22 @@
 -(void)gotCartItems{
     [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGorCurrentCartItems object:self.raenAPI];
     [HUD hideUIBlockingIndicator];
-    [HUD showTimedAlertWithTitle:@"Success!" text:Nil withTimeout:2];
+    [HUD showTimedAlertWithTitle:@"Success!" text:Nil withTimeout:1];
     NSLog(@"succesfuly gotCartItems %@",self.raenAPI.currentCartItems);
+    [self.tableView reloadData];
     
+}
+-(void)viewWillAppear:(BOOL)animated{
+    [self.raenAPI getCartItems];
+    [HUD showUIBlockingIndicatorWithText:@"Loading..."];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gotCartItems) name:RaenAPIGorCurrentCartItems object:self.raenAPI];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     self.raenAPI = [[AppDelegate instance] raenAPI];
-    [self.raenAPI getCartItems];
-    [HUD showUIBlockingIndicatorWithText:@"Loading..."];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gotCartItems) name:RaenAPIGorCurrentCartItems object:self.raenAPI];
+    
 }
 
 - (void)didReceiveMemoryWarning

@@ -11,6 +11,7 @@
 #define kRaenApiGetCart @"http://raenshop.ru/api/catalog/cart/" //get items in cart
 #define kRaenApiGetItemCard @"http://raenshop.ru/api/catalog/goods/id/"
 #define kRaenApiGetSubcategoryItems @"http://raenshop.ru/api/catalog/goods_list/cat_id/"
+#define kRaenApiSendToCartItem @"http://raenshop.ru/api/catalog/to_cart/"
 
 #import "RaenAPI.h"
 #import "JSONModelLib.h"
@@ -49,7 +50,7 @@ NSString *RaenAPIGorCurrentCartItems = @"RaenAPIGorCurrentCartItems";
     }
     return self;
 }
-
+/*
 -(NSURLSession*)session{
     if (!_session) {
         NSURLSessionConfiguration *sessionConf = [NSURLSessionConfiguration defaultSessionConfiguration];
@@ -59,7 +60,7 @@ NSString *RaenAPIGorCurrentCartItems = @"RaenAPIGorCurrentCartItems";
     }
     return _session;
 }
-
+*/
 -(void)updateBikes{
     [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetBikesURL
                                   completion:^(id json, JSONModelError *err) {
@@ -166,6 +167,7 @@ NSString *RaenAPIGorCurrentCartItems = @"RaenAPIGorCurrentCartItems";
 }
 
 -(void)getCartItems{
+    NSLog(@"raenAPI getCartItems");
     _currentCartItems = nil;
     
     [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetCart
@@ -175,12 +177,49 @@ NSString *RaenAPIGorCurrentCartItems = @"RaenAPIGorCurrentCartItems";
                                           NSLog(@"err! %@",err.localizedDescription);
                                           [[NSNotificationCenter defaultCenter] postNotificationName:@"failedGetCart" object:err];
                                       }
-                                      _currentCartItems= [CartItemModel arrayOfDictionariesFromModels:json];
+                                      _currentCartItems= [CartItemModel arrayOfModelsFromDictionaries:json];
                                       NSLog(@"_currentCartItems %@",_currentCartItems);
                                       if (_currentCartItems) {
-                                          NSLog(@"_currentCArtItems ready and count %i",_currentCartItems.count);
+                                          NSLog(@"_currentCArtItems ready and count %@",_currentCartItems);
                                           [[NSNotificationCenter defaultCenter] postNotificationName:RaenAPIGorCurrentCartItems object:self];
                                       }
                                   }];
+}
+
+-(void)addItemToCart:(SpecItem*)item qty:(NSUInteger)qty{
+    NSError *error;
+    
+    
+    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session = [NSURLSession sessionWithConfiguration:configuration delegate:self delegateQueue:nil];
+    NSURL *url = [NSURL URLWithString:kRaenApiSendToCartItem];
+    NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
+                                                           cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                       timeoutInterval:60.0];
+    
+   // [request addValue:@"application/json" forHTTPHeaderField:@"Content-Type"];
+   // [request addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+    [request setHTTPMethod:@"POST"];
+    //todo check price
+    NSString *params =[NSString stringWithFormat:@"name=nameOfItem&id=%@&price=%@&qty=1",item.db1cId,item.price];
+    //NSDictionary *params =[NSDictionary dictionaryWithObjectsAndKeys: item.db1cId,@"id",qty,@"qty",item.price,@"price", nil];
+    NSLog(@"parameters %@",params);
+    [request setHTTPBody:[params dataUsingEncoding:NSUTF8StringEncoding]];
+    NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        NSLog(@"Response:%@ %@\n", response, error);
+        if(error == nil)
+        {
+            NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
+            NSLog(@"JSONData %@",json);
+            /*
+            NSString * text = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
+            NSLog(@"Data = %@",text);
+             */
+        }
+        
+    }];
+    
+    [dataTask resume];
+    
 }
 @end

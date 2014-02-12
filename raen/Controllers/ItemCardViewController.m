@@ -37,6 +37,10 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGotCurrentItem object:self.raenAPI];
     [HUD hideUIBlockingIndicator];
     [HUD showTimedAlertWithTitle:@"Succes" text:@"to get item" withTimeout:1];
+    //just test
+#warning fix me
+    [self.raenAPI addItemToCart:self.raenAPI.currentItem.specItems[0] qty:1];
+    
     [self.tableView setHidden:NO];
     [self.tableView reloadData];
 }

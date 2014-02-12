@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3304D66218ABF8FA00B9441E /* SpecItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3304D66118ABF8FA00B9441E /* SpecItem.m */; };
 		6C5473C9188405130069E62B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473C8188405130069E62B /* Foundation.framework */; };
 		6C5473CB188405130069E62B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473CA188405130069E62B /* CoreGraphics.framework */; };
 		6C5473CD188405130069E62B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473CC188405130069E62B /* UIKit.framework */; };
@@ -78,6 +79,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		3304D66018ABF8FA00B9441E /* SpecItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpecItem.h; sourceTree = "<group>"; };
+		3304D66118ABF8FA00B9441E /* SpecItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpecItem.m; sourceTree = "<group>"; };
 		6C5473C5188405130069E62B /* raenapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = raenapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C5473C8188405130069E62B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6C5473CA188405130069E62B /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -287,6 +290,8 @@
 				6CBAF2A418AB3FF100426647 /* ImageModel.m */,
 				6CBAF2A518AB3FF100426647 /* ItemModel.h */,
 				6CBAF2A618AB3FF100426647 /* ItemModel.m */,
+				3304D66018ABF8FA00B9441E /* SpecItem.h */,
+				3304D66118ABF8FA00B9441E /* SpecItem.m */,
 				6CBAF2A718AB3FF100426647 /* JSONModel */,
 			);
 			path = Model;
@@ -579,6 +584,7 @@
 				6CBF689F18913082003ED717 /* SDWebImageManager.m in Sources */,
 				6CBF68A418913082003ED717 /* UIImage+WebP.m in Sources */,
 				6CBF689A18913082003ED717 /* SDImageCache.m in Sources */,
+				3304D66218ABF8FA00B9441E /* SpecItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -17,7 +17,8 @@ extern  NSString *RaenAPIGotCurrentItem;
 extern  NSString *RaenAPIGotCurrentSubcategoryItems;
 extern  NSString *RaenAPIGorCurrentCartItems;
 
-@interface RaenAPI : NSObject
+@interface RaenAPI : NSObject <NSURLSessionDelegate>
+
 @property (nonatomic,readonly,getter = isReady) BOOL ready;
 @property (nonatomic,strong) NSArray *bikes;
 @property (nonatomic,strong) NSArray *categories;
@@ -25,10 +26,10 @@ extern  NSString *RaenAPIGorCurrentCartItems;
 @property (nonatomic,strong) ItemModel *currentItem;
 @property (nonatomic,strong) NSArray *currentSubcategoryItems;
 @property (nonatomic,strong) NSArray *currentCartItems;
-
+/*
 @property (nonatomic,strong) NSURLSession *session;
 @property (nonatomic,strong) NSURLSessionDataTask *dataTask;
-
+*/
 +(RaenAPI*)sharedInstance;
 
 -(void)updateBikes;
@@ -38,5 +39,5 @@ extern  NSString *RaenAPIGorCurrentCartItems;
 -(void)getItemCardWithId:(NSString*)itemId;
 -(void)getSubcategoryWithId:(NSString*)subcategoryId;
 -(void)getCartItems;
-
+-(void)addItemToCart:(SpecItem*)item qty:(NSUInteger)qty;
 @end
