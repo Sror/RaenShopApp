@@ -65,7 +65,7 @@
 		6CBF68A418913082003ED717 /* UIImage+WebP.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBF689518913082003ED717 /* UIImage+WebP.m */; };
 		6CBF68A518913082003ED717 /* UIImageView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBF689718913082003ED717 /* UIImageView+WebCache.m */; };
 		6CBF68A718913097003ED717 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CBF68A618913097003ED717 /* ImageIO.framework */; };
-		6CDFB1E318A8E66000651AC5 /* RaenAPI.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CDFB1E218A8E66000651AC5 /* RaenAPI.m */; };
+		6CF584E218AE023E00549A79 /* RaenAPICommunicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CF584E118AE023E00549A79 /* RaenAPICommunicator.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -185,8 +185,9 @@
 		6CBF689618913082003ED717 /* UIImageView+WebCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+WebCache.h"; sourceTree = "<group>"; };
 		6CBF689718913082003ED717 /* UIImageView+WebCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+WebCache.m"; sourceTree = "<group>"; };
 		6CBF68A618913097003ED717 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
-		6CDFB1E118A8E66000651AC5 /* RaenAPI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RaenAPI.h; sourceTree = "<group>"; };
-		6CDFB1E218A8E66000651AC5 /* RaenAPI.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RaenAPI.m; sourceTree = "<group>"; };
+		6CF584DF18AE01B400549A79 /* RaenAPICommunicatorDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RaenAPICommunicatorDelegate.h; sourceTree = "<group>"; };
+		6CF584E018AE023E00549A79 /* RaenAPICommunicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RaenAPICommunicator.h; sourceTree = "<group>"; };
+		6CF584E118AE023E00549A79 /* RaenAPICommunicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RaenAPICommunicator.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -247,6 +248,7 @@
 		6C5473CE188405130069E62B /* raen */ = {
 			isa = PBXGroup;
 			children = (
+				6CF584DE18AE01B400549A79 /* Communicator */,
 				6CBAF2D118AB3FFE00426647 /* Cells */,
 				6CBAF2E118AB401B00426647 /* Controllers */,
 				6CBAF29A18AB3FF100426647 /* Model */,
@@ -254,8 +256,6 @@
 				6CBF68661890E22B003ED717 /* HUD */,
 				6C5473D7188405130069E62B /* AppDelegate.h */,
 				6C5473D8188405130069E62B /* AppDelegate.m */,
-				6CDFB1E118A8E66000651AC5 /* RaenAPI.h */,
-				6CDFB1E218A8E66000651AC5 /* RaenAPI.m */,
 				6C5473E6188405130069E62B /* Images.xcassets */,
 				6C5473CF188405130069E62B /* Supporting Files */,
 				6C5473DA188405130069E62B /* Main_iPhone.storyboard */,
@@ -440,6 +440,16 @@
 			path = SDWebImage;
 			sourceTree = "<group>";
 		};
+		6CF584DE18AE01B400549A79 /* Communicator */ = {
+			isa = PBXGroup;
+			children = (
+				6CF584DF18AE01B400549A79 /* RaenAPICommunicatorDelegate.h */,
+				6CF584E018AE023E00549A79 /* RaenAPICommunicator.h */,
+				6CF584E118AE023E00549A79 /* RaenAPICommunicator.m */,
+			);
+			path = Communicator;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -563,7 +573,6 @@
 				6CBF68701890E22B003ED717 /* MBProgressHUD.m in Sources */,
 				6CBF68A518913082003ED717 /* UIImageView+WebCache.m in Sources */,
 				6CBF689918913082003ED717 /* NSData+ImageContentType.m in Sources */,
-				6CDFB1E318A8E66000651AC5 /* RaenAPI.m in Sources */,
 				6CBAF2DC18AB3FFE00426647 /* CartItemCell.m in Sources */,
 				6CBAF2D018AB3FF100426647 /* JSONValueTransformer.m in Sources */,
 				6CBAF2DD18AB3FFE00426647 /* CVCell.m in Sources */,
@@ -574,6 +583,7 @@
 				6CBAF2C118AB3FF100426647 /* CartItemModel.m in Sources */,
 				6CBF689818913082003ED717 /* MKAnnotationView+WebCache.m in Sources */,
 				6CBF68A018913082003ED717 /* SDWebImagePrefetcher.m in Sources */,
+				6CF584E218AE023E00549A79 /* RaenAPICommunicator.m in Sources */,
 				6CBAF2C918AB3FF100426647 /* JSONModelClassProperty.m in Sources */,
 				6CBAF2C818AB3FF100426647 /* JSONModelArray.m in Sources */,
 				6CBF689E18913082003ED717 /* SDWebImageDownloaderOperation.m in Sources */,

@@ -7,15 +7,11 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "ChildrenModel.h"
-#import "AppDelegate.h"
-#import "RaenAPI.h"
+
+
 
 @interface GridItemsVC : UIViewController <UICollectionViewDataSource,UICollectionViewDelegate>
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
-//@property (strong, nonatomic) ChildrenModel *subcategory;
-@property (nonatomic,strong) RaenAPI *raenAPI;
+@property (strong, nonatomic)NSString *subcategoryID;
 
-
--(void)showItems;
 @end

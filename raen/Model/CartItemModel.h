@@ -15,5 +15,6 @@
 @property (nonatomic,strong) NSString *price;
 @property (nonatomic,strong) NSString *name;
 @property (nonatomic,strong) NSString *subtotal;
+@property (nonatomic,strong) NSString *params;
 
 @end

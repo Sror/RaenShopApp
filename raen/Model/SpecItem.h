@@ -9,9 +9,10 @@
 #import "JSONModel.h"
 @protocol SpecItem @end
 @interface SpecItem : JSONModel
-@property (nonatomic,strong) NSString *id;
+@property (nonatomic,strong) NSString<Optional> *id;
 @property (nonatomic,strong) NSString *db1cId;
 @property (nonatomic,strong) NSString *price;
 @property (nonatomic,strong) NSString <Optional>*priceNew;
+@property (nonatomic,strong) NSString <Optional>*color;
 
 @end

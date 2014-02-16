@@ -17,7 +17,7 @@
 @property (nonatomic, strong) NSString <Optional>*review;
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSString *price;
-@property (nonatomic,strong) NSString <Optional>*priceNew;
+@property (nonatomic,strong) NSString <Optional> *priceNew;
 @property (nonatomic, strong) NSString <Optional> *weight;
 @property (nonatomic, strong) NSString <Optional> *desc;
 @property (nonatomic, strong) NSString <Optional> *brand;

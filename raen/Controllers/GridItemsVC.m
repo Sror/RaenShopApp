@@ -13,10 +13,11 @@
 #import "UIImageView+WebCache.h"
 #import "ItemCardViewController.h"
 
-#define kRaenApiItemsLink @"http://raenshop.ru/api/catalog/goods_list/cat_id/"
+#import "RaenAPICommunicator.h"
 
-@interface GridItemsVC (){
-    //NSArray *_items;
+@interface GridItemsVC ()<RaenAPICommunicatorDelegate>
+{   RaenAPICommunicator *_communicator;
+    NSArray *_items;
 }
 
 @end
@@ -28,48 +29,49 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.raenAPI = [[AppDelegate instance] raenAPI];
-    [HUD showUIBlockingIndicatorWithText:@"Fetching JSON"];
-    JSONModelError *err;
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(failedGetJsonWithJSONError:) name:RaenAPIFailedGetData object:err];
-}
--(void)failedGetJsonWithJSONError:(JSONModelError*)err{
-    
-    [HUD hideUIBlockingIndicator];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:err.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
-    [alert show];
+    _communicator = [[RaenAPICommunicator alloc] init];
+    _communicator.delegate = self;
+    [_communicator getSubcategoryWithId:self.subcategoryID];
+    [HUD showUIBlockingIndicatorWithText:nil];
     
 }
+
 -(void)viewWillDisappear:(BOOL)animated{
-    //self.raenAPI.currentSubcategoryItems = nil;
-}
--(void)showItems{
-    NSLog(@"showItems");
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGotCurrentSubcategoryItems object:self.raenAPI];
-    [HUD hideUIBlockingIndicator];
-    [HUD showTimedAlertWithTitle:@"Succes" text:@"to get item" withTimeout:1];
     
-    [self.collectionView reloadData];
 }
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
+#pragma mark - RaenAPICOmmunicationDelegate 
+-(void)didReceiveSubcategoryItems:(NSArray *)items{
+    NSLog(@"didReceiveSubcategoryItems %@",items);
+    _items = items;
+    [self.collectionView reloadData];
+    [HUD hideUIBlockingIndicator];
+    
+}
+-(void)fetchingFailedWithError:(JSONModelError *)error{
+    [HUD hideUIBlockingIndicator];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
+    [alert show];
+}
 #pragma mark UICollectionViewDataSource
 #pragma mark - UICollectionViewDataSource Methods
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    return self.raenAPI.currentSubcategoryItems.count;
+    return _items.count;
 };
 
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *CollectionViewCellIdentifier = @"itemCell";
-    ItemCell *itemCell = (ItemCell*)[collectionView dequeueReusableCellWithReuseIdentifier:CollectionViewCellIdentifier forIndexPath:indexPath];
-    GoodModel *item = self.raenAPI.currentSubcategoryItems[indexPath.row];
+    ItemCell *itemCell = (ItemCell*)[collectionView dequeueReusableCellWithReuseIdentifier:CollectionViewCellIdentifier
+                                                                              forIndexPath:indexPath];
+    GoodModel *item = _items[indexPath.row];
     itemCell.titleLabel.text = item.title;
     [itemCell.activityIndicator startAnimating];
     if (![item.priceNew isEqualToString:@"0"]) {
@@ -90,16 +92,18 @@
 }
 #pragma  mark -UiCollectionViewDelegate
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    GoodModel *item = self.raenAPI.currentSubcategoryItems[indexPath.row];
+    GoodModel *item = _items[indexPath.row];
     [self performSegueWithIdentifier:@"toItemCardView" sender:item.id];
 }
 #pragma mark - 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     if ([segue.identifier isEqualToString:@"toItemCardView"]) {
-        ItemCardViewController *itemCardVC =[segue destinationViewController];
-       // itemCardVC.itemID = sender;
-        [self.raenAPI getItemCardWithId:sender];
-        [[NSNotificationCenter defaultCenter] addObserver:itemCardVC selector:@selector(showItem) name:RaenAPIGotCurrentItem object:self.raenAPI];
+        
+        ItemCardViewController *itemCardVC=segue.destinationViewController;
+        itemCardVC.itemID = sender;
+        
+        //[self.raenAPI getItemCardWithId:sender];
+        //[_communicator getItemCardWithId:sender];
         
     }
 }

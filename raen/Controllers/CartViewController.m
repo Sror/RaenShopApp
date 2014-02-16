@@ -10,33 +10,34 @@
 #import "HUD.h"
 #import "AppDelegate.h"
 #import "CartItemModel.h"
+#import "RaenAPICommunicator.h"
 
 
-@interface CartViewController ()
+@interface CartViewController ()<RaenAPICommunicatorDelegate>
+{
+    RaenAPICommunicator *_communicator;
+    NSArray *_items;
 
+}
 @end
 
 @implementation CartViewController
 
--(void)gotCartItems{
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGorCurrentCartItems object:self.raenAPI];
-    [HUD hideUIBlockingIndicator];
-    [HUD showTimedAlertWithTitle:@"Success!" text:Nil withTimeout:1];
-    NSLog(@"succesfuly gotCartItems %@",self.raenAPI.currentCartItems);
-    [self.tableView reloadData];
-    
-}
 -(void)viewWillAppear:(BOOL)animated{
-    [self.raenAPI getCartItems];
-    [HUD showUIBlockingIndicatorWithText:@"Loading..."];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(gotCartItems) name:RaenAPIGorCurrentCartItems object:self.raenAPI];
+    
+    [self.subView setHidden:YES];
+    [HUD showUIBlockingIndicatorWithText:Nil];
+    [_communicator getItemsFromCart];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    self.raenAPI = [[AppDelegate instance] raenAPI];
+    _communicator = [[RaenAPICommunicator alloc] init];
+    _communicator.delegate = self;
     
+    //User Interface
+    [self.subView.layer setCornerRadius:3.0];
 }
 
 - (void)didReceiveMemoryWarning
@@ -44,36 +45,61 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+#pragma mark - RaenAPICommunicationDelegate
+-(void)didReceiveCartItems:(NSArray *)items{
+    NSLog(@"didReceiveCartItems %@",items);
+    [HUD hideUIBlockingIndicator];
+    _items = items;
+    [self.tableView reloadData];
+    [self.subTotalLabel setText:[self subtotal]];
+    [self.subView setHidden:NO];
+}
+-(void)fetchingFailedWithError:(JSONModelError *)error {
+    [HUD hideUIBlockingIndicator];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
+    [alert show];
+}
+
 #pragma mark - UITableViewDataSource
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;
 }
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    NSUInteger count = self.raenAPI.currentCartItems.count;
-   
-    if (count>0) {
-        return count;
+    if (_items.count>0) {
+        return _items.count;
     } else{
         return 1;
     }
 }
 -(UITableViewCell *)tableView:(UITableView *)tb cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     static NSString *cellIdentifier = @"CartCell";
-    
-    NSUInteger itemsCount = self.raenAPI.currentCartItems.count;
+    UITableViewCell *cell = [tb dequeueReusableCellWithIdentifier:cellIdentifier];
+    NSUInteger itemsCount = _items.count;
     if (itemsCount == 0 && indexPath.row == 0)
 	{
-        UITableViewCell *cell = [tb dequeueReusableCellWithIdentifier:cellIdentifier];
         cell.textLabel.text = @"";
 		cell.detailTextLabel.text = @"У вас еще нет товаров в корзине…";
 		return cell;
     }
-    UITableViewCell *cell = [tb dequeueReusableCellWithIdentifier:cellIdentifier];
+    
     if (itemsCount>0) {
-        CartItemModel *itemInCart = self.raenAPI.currentCartItems[indexPath.row];
+
+        CartItemModel *itemInCart = _items[indexPath.row];
         cell.textLabel.text = itemInCart.name;
         cell.detailTextLabel.text = [NSString stringWithFormat:@"Кол-во: %@",itemInCart.qty];
+        
     }
     return cell;
+}
+-(NSString*)subtotal{
+    NSInteger total=0;
+    for (CartItemModel *cartItem in _items) {
+        total = total + [cartItem.subtotal intValue];
+    };
+    return [NSString stringWithFormat:@"Итого: %i руб.",total];
+}
+- (IBAction)checkOutButtonPressed:(id)sender {
+    NSLog(@"checkOutButtonPressed");
 }
 @end

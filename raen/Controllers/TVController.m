@@ -19,10 +19,11 @@
 
 #import "UIImageView+WebCache.h"
 
+#import "RaenAPICommunicator.h"
 
-
-@interface TVController () {
-
+@interface TVController ()<RaenAPICommunicatorDelegate> {
+    NSArray *_categories;
+    RaenAPICommunicator *_communicator;
 }
 
 @end
@@ -35,7 +36,9 @@
     [super viewDidLoad];
     [self.tableView setDelegate:self];
     [self.tableView setDataSource:self];
-    self.raenAPI = [[AppDelegate instance] raenAPI];
+    _communicator = [[RaenAPICommunicator alloc] init];
+    _communicator.delegate = self;
+    
     //set refresh button
     UIBarButtonItem *refreshButton=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(updateDataFromModel)];
     [self.navigationItem setRightBarButtonItem:refreshButton];
@@ -44,51 +47,48 @@
 
 }
 -(void)updateDataFromModel{
+    _categories = nil;
     [HUD showUIBlockingIndicatorWithText:@"Loading..."];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(bikesReady:) name:RaenAPIGotBikes object:self.raenAPI];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(categoriesReady:) name:RaenAPIGotCategories object:self.raenAPI];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(guardsReady:) name:RaenAPIGotGuards object:self.raenAPI];
-    [self.raenAPI updateGuards];
-    [self.raenAPI updateCategories];
-    [self.raenAPI updateBikes];
-}
--(void)bikesReady:(NSNotification*)not{
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGotBikes object:self.raenAPI];
-    NSIndexPath *bikesIndexPath = [NSIndexPath indexPathForRow:0 inSection:0];
-    [self.tableView reloadRowsAtIndexPaths:@[bikesIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-    //[self.tableView reloadData];
-    [HUD showTimedAlertWithTitle:@"Succes" text:@"to get bikes" withTimeout:1];
-    
-}
--(void)categoriesReady:(NSNotification*)not{
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGotCategories object:self.raenAPI];
-    
-    NSMutableArray *muArray = [[NSMutableArray alloc] init];
-    for (int i=0; i<self.raenAPI.categories.count; i++) {
-        if (i!=0 && i!=2) {
-            NSIndexPath *indexPath =[NSIndexPath indexPathForRow:i inSection:0];
-            [muArray addObject:indexPath];
-        }
-    }
-    NSArray *tmpArray = [NSArray arrayWithArray:muArray];
-    muArray = nil;
-    [self.tableView reloadData];
-    [self.tableView reloadRowsAtIndexPaths:tmpArray withRowAnimation:UITableViewRowAnimationFade];
-    [HUD showTimedAlertWithTitle:@"Succes" text:@"got categories data" withTimeout:1];
+    [_communicator getAllCategories];
 
 }
--(void)guardsReady:(NSNotification*)not{
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:RaenAPIGotGuards object:self.raenAPI];
-    NSIndexPath *guardsIndexPath = [NSIndexPath indexPathForRow:2 inSection:0];
-    [self.tableView reloadRowsAtIndexPaths:@[guardsIndexPath] withRowAnimation:UITableViewRowAnimationFade];
-    //[self.tableView reloadData];
-    [HUD showTimedAlertWithTitle:@"Succes" text:@"got categories data" withTimeout:1];
+#pragma mark - RaenAPICommunicatorDelegate
+-(void)fetchingFailedWithError:(JSONModelError *)error{
+    [HUD hideUIBlockingIndicator];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
+    [alert show];
     
 }
+-(void)didReceiveAllCategories:(NSArray *)array{
+    NSLog(@"didReceiveAllCategories");
+    [HUD hideUIBlockingIndicator];
+    _categories = array;
+    //[self.tableView reloadData];
+    [self reloadTableViewWithAnimation:YES];
+}
+-(void)reloadTableViewWithAnimation:(BOOL)animation{
+    if (animation) {
+        [self.tableView reloadData];
+        [self.tableView numberOfRowsInSection:_categories.count];
+        NSMutableArray *evenIndexPaths = [NSMutableArray array];
+        NSMutableArray *oddIntexPath= [NSMutableArray array];
+        for (int i =0; i<_categories.count; i++) {
+            NSIndexPath *indexPath= [NSIndexPath indexPathForRow:i inSection:0];
+            if (i % 2==0) {
+                [evenIndexPaths addObject:indexPath];
+            }else{
+                [oddIntexPath addObject:indexPath];
+            }
+        }
+        [self.tableView reloadRowsAtIndexPaths:evenIndexPaths withRowAnimation:UITableViewRowAnimationLeft];
+        [self.tableView reloadRowsAtIndexPaths:oddIntexPath withRowAnimation:UITableViewRowAnimationRight];
+        //[self.tableView endUpdates];
+    }
+    else{
+        [self.tableView reloadData];
+    }
+}
 -(void)viewDidAppear:(BOOL)animated {
-    
-    
 }
 
 - (void)didReceiveMemoryWarning
@@ -106,13 +106,8 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    NSLog(@"self.raenAPI.categories.count %i",self.raenAPI.categories.count);
-    if (self.raenAPI.categories.count>0) {
-        return self.raenAPI.categories.count;
-    }else{
-        ///returning
-        return 10;
-    }
+    
+    return _categories.count;
     
 }
 
@@ -124,9 +119,8 @@
         tvCell = [[TVCell alloc] initWithStyle:UITableViewCellStyleDefault
                               reuseIdentifier:CellIdentifier];
     }
-    CategoryModel *category = self.raenAPI.categories[indexPath.row];
+    CategoryModel *category = _categories[indexPath.row];
     tvCell.label.text = category.title;
-    //tvCell.label.text =[NSString stringWithFormat:@"Новость %d в секции %d",indexPath.row,indexPath.section];
     return tvCell;
 }
 
@@ -134,21 +128,22 @@
 {
     [cell setCollectionViewDataSourceDelegate:self index:indexPath.row];
     NSInteger index = cell.collectionView.index;
-   // CGFloat horizontalOffset = [self.contentOffsetDictionary[[@(index) stringValue]] floatValue];
-    //[cell.collectionView setContentOffset:CGPointMake(horizontalOffset, 0)];
+
 }
 
 #pragma mark - UICollectionViewDataSource Methods
 
 -(NSInteger)collectionView:(IndexedCV *)collectionView numberOfItemsInSection:(NSInteger)section
 {
-    CategoryModel *category=self.raenAPI.categories[collectionView.index];
+    CategoryModel *category=_categories[collectionView.index];
+    /*
     if ([category.id isEqualToString:@"26"]) {
        return self.raenAPI.bikes.count;
     }
     if ([category.id isEqualToString:@"74"]) {
         return self.raenAPI.guards.count;
     }
+     */
     return category.childrens.count;
 };
 
@@ -156,22 +151,8 @@
 {
     CVCell *cvCell = (CVCell*)[collectionView dequeueReusableCellWithReuseIdentifier:CollectionViewCellIdentifier forIndexPath:indexPath];
     [cvCell.label.layer setCornerRadius:5.0];
-    CategoryModel *category=self.raenAPI.categories[collectionView.index];
-    if ([category.id isEqualToString:@"26"]) {
-        GoodModel *bike = self.raenAPI.bikes[indexPath.row];
-        cvCell.label.text = bike.title;
-        //NSString *tmpImgLink = [NSString stringWithFormat:@"http://raenshop.ru/img/goods/bikes/%@",bike.imageLink];
-        //NSLog(@"tmpImgLink %@",tmpImgLink);
-        [cvCell.activityIndicator startAnimating];
-        [cvCell.imageView setImageWithURL:[NSURL URLWithString:bike.imageLink]
-                                completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-                                    [cvCell.activityIndicator stopAnimating];
-                                    if (error) {
-                                        NSLog(@"error to load bike image %@",error.localizedDescription);
-                                    }
-                                }];
-        return cvCell;
-    }
+    CategoryModel *category=_categories[collectionView.index];
+    /*
     if ([category.id isEqualToString:@"74"]) {
         GoodModel *guard =self.raenAPI.guards[indexPath.row];
         cvCell.label.text = guard.title;
@@ -184,7 +165,7 @@
         }];
         return cvCell;
     }
-    
+    */
     ChildrenModel *children = category.childrens[indexPath.row];
     cvCell.label.text = children.title;
     [cvCell.activityIndicator startAnimating];
@@ -202,38 +183,30 @@
 -(void)collectionView:(IndexedCV *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     NSLog(@"indexedCV #%d, did selectItem at row %d",collectionView.index,indexPath.row);
    
-    CategoryModel *category=self.raenAPI.categories[collectionView.index];
-    if ([category.id isEqualToString:@"26"])
-    {
-        GoodModel *bike=self.raenAPI.bikes[indexPath.row];
-        [self performSegueWithIdentifier:@"toItemCardView" sender:bike.id];
-    }else if([category.id isEqualToString:@"74"])
+    CategoryModel *category=_categories[collectionView.index];
+    /*
+    if([category.id isEqualToString:@"74"])
     {
         GoodModel *guardItem = self.raenAPI.guards[indexPath.row];
         [self performSegueWithIdentifier:@"toItemCardView" sender:guardItem.id];
-    }else
-    {
+    }*/
+     //else
+    
         ChildrenModel *subCategory = category.childrens[indexPath.row];
         [self performSegueWithIdentifier:@"toGridItemsVC" sender:subCategory.id];
-    }
+    
     
 }
-#pragma mark -
+#pragma mark -Prepare Segue
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     if ([segue.identifier isEqualToString:@"toItemCardView"]) {
-    
         ItemCardViewController *itemCardVC=segue.destinationViewController;
-        //itemCardVC.itemID = sender;
-         
-        [self.raenAPI getItemCardWithId:sender];
-        [[NSNotificationCenter defaultCenter] addObserver:itemCardVC selector:@selector(showItem) name:RaenAPIGotCurrentItem object:self.raenAPI];
+        itemCardVC.itemID = sender;
        
     }
     if ([segue.identifier isEqualToString:@"toGridItemsVC"]) {
         GridItemsVC *gridItemsVC = segue.destinationViewController;
-        //gridItemsVC.subcategory = sender;
-        [self.raenAPI getSubcategoryWithId:sender];
-        [[NSNotificationCenter defaultCenter] addObserver:gridItemsVC selector:@selector(showItems) name:RaenAPIGotCurrentSubcategoryItems object:self.raenAPI];
+        gridItemsVC.subcategoryID = sender;
     }
 }
 

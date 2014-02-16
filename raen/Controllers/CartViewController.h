@@ -7,11 +7,14 @@
 //
 
 #import <UIKit/UIKit.h>
-#import "RaenAPI.h"
+#import "RaenAPICommunicatorDelegate.h"
 
-@interface CartViewController : UIViewController <UITableViewDataSource,UITableViewDelegate>
+@interface CartViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,RaenAPICommunicatorDelegate>
 
-@property (nonatomic,strong) RaenAPI *raenAPI;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
+@property (weak, nonatomic) IBOutlet UIView *subView;
+@property (weak, nonatomic) IBOutlet UILabel *subTotalLabel;
+@property (weak, nonatomic) IBOutlet UIButton *checkOutButton;
+- (IBAction)checkOutButtonPressed:(id)sender;
 
 @end
