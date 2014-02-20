@@ -12,9 +12,8 @@
 
 #import "CartItemModel.h"
 #import "GoodModel.h"
-#import "ItemModel.h"
 #import "CategoryModel.h"
-
+#import "NewsCategoryModel.h"
 
 #define kRaenApiGetGuard @"http://raenshop.ru/api/catalog/goods_list/cat_id/81/" //get all guard items
 #define kRaenApiGetCategories @"http://raenshop.ru/api/catalog/categories" //get all categories
@@ -22,25 +21,25 @@
 #define kRaenApiGetItemCard @"http://raenshop.ru/api/catalog/goods/id/"
 #define kRaenApiGetSubcategoryItems @"http://raenshop.ru/api/catalog/goods_list/cat_id/"
 #define kRaenApiSendToCartItem @"http://raenshop.ru/api/catalog/to_cart/"
+#define kRaenApiGetNews @"http://raenshop.ru/api/news/categories/"
+
 @implementation RaenAPICommunicator
 
--(void)getItemsFromCart{
-    NSLog(@"getting items from cart");
-    //TODO add cookie !
-    [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetCart
-                                  completion:^(id json, JSONModelError *err) {
-                                      if (err) {
-                                          NSLog(@"err! %@",err.localizedDescription);
-                                          [self.delegate fetchingFailedWithError:err];
-                                      }
-                                      NSArray *cartItems =[CartItemModel arrayOfModelsFromDictionaries:json];
-                                      if (cartItems) {
-                                          [self.delegate didReceiveCartItems:cartItems];
-                                      }else{
-                                          NSLog(@"----something went wrong with init JSONModel----");
-                                      }
-                                      
-                                  }];
+-(void)getNews{
+    NSLog(@"getting news from %@",kRaenApiGetNews);
+    [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetNews completion:^(id json, JSONModelError *err) {
+        if (err) {
+            NSLog(@"err %@",err.localizedDescription);
+            [self.delegate fetchingFailedWithError:err];
+        }
+        NSArray *news = [NewsCategoryModel arrayOfModelsFromDictionaries:json];
+        if (news) {
+            [self.delegate didReceiveNews:news];
+        }else{
+            NSLog(@"----something went wrong with init JSONModel----");
+        }
+    }];
+
 }
 -(void)getSubcategoryWithId:(NSString*)subcategoryId{
    
@@ -99,6 +98,26 @@
                                       }
                                   }];
 
+}
+#pragma mark -
+#pragma mark CART methods
+-(void)getItemsFromCart{
+    NSLog(@"getting items from cart");
+    //TODO add cookie !
+    [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetCart
+                                  completion:^(id json, JSONModelError *err) {
+                                      if (err) {
+                                          NSLog(@"err! %@",err.localizedDescription);
+                                          [self.delegate fetchingFailedWithError:err];
+                                      }
+                                      NSArray *cartItems =[CartItemModel arrayOfModelsFromDictionaries:json];
+                                      if (cartItems) {
+                                          [self.delegate didReceiveCartItems:cartItems];
+                                      }else{
+                                          NSLog(@"----something went wrong with init JSONModel----");
+                                      }
+                                      
+                                  }];
 }
 #warning fix add item to cart
 -(void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty{

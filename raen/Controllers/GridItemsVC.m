@@ -47,7 +47,7 @@
 }
 #pragma mark - RaenAPICOmmunicationDelegate 
 -(void)didReceiveSubcategoryItems:(NSArray *)items{
-    NSLog(@"didReceiveSubcategoryItems %@",items);
+    
     _items = items;
     [self.collectionView reloadData];
     [HUD hideUIBlockingIndicator];

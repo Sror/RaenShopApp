@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3304D66218ABF8FA00B9441E /* SpecItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3304D66118ABF8FA00B9441E /* SpecItem.m */; };
+		6C31236018B2852A00839A6E /* BrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C31235F18B2852A00839A6E /* BrowserViewController.m */; };
 		6C5473C9188405130069E62B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473C8188405130069E62B /* Foundation.framework */; };
 		6C5473CB188405130069E62B /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473CA188405130069E62B /* CoreGraphics.framework */; };
 		6C5473CD188405130069E62B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473CC188405130069E62B /* UIKit.framework */; };
@@ -21,6 +22,9 @@
 		6C5473EF188405140069E62B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473C8188405130069E62B /* Foundation.framework */; };
 		6C5473F0188405140069E62B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473CC188405130069E62B /* UIKit.framework */; };
 		6C6472CC18ABD845001028DE /* CartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C6472CB18ABD845001028DE /* CartViewController.m */; };
+		6CB89CD518B627180048407B /* NewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CB89CD418B627180048407B /* NewsViewController.m */; };
+		6CB89CDB18B67C900048407B /* NewsCategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CB89CDA18B67C900048407B /* NewsCategoryModel.m */; };
+		6CB89CDE18B67CB60048407B /* NewsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CB89CDD18B67CB60048407B /* NewsModel.m */; };
 		6CBAF2C118AB3FF100426647 /* CartItemModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF29C18AB3FF100426647 /* CartItemModel.m */; };
 		6CBAF2C218AB3FF100426647 /* CategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF29E18AB3FF100426647 /* CategoryModel.m */; };
 		6CBAF2C318AB3FF100426647 /* ChildrenModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2A018AB3FF100426647 /* ChildrenModel.m */; };
@@ -65,6 +69,7 @@
 		6CBF68A418913082003ED717 /* UIImage+WebP.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBF689518913082003ED717 /* UIImage+WebP.m */; };
 		6CBF68A518913082003ED717 /* UIImageView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBF689718913082003ED717 /* UIImageView+WebCache.m */; };
 		6CBF68A718913097003ED717 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CBF68A618913097003ED717 /* ImageIO.framework */; };
+		6CF0820418B4DFE900AB3533 /* AvailableItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CF0820318B4DFE900AB3533 /* AvailableItemCell.m */; };
 		6CF584E218AE023E00549A79 /* RaenAPICommunicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CF584E118AE023E00549A79 /* RaenAPICommunicator.m */; };
 /* End PBXBuildFile section */
 
@@ -81,6 +86,8 @@
 /* Begin PBXFileReference section */
 		3304D66018ABF8FA00B9441E /* SpecItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpecItem.h; sourceTree = "<group>"; };
 		3304D66118ABF8FA00B9441E /* SpecItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpecItem.m; sourceTree = "<group>"; };
+		6C31235E18B2852A00839A6E /* BrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowserViewController.h; sourceTree = "<group>"; };
+		6C31235F18B2852A00839A6E /* BrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowserViewController.m; sourceTree = "<group>"; };
 		6C5473C5188405130069E62B /* raenapp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = raenapp.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C5473C8188405130069E62B /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		6C5473CA188405130069E62B /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -98,6 +105,12 @@
 		6C5473ED188405130069E62B /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		6C6472CA18ABD845001028DE /* CartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CartViewController.h; sourceTree = "<group>"; };
 		6C6472CB18ABD845001028DE /* CartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CartViewController.m; sourceTree = "<group>"; };
+		6CB89CD318B627180048407B /* NewsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsViewController.h; sourceTree = "<group>"; };
+		6CB89CD418B627180048407B /* NewsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsViewController.m; sourceTree = "<group>"; };
+		6CB89CD918B67C900048407B /* NewsCategoryModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsCategoryModel.h; sourceTree = "<group>"; };
+		6CB89CDA18B67C900048407B /* NewsCategoryModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsCategoryModel.m; sourceTree = "<group>"; };
+		6CB89CDC18B67CB60048407B /* NewsModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsModel.h; sourceTree = "<group>"; };
+		6CB89CDD18B67CB60048407B /* NewsModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsModel.m; sourceTree = "<group>"; };
 		6CBAF29B18AB3FF100426647 /* CartItemModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CartItemModel.h; sourceTree = "<group>"; };
 		6CBAF29C18AB3FF100426647 /* CartItemModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CartItemModel.m; sourceTree = "<group>"; };
 		6CBAF29D18AB3FF100426647 /* CategoryModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CategoryModel.h; sourceTree = "<group>"; };
@@ -185,6 +198,8 @@
 		6CBF689618913082003ED717 /* UIImageView+WebCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+WebCache.h"; sourceTree = "<group>"; };
 		6CBF689718913082003ED717 /* UIImageView+WebCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+WebCache.m"; sourceTree = "<group>"; };
 		6CBF68A618913097003ED717 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		6CF0820218B4DFE900AB3533 /* AvailableItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AvailableItemCell.h; sourceTree = "<group>"; };
+		6CF0820318B4DFE900AB3533 /* AvailableItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AvailableItemCell.m; sourceTree = "<group>"; };
 		6CF584DF18AE01B400549A79 /* RaenAPICommunicatorDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RaenAPICommunicatorDelegate.h; sourceTree = "<group>"; };
 		6CF584E018AE023E00549A79 /* RaenAPICommunicator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RaenAPICommunicator.h; sourceTree = "<group>"; };
 		6CF584E118AE023E00549A79 /* RaenAPICommunicator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RaenAPICommunicator.m; sourceTree = "<group>"; };
@@ -275,9 +290,21 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
+		6CB89CDF18B67CCE0048407B /* News */ = {
+			isa = PBXGroup;
+			children = (
+				6CB89CD918B67C900048407B /* NewsCategoryModel.h */,
+				6CB89CDA18B67C900048407B /* NewsCategoryModel.m */,
+				6CB89CDC18B67CB60048407B /* NewsModel.h */,
+				6CB89CDD18B67CB60048407B /* NewsModel.m */,
+			);
+			name = News;
+			sourceTree = "<group>";
+		};
 		6CBAF29A18AB3FF100426647 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				6CB89CDF18B67CCE0048407B /* News */,
 				6CBAF29B18AB3FF100426647 /* CartItemModel.h */,
 				6CBAF29C18AB3FF100426647 /* CartItemModel.m */,
 				6CBAF29D18AB3FF100426647 /* CategoryModel.h */,
@@ -366,6 +393,8 @@
 				6CBAF2D518AB3FFE00426647 /* CVCell.m */,
 				6CBAF2D618AB3FFE00426647 /* ItemCardCell.h */,
 				6CBAF2D718AB3FFE00426647 /* ItemCardCell.m */,
+				6CF0820218B4DFE900AB3533 /* AvailableItemCell.h */,
+				6CF0820318B4DFE900AB3533 /* AvailableItemCell.m */,
 				6CBAF2D818AB3FFE00426647 /* ItemCell.h */,
 				6CBAF2D918AB3FFE00426647 /* ItemCell.m */,
 				6CBAF2DA18AB3FFE00426647 /* TVCell.h */,
@@ -377,16 +406,20 @@
 		6CBAF2E118AB401B00426647 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
-				6CBAF2E218AB401B00426647 /* GridItemsVC.h */,
-				6CBAF2E318AB401B00426647 /* GridItemsVC.m */,
-				6CBAF2E418AB401B00426647 /* IndexedCV.h */,
-				6CBAF2E518AB401B00426647 /* IndexedCV.m */,
-				6CBAF2E618AB401B00426647 /* ItemCardViewController.h */,
-				6CBAF2E718AB401B00426647 /* ItemCardViewController.m */,
 				6CBAF2EA18AB401B00426647 /* TVController.h */,
 				6CBAF2EB18AB401B00426647 /* TVController.m */,
+				6CBAF2E218AB401B00426647 /* GridItemsVC.h */,
+				6CBAF2E318AB401B00426647 /* GridItemsVC.m */,
+				6CBAF2E618AB401B00426647 /* ItemCardViewController.h */,
+				6CBAF2E718AB401B00426647 /* ItemCardViewController.m */,
 				6C6472CA18ABD845001028DE /* CartViewController.h */,
 				6C6472CB18ABD845001028DE /* CartViewController.m */,
+				6C31235E18B2852A00839A6E /* BrowserViewController.h */,
+				6C31235F18B2852A00839A6E /* BrowserViewController.m */,
+				6CBAF2E418AB401B00426647 /* IndexedCV.h */,
+				6CBAF2E518AB401B00426647 /* IndexedCV.m */,
+				6CB89CD318B627180048407B /* NewsViewController.h */,
+				6CB89CD418B627180048407B /* NewsViewController.m */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -568,6 +601,7 @@
 				6CBF689C18913082003ED717 /* SDWebImageDecoder.m in Sources */,
 				6CBAF2C718AB3FF100426647 /* JSONModel.m in Sources */,
 				6C5473D9188405130069E62B /* AppDelegate.m in Sources */,
+				6C31236018B2852A00839A6E /* BrowserViewController.m in Sources */,
 				6C6472CC18ABD845001028DE /* CartViewController.m in Sources */,
 				6CBAF2F018AB401B00426647 /* TVController.m in Sources */,
 				6CBF68701890E22B003ED717 /* MBProgressHUD.m in Sources */,
@@ -575,12 +609,14 @@
 				6CBF689918913082003ED717 /* NSData+ImageContentType.m in Sources */,
 				6CBAF2DC18AB3FFE00426647 /* CartItemCell.m in Sources */,
 				6CBAF2D018AB3FF100426647 /* JSONValueTransformer.m in Sources */,
+				6CB89CD518B627180048407B /* NewsViewController.m in Sources */,
 				6CBAF2DD18AB3FFE00426647 /* CVCell.m in Sources */,
 				6CBAF2CB18AB3FF100426647 /* NSArray+JSONModel.m in Sources */,
 				6CBF689D18913082003ED717 /* SDWebImageDownloader.m in Sources */,
 				6CBF689B18913082003ED717 /* SDWebImageCompat.m in Sources */,
 				6CBF686F1890E22B003ED717 /* HUD.m in Sources */,
 				6CBAF2C118AB3FF100426647 /* CartItemModel.m in Sources */,
+				6CB89CDE18B67CB60048407B /* NewsModel.m in Sources */,
 				6CBF689818913082003ED717 /* MKAnnotationView+WebCache.m in Sources */,
 				6CBF68A018913082003ED717 /* SDWebImagePrefetcher.m in Sources */,
 				6CF584E218AE023E00549A79 /* RaenAPICommunicator.m in Sources */,
@@ -589,11 +625,13 @@
 				6CBF689E18913082003ED717 /* SDWebImageDownloaderOperation.m in Sources */,
 				6CBAF2CF18AB3FF100426647 /* JSONKeyMapper.m in Sources */,
 				6CBAF2CE18AB3FF100426647 /* JSONModel+networking.m in Sources */,
+				6CB89CDB18B67C900048407B /* NewsCategoryModel.m in Sources */,
 				6C5473D5188405130069E62B /* main.m in Sources */,
 				6CBAF2ED18AB401B00426647 /* IndexedCV.m in Sources */,
 				6CBF689F18913082003ED717 /* SDWebImageManager.m in Sources */,
 				6CBF68A418913082003ED717 /* UIImage+WebP.m in Sources */,
 				6CBF689A18913082003ED717 /* SDImageCache.m in Sources */,
+				6CF0820418B4DFE900AB3533 /* AvailableItemCell.m in Sources */,
 				3304D66218ABF8FA00B9441E /* SpecItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

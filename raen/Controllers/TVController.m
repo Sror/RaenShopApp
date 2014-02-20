@@ -193,7 +193,7 @@
      //else
     
         ChildrenModel *subCategory = category.childrens[indexPath.row];
-        [self performSegueWithIdentifier:@"toGridItemsVC" sender:subCategory.id];
+        [self performSegueWithIdentifier:@"toGridItemsVC" sender:subCategory];
     
     
 }
@@ -206,7 +206,9 @@
     }
     if ([segue.identifier isEqualToString:@"toGridItemsVC"]) {
         GridItemsVC *gridItemsVC = segue.destinationViewController;
-        gridItemsVC.subcategoryID = sender;
+        ChildrenModel *subCategory = sender;
+        gridItemsVC.subcategoryID = subCategory.id;
+        gridItemsVC.navigationItem.title =subCategory.title;
     }
 }
 

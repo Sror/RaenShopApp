@@ -14,5 +14,10 @@
 @property (nonatomic,strong) NSString *price;
 @property (nonatomic,strong) NSString <Optional>*priceNew;
 @property (nonatomic,strong) NSString <Optional>*color;
-
+@property (nonatomic,strong) NSString <Optional> *param1;
+@property (nonatomic,strong) NSString <Optional> *param2;
+@property (nonatomic,strong) NSString <Optional> *param3;
+@property (nonatomic,strong) NSString <Optional> *param4;
+@property (nonatomic,strong) NSString <Optional> *param5;
+@property (nonatomic,strong) NSString <Optional> *image;
 @end

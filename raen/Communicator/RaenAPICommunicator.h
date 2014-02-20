@@ -8,16 +8,18 @@
 
 #import <Foundation/Foundation.h>
 #import "RaenAPICommunicatorDelegate.h"
+#import "ItemModel.h"
 
 @class RaenAPICommunicator;
 
 @interface RaenAPICommunicator : NSObject 
 @property (weak, nonatomic) id<RaenAPICommunicatorDelegate> delegate;
 
+- (void)getNews;
 - (void)getAllCategories;
 - (void)getSubcategoryWithId:(NSString*)subcategoryId;
 - (void)getItemCardWithId:(NSString*)itemId;
 //cart
 - (void)getItemsFromCart;
-
+- (void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty;
 @end

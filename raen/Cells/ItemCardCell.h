@@ -12,10 +12,10 @@
 @property (weak, nonatomic) IBOutlet UIScrollView *scrollView;
 @property (weak, nonatomic) IBOutlet UIPageControl *pageControl;
 
-@property (weak, nonatomic) IBOutlet UIImageView *brandImageView;
+
 @property (weak, nonatomic) IBOutlet UILabel *nameLabel;
 @property (weak, nonatomic) IBOutlet UILabel *priceLabel;
-@property (weak, nonatomic) IBOutlet UILabel *weightLabel;
+@property (weak, nonatomic) IBOutlet UILabel *oldPriceLabel;
 @property (weak, nonatomic) IBOutlet UITextView *textView;
 
 
