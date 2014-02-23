@@ -20,7 +20,7 @@
 {
     [super viewDidLoad];
     self.webView.delegate = self;
-    NSLog(@"opening link %@ in browser %@",self.link);
+    
     if (!self.link) {
         NSLog(@"empty link for browser!");
     }

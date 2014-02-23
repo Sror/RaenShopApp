@@ -177,7 +177,8 @@
 //PRICE LABELS
         if (_item.priceNew.length>2) {
             cell.priceLabel.text =  [NSString stringWithFormat:@"%@ Руб.",_item.priceNew];
-            cell.oldPriceLabel.text = [NSString stringWithFormat:@"%@ Руб.",_item.price];
+            cell.oldPriceLabel.attributedText = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ Руб.",_item.price]
+                                                                      attributes:@{NSStrikethroughStyleAttributeName:[NSNumber numberWithInteger:NSUnderlineStyleSingle]}];
         }else{
             cell.priceLabel.text = @"";
             cell.oldPriceLabel.text = [NSString stringWithFormat:@"%@ Руб.",_item.price];
@@ -200,7 +201,7 @@
         SpecItem *specItem = _item.specItems[indexPath.row];
         AvailableItemCell *cell = [tableView dequeueReusableCellWithIdentifier:@"availableItemCell" forIndexPath:indexPath];
         NSString *paramStr =[self allParamsToStr:specItem];
-        paramStr = [paramStr stringByAppendingString:[NSString stringWithFormat:@"\n%@",specItem.color]];
+        paramStr = [paramStr stringByAppendingString:[NSString stringWithFormat:@"\nЦвет %@",specItem.color]];
         cell.textView.text = paramStr;
         [cell.addToCartButton setTag:indexPath.row];
         [cell.addToCartButton addTarget:self action:@selector(buyButtonPressed:)
@@ -262,7 +263,7 @@
     int row = [sender tag];
     [_communicator addItemToCart:_item withSpecItemAtIndex:row andQty:1];
 }
-#pragma mark -
+#pragma mark - Helpers
 -(NSString*)allParamsToStr:(SpecItem*)specItem{
     NSArray *params = @[specItem.param1,specItem.param2,specItem.param3,specItem.param4,specItem.param5];
     NSMutableArray *availableParameters =[NSMutableArray array];
@@ -283,4 +284,5 @@
     }
     return param;
 }
+
 @end

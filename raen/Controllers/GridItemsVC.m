@@ -74,14 +74,17 @@
     GoodModel *item = _items[indexPath.row];
     itemCell.titleLabel.text = item.title;
     [itemCell.activityIndicator startAnimating];
-    if (![item.priceNew isEqualToString:@"0"]) {
-        itemCell.priceNewLabel.text = [NSString stringWithFormat:@"%@ руб.",item.priceNew];
-        itemCell.priceLabel.text = [NSString stringWithFormat:@"Было %@ руб.",item.price];
+    //PRICE LABELS
+    if (item.priceNew.length>2) {
+        itemCell.priceLabel.text =  [NSString stringWithFormat:@"%@ Руб.",item.priceNew];
+        itemCell.oldPriceLabel.attributedText = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ Руб.",item.price]
+                                                                                attributes:@{NSStrikethroughStyleAttributeName:[NSNumber numberWithInteger:NSUnderlineStyleSingle]}];
+       // itemCell.oldPriceLabel.text = [NSString stringWithFormat:@"%@ Руб.",item.price];
     }else{
-        itemCell.priceNewLabel.backgroundColor = [UIColor colorWithRed:255/255.0 green:204/255.0 blue:102/255.0 alpha:1.0];
-        itemCell.priceNewLabel.text = [NSString stringWithFormat:@"%@ руб.",item.price];
-        [itemCell.priceLabel setHidden:YES];
+        itemCell.priceLabel.text = @"";
+        itemCell.oldPriceLabel.text = [NSString stringWithFormat:@"%@ Руб.",item.price];
     }
+
     [itemCell.imageView setImageWithURL:[NSURL URLWithString:item.imageLink] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
         [itemCell.activityIndicator stopAnimating];
         if (error) {
