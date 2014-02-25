@@ -5,6 +5,7 @@
 //  Created by Alexey Ivanov on 24.01.14.
 //  Copyright (c) 2014 Aleksey Ivanov. All rights reserved.
 //
+
 //controllers
 #import "ItemCardViewController.h"
 #import "BrowserViewController.h"
@@ -20,6 +21,7 @@
 #import "UIImageView+WebCache.h"
 #import "HUD.h"
 
+#define IS_IPHONE_5 ( fabs( ( double )[ [ UIScreen mainScreen ] bounds ].size.height - ( double )568 ) < DBL_EPSILON )
 
 @interface ItemCardViewController ()<RaenAPICommunicatorDelegate> {
     
@@ -62,31 +64,28 @@
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
 }
+
 -(void)didReceiveItemCard:(id)itemCard{
     NSLog(@"didReceiveItemCard");
     [HUD hideUIBlockingIndicator];
-    
     _item = itemCard;
     self.navigationItem.title = _item.title;
     [self addReviewAndVideo];
     [self.tableView setHidden:NO];
     [self.tableView reloadData];
 }
--(void)addReviewAndVideo{
-    _properties =[NSMutableArray array];
-    if ([_item.review rangeOfString:@"http"].location != NSNotFound) {
-        NSLog(@"item review found");
-        NSString* itemPropertyKey =[NSString stringWithFormat:@"Обзор %@",_item.title];
-        NSDictionary *tmpDict =@{itemPropertyKey: _item.review};
-        [_properties addObject:tmpDict];
-    }
-    if ([_item.video rangeOfString:@"http"].location !=NSNotFound) {
-        NSLog(@"item video link found");
-        NSString* itemPropertyKey =[NSString stringWithFormat:@"Видеообзор %@",_item.title];
-        NSDictionary *tmpDict =@{itemPropertyKey: _item.video};
-        [_properties addObject:tmpDict];
-    }
+
+-(void)didAddItemToCartWithResponse:(NSDictionary *)response{
+    NSLog(@"succesful did add item to cart with response %@",response);
+    NSString *totalItems=response[@"total_items"];
+    NSLog(@"setting tabbar badge");
+    
+    [[[[[self tabBarController]tabBar]items]objectAtIndex:2] setBadgeValue:[NSString stringWithFormat:@"%@",totalItems]];
+    [_communicator saveCookies];
+    
 }
+
+
 #pragma  mark - ScrollView
 -(void)loadPage:(NSInteger)page forScrollView:(UIScrollView*)scrollView {
     
@@ -147,7 +146,6 @@
                                              context:nil];
         
         CGSize boundingSize = boundingRect.size;
-        NSLog(@"boundingSize height %f",boundingRect.size.height);
         // end ios7 only
         return (183+20+boundingSize.height);
 
@@ -201,7 +199,7 @@
         SpecItem *specItem = _item.specItems[indexPath.row];
         AvailableItemCell *cell = [tableView dequeueReusableCellWithIdentifier:@"availableItemCell" forIndexPath:indexPath];
         NSString *paramStr =[self allParamsToStr:specItem];
-        paramStr = [paramStr stringByAppendingString:[NSString stringWithFormat:@"\nЦвет %@",specItem.color]];
+        paramStr = [paramStr stringByAppendingString:[NSString stringWithFormat:@"\nЦвет: %@",specItem.color]];
         cell.textView.text = paramStr;
         [cell.addToCartButton setTag:indexPath.row];
         [cell.addToCartButton addTarget:self action:@selector(buyButtonPressed:)
@@ -220,7 +218,6 @@
         }else{
             NSLog(@"No image for thumbnail image");
         }
-        
         return cell;
     }
     //should never happen
@@ -247,7 +244,7 @@
         [self performSegueWithIdentifier:@"toBrowser" sender:tmpDict];
     }
 }
-#pragma mark -
+#pragma mark - prepare for segue
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
 #warning WTF?
@@ -261,9 +258,80 @@
 #pragma mark - buy button pressed
 -(void)buyButtonPressed:(id)sender{
     int row = [sender tag];
+    NSLog(@"buyButtonPressed row %i",row);
+    //to do animation
+    [self animateCellWithRow:row];
     [_communicator addItemToCart:_item withSpecItemAtIndex:row andQty:1];
 }
 #pragma mark - Helpers
+-(void)animateCellWithRow:(NSInteger)row{
+    NSIndexPath *indexPath =[NSIndexPath indexPathForRow:row inSection:2];
+    AvailableItemCell *cell =(AvailableItemCell*)[self.tableView cellForRowAtIndexPath:indexPath];
+    UIImageView *imgView =cell.thumbnail;
+    CGRect rect =[imgView.superview convertRect:imgView.frame fromView:nil];
+    rect = CGRectMake(5, (rect.origin.y*-1)-10, imgView.frame.size.width, imgView.frame.size.height);
+	NSLog(@"rect is %f,%f,%f,%f",rect.origin.x,rect.origin.y,rect.size.width,rect.size.height);
+    // create new duplicate image
+	UIImageView *starView = [[UIImageView alloc] initWithImage:imgView.image];
+    [starView setFrame:rect];
+    //do i need this?
+    /*
+	starView.layer.cornerRadius=5;
+	starView.layer.borderColor=[[UIColor blackColor] CGColor];
+	starView.layer.borderWidth=3;
+    */
+    [self.view addSubview:starView];
+    // begin ---- apply position animation
+	CAKeyframeAnimation *pathAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
+    pathAnimation.calculationMode = kCAAnimationPaced;
+    pathAnimation.fillMode = kCAFillModeForwards;
+    pathAnimation.removedOnCompletion = NO;
+    pathAnimation.duration=0.65;
+	pathAnimation.delegate=self;
+	
+	// tab-bar right side item frame-point = end point
+	CGPoint endPoint = CGPointMake(320 , 480);
+    if (IS_IPHONE_5)
+    {
+        endPoint = CGPointMake(265, 550);
+    }else{
+        endPoint = CGPointMake(265, 440);
+    }
+    NSLog(@"endpoint.x %f , endpoint.y %f",endPoint.x,endPoint.y);
+	CGMutablePathRef curvedPath = CGPathCreateMutable();
+    CGPathMoveToPoint(curvedPath, NULL, starView.frame.origin.x, starView.frame.origin.y);
+    CGPathAddCurveToPoint(curvedPath, NULL, endPoint.x, starView.frame.origin.y, endPoint.x, starView.frame.origin.y, endPoint.x, endPoint.y);
+    pathAnimation.path = curvedPath;
+    CGPathRelease(curvedPath);
+	// end ---- apply position animation
+	
+	// apply transform animation
+	CABasicAnimation *basic=[CABasicAnimation animationWithKeyPath:@"transform"];
+	[basic setToValue:[NSValue valueWithCATransform3D:CATransform3DMakeScale(0.25, 0.25, 0.25)]];
+	[basic setAutoreverses:NO];
+	[basic setDuration:0.65];
+	
+	[starView.layer addAnimation:pathAnimation forKey:@"curveAnimation"];
+	[starView.layer addAnimation:basic forKey:@"transform"];
+	
+	[starView performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:0.65];
+    
+}
+-(void)addReviewAndVideo{
+    _properties =[NSMutableArray array];
+    if ([_item.review rangeOfString:@"http"].location != NSNotFound) {
+        NSLog(@"item review found");
+        NSString* itemPropertyKey =[NSString stringWithFormat:@"Обзор %@",_item.title];
+        NSDictionary *tmpDict =@{itemPropertyKey: _item.review};
+        [_properties addObject:tmpDict];
+    }
+    if ([_item.video rangeOfString:@"http"].location !=NSNotFound) {
+        NSLog(@"item video link found");
+        NSString* itemPropertyKey =[NSString stringWithFormat:@"Видеообзор %@",_item.title];
+        NSDictionary *tmpDict =@{itemPropertyKey: _item.video};
+        [_properties addObject:tmpDict];
+    }
+}
 -(NSString*)allParamsToStr:(SpecItem*)specItem{
     NSArray *params = @[specItem.param1,specItem.param2,specItem.param3,specItem.param4,specItem.param5];
     NSMutableArray *availableParameters =[NSMutableArray array];

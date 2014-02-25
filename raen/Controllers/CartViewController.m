@@ -22,6 +22,7 @@
 @end
 
 @implementation CartViewController
+@synthesize tabBarItem;
 
 -(void)viewWillAppear:(BOOL)animated{
     
@@ -29,12 +30,20 @@
     [HUD showUIBlockingIndicatorWithText:Nil];
     [_communicator getItemsFromCart];
 }
-
+-(NSString*)itemsCount{
+    int itemsCount = 0;
+    for (int i=0; i<_items.count; i++) {
+        CartItemModel *currentItem = _items[i];
+        itemsCount = itemsCount + [currentItem.qty intValue];
+    }
+    return [NSString stringWithFormat:@"%i",itemsCount];
+}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
+    //[[self tabBarController] tabBar] items] objectAtIndex:1] setBadgeValue:[self itemsCount]]];
     
     //User Interface
     [self.subView.layer setCornerRadius:3.0];
@@ -51,6 +60,8 @@
     NSLog(@"didReceiveCartItems %@",items);
     [HUD hideUIBlockingIndicator];
     _items = items;
+    
+    [self.tabBarItem setBadgeValue:[self itemsCount]];
     [self.tableView reloadData];
     [self.subTotalLabel setText:[self subtotal]];
     [self.subView setHidden:NO];
@@ -84,7 +95,6 @@
     }
     
     if (itemsCount>0) {
-
         CartItemModel *itemInCart = _items[indexPath.row];
         cell.textLabel.text = itemInCart.name;
         cell.detailTextLabel.text = [NSString stringWithFormat:@"Кол-во: %@",itemInCart.qty];

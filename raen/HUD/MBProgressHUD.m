@@ -406,6 +406,7 @@
 
 			CGFloat maxHeight = frame.size.height - self.height - 2*margin;
 			CGSize labelSize = [detailsLabel.text sizeWithFont:detailsLabel.font constrainedToSize:CGSizeMake(frame.size.width - 4*margin, maxHeight) lineBreakMode:detailsLabel.lineBreakMode];
+            
             lHeight = labelSize.height;
             lWidth = labelSize.width;
 			

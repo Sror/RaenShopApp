@@ -22,4 +22,10 @@
 //cart
 - (void)getItemsFromCart;
 - (void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty;
+
+-(void)deleteCookieFromLocalStorage;
+-(void)saveCookies;
+-(void)restoreCookies;
+-(void)deleteCookies;
+
 @end

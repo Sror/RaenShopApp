@@ -14,6 +14,7 @@
 @optional
 - (void)didReceiveNews:(NSArray*)news;
 - (void)didReceiveCartItems:(NSArray *)items;
+- (void)didAddItemToCartWithResponse:(NSDictionary*)response;
 - (void)didReceiveSubcategoryItems:(NSArray *)items;
 - (void)didReceiveItemCard:(id)itemCard;
 - (void)didReceiveAllCategories:(NSArray *)array;

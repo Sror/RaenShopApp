@@ -20,7 +20,7 @@
 #import "UIImageView+WebCache.h"
 
 @interface NewsViewController ()<RaenAPICommunicatorDelegate>{
-     RaenAPICommunicator *_communicator;
+    RaenAPICommunicator *_communicator;
     NSArray *_news;
 }
 
@@ -40,6 +40,7 @@
 }
 -(void)updateDataFromModel{
     _news = nil;
+    [self.tableView reloadData];
     [HUD showUIBlockingIndicatorWithText:@"Loading..."];
     [_communicator getNews];
     
@@ -109,7 +110,7 @@
 }
 #pragma mark uiCollectionView delegate
 -(void)collectionView:(IndexedCV *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    NSLog(@"indexedCV %lu, did selectItem at row %lu",collectionView.index,indexPath.row);
+    //NSLog(@"indexedCV %lu, did selectItem at row %lu",collectionView.index,indexPath.row);
     NewsCategoryModel *newsCategory=_news[collectionView.index];
     NewsModel *newsInCategory =newsCategory.news[indexPath.row];
     if ([newsInCategory.link rangeOfString:@"http"].location !=NSNotFound) {
@@ -121,9 +122,9 @@
     
 }
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    if ([segue.identifier isEqualToString:@"toBrowser"]) {
+    if ([segue.identifier isEqualToString:@"toBrowser"])
+    {
        BrowserViewController *browserVC= segue.destinationViewController;
-        
         browserVC.link = sender;
     }
 }

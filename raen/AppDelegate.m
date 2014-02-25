@@ -7,18 +7,22 @@
 //
 
 #import "AppDelegate.h"
-
+#import "CartViewController.h"
 @implementation AppDelegate
-
-
-
+@synthesize communicator=_communicator;
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    // Override point for customization after application launch.
-   
+    _communicator = [[RaenAPICommunicator alloc] init];
+#warning if first load app save cookie session!
+    NSArray* cookieDictionary = [[NSUserDefaults standardUserDefaults] valueForKey:@"cookieArray"];
+    NSLog(@"cookieDict %@",cookieDictionary);
+    if (cookieDictionary) {
+        [_communicator restoreCookies];
+    }
+    
     return YES;
 }
-							
+
 - (void)applicationWillResignActive:(UIApplication *)application
 {
     // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
@@ -43,6 +47,8 @@
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
+    NSLog(@"applicationWillTerminate");
+    [_communicator saveCookies];
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
 }
 

@@ -110,6 +110,7 @@
                                           NSLog(@"err! %@",err.localizedDescription);
                                           [self.delegate fetchingFailedWithError:err];
                                       }
+                                      NSLog(@"json from cart %@",json);
                                       NSArray *cartItems =[CartItemModel arrayOfModelsFromDictionaries:json];
                                       if (cartItems) {
                                           [self.delegate didReceiveCartItems:cartItems];
@@ -118,7 +119,9 @@
                                       }
                                       
                                   }];
+   
 }
+
 #warning fix add item to cart
 -(void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty{
     
@@ -130,6 +133,10 @@
                                                        timeoutInterval:60.0];
     
     [request setHTTPMethod:@"POST"];
+    /*
+    NSString *oldCookieValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"raenSessionCookieValue"];
+    [request setValue:[NSString stringWithFormat:@"ci_session=%@",oldCookieValue] forHTTPHeaderField:@"Cookie"];
+    */
     SpecItem *specItem = item.specItems[index];
     NSString *price =item.priceNew.length >2 ? item.priceNew : item.price;
     NSString *params =[NSString stringWithFormat:@"name=%@,%@&id=%@&price=%@&qty=1",item.title,specItem.color,specItem.db1cId,price];
@@ -137,20 +144,73 @@
     NSLog(@"parameters %@",params);
     [request setHTTPBody:[params dataUsingEncoding:NSUTF8StringEncoding]];
     NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        NSLog(@"Response:%@ %@\n", response, error);
+       // NSLog(@"Response:%@ %@\n", response, error);
         if(error == nil)
         {
             NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:nil];
-            //NSLog(@"JSONData %@",json);
-            /*
-             NSString * text = [[NSString alloc] initWithData: data encoding: NSUTF8StringEncoding];
-             NSLog(@"Data = %@",text);
-             */
+            [self.delegate didAddItemToCartWithResponse:json];
+        }else{
+#warning TODO notification when had error to add item to cart
+            
+            NSLog(@"---error to add item to cart------");
         }
         
     }];
     
     [dataTask resume];
     
+}
+
+#pragma mark - Cookie manager methods
+-(void)deleteCookieFromLocalStorage{
+    NSLog(@"deleting cookies from local storage");
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"cookieArray"];
+    NSLog(@"%@",[[NSUserDefaults standardUserDefaults] objectForKey:@"cookieArray"]);
+    [[NSUserDefaults standardUserDefaults]synchronize];
+}
+-(void)saveCookies{
+    NSLog(@"saving cookies");
+    NSMutableArray *cookieArray = [[NSMutableArray alloc] init];
+    for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
+        if ([cookie.domain isEqualToString:@"raenshop.ru"]&&[cookie.name isEqualToString:@"ci_session"]) {
+            [cookieArray addObject:cookie.name];
+            NSMutableDictionary *cookieProperties = [NSMutableDictionary dictionary];
+            [cookieProperties setObject:cookie.name forKey:NSHTTPCookieName];
+            [cookieProperties setObject:cookie.value forKey:NSHTTPCookieValue];
+            [cookieProperties setObject:cookie.domain forKey:NSHTTPCookieDomain];
+            [cookieProperties setObject:cookie.path forKey:NSHTTPCookiePath];
+            [cookieProperties setObject:[NSNumber numberWithInt:cookie.version] forKey:NSHTTPCookieVersion];
+#warning time interval?
+            [cookieProperties setObject:[[NSDate date] dateByAddingTimeInterval:2629743] forKey:NSHTTPCookieExpires];
+            NSLog(@"standartUserDefaults setValue %@ forKey:%@",cookieProperties,cookie.name);
+            [[NSUserDefaults standardUserDefaults] setValue:cookieProperties forKey:cookie.name];
+        }
+    }
+    NSLog(@"%@",cookieArray);
+    [[NSUserDefaults standardUserDefaults] setValue:cookieArray forKey:@"cookieArray"];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+-(void)restoreCookies{
+    NSLog(@"restore cookies");
+    NSMutableArray* cookieDictionary = [[NSUserDefaults standardUserDefaults] valueForKey:@"cookieArray"];
+    NSLog(@"cookie dictionary found is %@",cookieDictionary);
+    
+    for (int i=0; i < cookieDictionary.count; i++)
+    {
+        NSLog(@"cookie found is %@",[cookieDictionary objectAtIndex:i]);
+        NSMutableDictionary* cookieDictionary1 = [[NSUserDefaults standardUserDefaults] valueForKey:cookieDictionary[i]];
+        NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieDictionary1];
+        [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
+    }
+}
+-(void)deleteCookies
+{
+    NSLog(@"deleting allcookies");
+    NSHTTPCookie *cookie;
+    NSHTTPCookieStorage *storage = [NSHTTPCookieStorage sharedHTTPCookieStorage];
+    for (cookie in [storage cookies])
+    {
+        [storage deleteCookie:cookie];
+    }
 }
 @end

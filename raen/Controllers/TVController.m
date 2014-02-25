@@ -48,6 +48,7 @@
 }
 -(void)updateDataFromModel{
     _categories = nil;
+    [self.tableView reloadData];
     [HUD showUIBlockingIndicatorWithText:@"Loading..."];
     [_communicator getAllCategories];
 
