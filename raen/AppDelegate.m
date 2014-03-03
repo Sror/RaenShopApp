@@ -17,7 +17,7 @@
     NSArray* cookieDictionary = [[NSUserDefaults standardUserDefaults] valueForKey:@"cookieArray"];
     NSLog(@"cookieDict %@",cookieDictionary);
     if (cookieDictionary) {
-        [_communicator restoreCookies];
+        //[_communicator restoreCookies];
     }
     
     return YES;

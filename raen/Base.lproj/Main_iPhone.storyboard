@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4510" systemVersion="13B42" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="8YX-ce-x5E">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="4510" systemVersion="13C64" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="8YX-ce-x5E">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3742"/>
     </dependencies>
@@ -293,7 +293,7 @@
                             <outlet property="delegate" destination="CZ4-MO-1fc" id="2Lw-YC-2bq"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" id="gMB-ew-6za"/>
+                    <navigationItem key="navigationItem" title="Магазин" id="gMB-ew-6za"/>
                     <connections>
                         <outlet property="tableView" destination="KBU-I5-PFd" id="tgx-3J-tP3"/>
                         <segue destination="SAG-CH-AS9" kind="push" identifier="toItemCardView" customClass="CustomSegue" id="Zzc-JE-lxP"/>
@@ -424,12 +424,12 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="80K-hl-Qsv">
-                                <rect key="frame" x="0.0" y="20" width="320" height="460"/>
+                                <rect key="frame" x="0.0" y="20" width="320" height="411"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="CartCell" textLabel="vi1-6P-gqJ" detailTextLabel="oJs-Ap-gYQ" style="IBUITableViewCellStyleSubtitle" id="CH9-7t-JIL">
-                                        <rect key="frame" x="0.0" y="22" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="86" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="CH9-7t-JIL" id="K7h-j7-oYZ">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="43"/>
@@ -495,7 +495,7 @@
                             <constraint firstAttribute="trailing" secondItem="GZX-iA-nzG" secondAttribute="trailing" constant="17" id="sH6-99-8L9"/>
                         </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Корзина" image="second" id="Z7h-1E-pvt"/>
+                    <navigationItem key="navigationItem" title="Корзина" id="MdL-rU-dLD"/>
                     <connections>
                         <outlet property="checkOutButton" destination="ymR-Q0-4G1" id="cS6-7i-n2l"/>
                         <outlet property="subTotalLabel" destination="iUn-PN-R4s" id="bdM-ww-xQe"/>
@@ -506,7 +506,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="3qq-4t-Ow8" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="653" y="180"/>
+            <point key="canvasLocation" x="1179" y="180"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="Vex-rW-GRa">
@@ -521,18 +521,18 @@
                     <connections>
                         <segue destination="FfV-Ji-4Ce" kind="relationship" relationship="viewControllers" id="hFF-Js-A6d"/>
                         <segue destination="KZg-Gt-oCk" kind="relationship" relationship="viewControllers" id="SUk-Ux-ee1"/>
-                        <segue destination="QUy-BD-bpt" kind="relationship" relationship="viewControllers" id="M8t-EP-wfW"/>
+                        <segue destination="ChX-la-8l6" kind="relationship" relationship="viewControllers" id="M8t-EP-wfW"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="FNP-y4-bzi" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="132" y="180"/>
         </scene>
-        <!--Navigation Controller - Каталог-->
+        <!--Navigation Controller - Магазин-->
         <scene sceneID="RSJ-9m-ZbB">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="KZg-Gt-oCk" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Каталог" image="first" id="u1e-5L-l1D"/>
+                    <tabBarItem key="tabBarItem" title="Магазин" image="shop.png" id="u1e-5L-l1D"/>
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="9YY-NB-Oqe">
                         <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
@@ -650,11 +650,11 @@
                         <viewControllerLayoutGuide type="bottom" id="aOH-Wo-iRZ"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="PbV-5V-Rv7">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="431"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <webView contentMode="scaleToFill" misplaced="YES" scalesPageToFit="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k0B-JK-6RJ">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                            <webView contentMode="scaleToFill" scalesPageToFit="YES" translatesAutoresizingMaskIntoConstraints="NO" id="k0B-JK-6RJ">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="431"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
                             </webView>
@@ -683,13 +683,13 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="XyB-T0-tGb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1915" y="268"/>
+            <point key="canvasLocation" x="2441" y="268"/>
         </scene>
         <!--Navigation Controller - Новости-->
         <scene sceneID="0m9-vx-alT">
             <objects>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="FfV-Ji-4Ce" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Новости" id="3Af-ds-7sA"/>
+                    <tabBarItem key="tabBarItem" title="Новости" image="news.png" id="3Af-ds-7sA"/>
                     <toolbarItems/>
                     <simulatedTabBarMetrics key="simulatedBottomBarMetrics" translucent="NO"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ix8-UC-xQ6">
@@ -705,10 +705,30 @@
             </objects>
             <point key="canvasLocation" x="653" y="766"/>
         </scene>
+        <!--Navigation Controller - Корзина-->
+        <scene sceneID="Wkg-7i-WL6">
+            <objects>
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="ChX-la-8l6" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Корзина" image="cart.png" id="Z7h-1E-pvt"/>
+                    <toolbarItems/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="jgJ-mb-dyo">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <nil name="viewControllers"/>
+                    <connections>
+                        <segue destination="QUy-BD-bpt" kind="relationship" relationship="rootViewController" id="X2p-Ay-R8r"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="LVB-b2-nYN" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="653" y="180"/>
+        </scene>
     </scenes>
     <resources>
-        <image name="first" width="30" height="30"/>
-        <image name="second" width="30" height="30"/>
+        <image name="cart.png" width="30" height="30"/>
+        <image name="news.png" width="30" height="30"/>
+        <image name="shop.png" width="30" height="30"/>
     </resources>
     <simulatedMetricsContainer key="defaultSimulatedMetrics">
         <simulatedStatusBarMetrics key="statusBar"/>
@@ -717,6 +737,6 @@
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
         <segue reference="Zzc-JE-lxP"/>
-        <segue reference="J4K-SU-wGc"/>
+        <segue reference="d3a-rU-u9R"/>
     </inferredMetricsTieBreakers>
 </document>

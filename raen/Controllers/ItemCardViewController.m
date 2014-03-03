@@ -128,7 +128,7 @@
     }else if(section==1){
         return _properties.count;
     }else{
-        return _item.specItems.count;
+        return [self availabledSpecItems].count;
     }
 }
 
@@ -151,18 +151,36 @@
 
     }
     if (indexPath.section==2) {
-        return 70;
+        UIFont *font =[UIFont fontWithName:@"HelveticaNeue" size:14];
+        SpecItem *specItem = [self availabledSpecItems][indexPath.row];
+        NSString *paramStr =[self allParamsToStrFrom:specItem];
+        paramStr = [paramStr stringByAppendingString:[NSString stringWithFormat:@"\nЦвет: %@",specItem.color]];
+        CGRect boundingRect = [paramStr boundingRectWithSize:CGSizeMake(125, 4000)
+                                                      options:NSStringDrawingUsesLineFragmentOrigin
+                                                   attributes:@{NSFontAttributeName:font}
+                                                      context:nil];
+        CGSize boundingSize = boundingRect.size;
+        NSLog(@"boundingSize.height %f, weight %f",boundingSize.height,boundingSize.width);
+        if (boundingSize.height<75) {
+            return 80;
+        }else{
+            NSLog(@"cell size %f",10+boundingSize.height);
+            return (10+boundingSize.height);
+        }
+        
+        
+        //return 70;
     }
     //all other cells height =44px
     return 44;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    //UITableViewCell *cell =[tableView dequeueReusableCellWithIdentifier:@"defaultCell" forIndexPath:indexPath];
+
     if (indexPath.section == 0) {
-//item card cell
+        //item card cell
         static NSString *CellIdentifier = @"itemCardCell";
         ItemCardCell *cell =[tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-// Set up the content size of the scroll view
+        // Set up the content size of the scroll view
         [self setScrollViewSize:cell.scrollView withPages:_item.images.count];
         cell.pageControl.numberOfPages =_item.images.count;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
@@ -170,9 +188,9 @@
         for (NSInteger i=0; i<_item.images.count; i++) {
             [self loadPage:i forScrollView:cell.scrollView];
         }
-//TITLE
+        //TITLE
         cell.nameLabel.text = _item.title;
-//PRICE LABELS
+        //PRICE LABELS
         if (_item.priceNew.length>2) {
             cell.priceLabel.text =  [NSString stringWithFormat:@"%@ Руб.",_item.priceNew];
             cell.oldPriceLabel.attributedText = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@ Руб.",_item.price]
@@ -181,48 +199,53 @@
             cell.priceLabel.text = @"";
             cell.oldPriceLabel.text = [NSString stringWithFormat:@"%@ Руб.",_item.price];
         }
-//DESCRIPTION
+        //DESCRIPTION
         NSString *itemDescription =[_item.desc stringByReplacingOccurrencesOfString:@"<br>" withString:@"//n"];
         itemDescription = [itemDescription stringByReplacingOccurrencesOfString:@"<br />" withString:@""];
         itemDescription = [itemDescription stringByAppendingString:[NSString stringWithFormat:@"\nВес: %@ гр.",_item.weight]];
         cell.textView.text = itemDescription;
         return cell;
     }
-//VIDEO AND REVIEW LINKS
+    //VIDEO AND REVIEW LINKS section
     if (indexPath.section == 1) {
         NSDictionary *tmpDict =_properties[indexPath.row];
         UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"defaultCell" forIndexPath:indexPath];
         cell.textLabel.text = [tmpDict allKeys][0];
         return cell;
     }
+    //availabled items section
     if (indexPath.section==2) {
-        SpecItem *specItem = _item.specItems[indexPath.row];
+        SpecItem *specItem = [self availabledSpecItems][indexPath.row];
         AvailableItemCell *cell = [tableView dequeueReusableCellWithIdentifier:@"availableItemCell" forIndexPath:indexPath];
-        NSString *paramStr =[self allParamsToStr:specItem];
+        NSString *paramStr =[self allParamsToStrFrom:specItem];
         paramStr = [paramStr stringByAppendingString:[NSString stringWithFormat:@"\nЦвет: %@",specItem.color]];
         cell.textView.text = paramStr;
         [cell.addToCartButton setTag:indexPath.row];
         [cell.addToCartButton addTarget:self action:@selector(buyButtonPressed:)
-                            forControlEvents:UIControlEventTouchUpInside];
+                       forControlEvents:UIControlEventTouchUpInside];
         if ([specItem.image rangeOfString:@"http"].location !=NSNotFound) {
             [cell.spinner startAnimating];
             [cell.thumbnail setImageWithURL:[NSURL URLWithString:specItem.image]
                                   completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
                                       [cell.spinner stopAnimating];
                                       if (!error) {
-                                           NSLog(@"thumbnail image loaded from %@",specItem.image);
+                                         
                                       }else{
                                           NSLog(@"error to load image");
+                                          [cell.thumbnail setImage:[UIImage imageNamed:@"no_image.jpg"]];
                                       }
-            }];
+                                  }];
         }else{
             NSLog(@"No image for thumbnail image");
+            [cell.thumbnail setImage:[UIImage imageNamed:@"no_image.jpg"]];
         }
         return cell;
     }
     //should never happen
-    NSLog(@"----should never happer----");
-    return nil;
+    NSLog(@"----should never happen----");
+    UITableViewCell *cell =[self.tableView dequeueReusableCellWithIdentifier:@"defaultCell"];
+    cell.textLabel.text = @"empty cell";
+    return cell;
 }
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     if (section==1 &&_properties.count) {
@@ -257,8 +280,8 @@
 }
 #pragma mark - buy button pressed
 -(void)buyButtonPressed:(id)sender{
-    int row = [sender tag];
-    NSLog(@"buyButtonPressed row %i",row);
+    NSInteger row = [sender tag];
+    NSLog(@"buyButtonPressed row %ld",(long)row);
     //to do animation
     [self animateCellWithRow:row];
     [_communicator addItemToCart:_item withSpecItemAtIndex:row andQty:1];
@@ -269,24 +292,24 @@
     AvailableItemCell *cell =(AvailableItemCell*)[self.tableView cellForRowAtIndexPath:indexPath];
     UIImageView *imgView =cell.thumbnail;
     CGRect rect =[imgView.superview convertRect:imgView.frame fromView:nil];
-    rect = CGRectMake(5, (rect.origin.y*-1)-10, imgView.frame.size.width, imgView.frame.size.height);
+    rect = CGRectMake(rect.origin.x+35, (rect.origin.y*-1)+35, imgView.frame.size.width, imgView.frame.size.height);
 	NSLog(@"rect is %f,%f,%f,%f",rect.origin.x,rect.origin.y,rect.size.width,rect.size.height);
     // create new duplicate image
 	UIImageView *starView = [[UIImageView alloc] initWithImage:imgView.image];
     [starView setFrame:rect];
     //do i need this?
-    /*
+    
 	starView.layer.cornerRadius=5;
 	starView.layer.borderColor=[[UIColor blackColor] CGColor];
-	starView.layer.borderWidth=3;
-    */
+	starView.layer.borderWidth=1;
+    
     [self.view addSubview:starView];
     // begin ---- apply position animation
 	CAKeyframeAnimation *pathAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
     pathAnimation.calculationMode = kCAAnimationPaced;
     pathAnimation.fillMode = kCAFillModeForwards;
     pathAnimation.removedOnCompletion = NO;
-    pathAnimation.duration=0.65;
+    pathAnimation.duration=0.8;
 	pathAnimation.delegate=self;
 	
 	// tab-bar right side item frame-point = end point
@@ -309,12 +332,12 @@
 	CABasicAnimation *basic=[CABasicAnimation animationWithKeyPath:@"transform"];
 	[basic setToValue:[NSValue valueWithCATransform3D:CATransform3DMakeScale(0.25, 0.25, 0.25)]];
 	[basic setAutoreverses:NO];
-	[basic setDuration:0.65];
+	[basic setDuration:0.8];
 	
 	[starView.layer addAnimation:pathAnimation forKey:@"curveAnimation"];
 	[starView.layer addAnimation:basic forKey:@"transform"];
 	
-	[starView performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:0.65];
+	[starView performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:0.8];
     
 }
 -(void)addReviewAndVideo{
@@ -332,7 +355,7 @@
         [_properties addObject:tmpDict];
     }
 }
--(NSString*)allParamsToStr:(SpecItem*)specItem{
+-(NSString*)allParamsToStrFrom:(SpecItem*)specItem{
     NSArray *params = @[specItem.param1,specItem.param2,specItem.param3,specItem.param4,specItem.param5];
     NSMutableArray *availableParameters =[NSMutableArray array];
     for (NSString*parameter in params) {
@@ -352,5 +375,13 @@
     }
     return param;
 }
-
+-(NSArray*)availabledSpecItems{
+    NSMutableArray *availabledSpecItems = [NSMutableArray array];
+    for (SpecItem *specItem in _item.specItems) {
+        if (specItem.sklad.integerValue>0 || specItem.piter.integerValue>0 || specItem.shop.integerValue>0) {
+            [availabledSpecItems addObject:specItem];
+        }
+    }
+    return availabledSpecItems;
+}
 @end

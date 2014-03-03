@@ -28,6 +28,7 @@
     
     [self.subView setHidden:YES];
     [HUD showUIBlockingIndicatorWithText:Nil];
+   
     [_communicator getItemsFromCart];
 }
 -(NSString*)itemsCount{

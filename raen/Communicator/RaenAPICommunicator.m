@@ -39,8 +39,8 @@
             NSLog(@"----something went wrong with init JSONModel----");
         }
     }];
-
 }
+
 -(void)getSubcategoryWithId:(NSString*)subcategoryId{
    
     NSString *urlStr =[kRaenApiGetSubcategoryItems stringByAppendingString:subcategoryId];
@@ -58,7 +58,6 @@
             NSLog(@"----something went wrong with init JSONModel----");
         }
     }];
-    
 }
 
 -(void)getItemCardWithId:(NSString*)itemId{
@@ -78,7 +77,6 @@
                                           NSLog(@"----something went wrong with init JSONModel----");
                                       }
                                   }];
-    
 }
 
 - (void)getAllCategories{
@@ -104,6 +102,7 @@
 -(void)getItemsFromCart{
     NSLog(@"getting items from cart");
     //TODO add cookie !
+    [self restoreCookies];
     [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetCart
                                   completion:^(id json, JSONModelError *err) {
                                       if (err) {
@@ -131,12 +130,8 @@
     NSMutableURLRequest *request = [NSMutableURLRequest requestWithURL:url
                                                            cachePolicy:NSURLRequestUseProtocolCachePolicy
                                                        timeoutInterval:60.0];
-    
+    [self restoreCookies];
     [request setHTTPMethod:@"POST"];
-    /*
-    NSString *oldCookieValue = [[NSUserDefaults standardUserDefaults] objectForKey:@"raenSessionCookieValue"];
-    [request setValue:[NSString stringWithFormat:@"ci_session=%@",oldCookieValue] forHTTPHeaderField:@"Cookie"];
-    */
     SpecItem *specItem = item.specItems[index];
     NSString *price =item.priceNew.length >2 ? item.priceNew : item.price;
     NSString *params =[NSString stringWithFormat:@"name=%@,%@&id=%@&price=%@&qty=1",item.title,specItem.color,specItem.db1cId,price];
@@ -154,11 +149,8 @@
             
             NSLog(@"---error to add item to cart------");
         }
-        
     }];
-    
     [dataTask resume];
-    
 }
 
 #pragma mark - Cookie manager methods
@@ -203,6 +195,7 @@
         [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
     }
 }
+
 -(void)deleteCookies
 {
     NSLog(@"deleting allcookies");

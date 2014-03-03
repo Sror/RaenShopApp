@@ -15,6 +15,7 @@
 @interface RaenAPICommunicator : NSObject 
 @property (weak, nonatomic) id<RaenAPICommunicatorDelegate> delegate;
 
+
 - (void)getNews;
 - (void)getAllCategories;
 - (void)getSubcategoryWithId:(NSString*)subcategoryId;
