@@ -18,6 +18,9 @@
 - (void)didReceiveSubcategoryItems:(NSArray *)items;
 - (void)didReceiveItemCard:(id)itemCard;
 - (void)didReceiveAllCategories:(NSArray *)array;
+- (void)didReceiveSliderItems:(NSArray*)array;
+- (void)didReceiveSaleOfDay:(id)saleOfDayModel;
+- (void)didRemoveItemFromCartWithResponse:(NSDictionary*)response;
 @required
 - (void)fetchingFailedWithError:(JSONModelError *)error;
 @end

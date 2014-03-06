@@ -7,6 +7,7 @@
 //
 
 #import "JSONModel.h"
+#import "CartItemParamsModel.h"
 
 @interface CartItemModel : JSONModel
 @property (nonatomic,strong) NSString *rowid;
@@ -15,6 +16,7 @@
 @property (nonatomic,strong) NSString *price;
 @property (nonatomic,strong) NSString *name;
 @property (nonatomic,strong) NSString *subtotal;
-@property (nonatomic,strong) NSString *params;
+@property (nonatomic,strong) NSString <Optional>*params;
+@property (nonatomic,strong) NSString <Optional> *image;
 
 @end

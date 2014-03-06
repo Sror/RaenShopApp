@@ -7,10 +7,13 @@
 //
 
 #import "JSONModel.h"
-@protocol NewsModel @end
 @interface NewsModel : JSONModel
+
 @property (nonatomic,strong) NSString <Optional> *title;
 @property (nonatomic,strong) NSString <Optional> *date;
 @property (nonatomic,strong) NSString <Optional> *link;
 @property (nonatomic,strong) NSString <Optional> *image;
+@property (nonatomic,strong) NSString <Optional> *text;
+@property (nonatomic,strong) NSString <Optional> *type;
+
 @end

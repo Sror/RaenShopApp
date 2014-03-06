@@ -252,7 +252,7 @@
         return @"Подробнее:";
     }
     if (section==2 &&_item.specItems.count) {
-        return @"Модели и наличие:";
+        return @"Модели в наличие:";
     }
     return nil;
 }
@@ -270,7 +270,6 @@
 #pragma mark - prepare for segue
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
-#warning WTF?
     if ([segue.identifier isEqualToString:@"toBrowser"]) {
         BrowserViewController *browserVC= segue.destinationViewController;
         NSDictionary *tmpDict = sender;

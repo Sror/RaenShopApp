@@ -10,8 +10,10 @@
 #import "HUD.h"
 #import "AppDelegate.h"
 #import "CartItemModel.h"
+#import "CartItemParamsModel.h"
 #import "RaenAPICommunicator.h"
-
+#import "CartCell.h"
+#import "UIImageView+WebCache.h"
 
 @interface CartViewController ()<RaenAPICommunicatorDelegate>
 {
@@ -31,6 +33,8 @@
    
     [_communicator getItemsFromCart];
 }
+
+
 -(NSString*)itemsCount{
     int itemsCount = 0;
     for (int i=0; i<_items.count; i++) {
@@ -45,7 +49,7 @@
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
     //[[self tabBarController] tabBar] items] objectAtIndex:1] setBadgeValue:[self itemsCount]]];
-    
+    [self.tableView setHidden:YES];
     //User Interface
     [self.subView.layer setCornerRadius:3.0];
 }
@@ -59,6 +63,7 @@
 #pragma mark - RaenAPICommunicationDelegate
 -(void)didReceiveCartItems:(NSArray *)items{
     NSLog(@"didReceiveCartItems %@",items);
+    [self.tableView setHidden:NO];
     [HUD hideUIBlockingIndicator];
     _items = items;
     
@@ -71,6 +76,12 @@
     [HUD hideUIBlockingIndicator];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
+}
+-(void)didRemoveItemFromCartWithResponse:(NSDictionary *)response{
+    NSLog(@"didRemoveItemFromCartWithResponse %@",response);
+    [_communicator saveCookies];
+    [HUD hideUIBlockingIndicator];
+    [self.tableView reloadData];
 }
 
 #pragma mark - UITableViewDataSource
@@ -86,22 +97,54 @@
 }
 -(UITableViewCell *)tableView:(UITableView *)tb cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     static NSString *cellIdentifier = @"CartCell";
-    UITableViewCell *cell = [tb dequeueReusableCellWithIdentifier:cellIdentifier];
+    CartCell *cell = [tb dequeueReusableCellWithIdentifier:cellIdentifier];
     NSUInteger itemsCount = _items.count;
     if (itemsCount == 0 && indexPath.row == 0)
 	{
-        cell.textLabel.text = @"";
-		cell.detailTextLabel.text = @"У вас еще нет товаров в корзине…";
+        cell.titleLabel.text = @"У вас еще нет товаров в корзине…";
+        cell.textView.text = nil;
+        cell.priceLabel.text = nil;
 		return cell;
     }
-    
     if (itemsCount>0) {
         CartItemModel *itemInCart = _items[indexPath.row];
-        cell.textLabel.text = itemInCart.name;
-        cell.detailTextLabel.text = [NSString stringWithFormat:@"Кол-во: %@",itemInCart.qty];
+        cell.titleLabel.text = itemInCart.name;
+        [cell.spinner startAnimating];
+        [cell.itemImageView setImageWithURL:[NSURL URLWithString:itemInCart.image]
+                                  completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+                                      [cell.spinner stopAnimating];
+                                  }];
+        cell.priceLabel.text = [NSString stringWithFormat:@"%@ руб.",itemInCart.price];
+        cell.textView.text = itemInCart.params;
+        
+       // cell.textView.text = [self allParamsToString:itemInCart.params];
+        //cell.detailTextLabel.text = [NSString stringWithFormat:@"Кол-во: %@",itemInCart.qty];
         
     }
     return cell;
+}
+
+
+// Override to support editing the table view.
+- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    if (editingStyle == UITableViewCellEditingStyleDelete) {
+        NSLog(@"delete item at Index %d",indexPath.row);
+        [HUD showUIBlockingIndicator];
+        CartItemModel *cartItem = _items[indexPath.row];
+        [_communicator removeItemFromCartWithID:cartItem.id];
+    }
+}
+
+#pragma mark - Helpers
+-(NSString*)allParamsToString:(NSArray*)params{
+    NSString *fullstring =@"";
+    for (CartItemParamsModel *param in params) {
+        if (param.title) {
+            fullstring = [fullstring stringByAppendingString:[NSString stringWithFormat:@"\n%@",param.title]];
+        }
+    }
+    return fullstring;
 }
 -(NSString*)subtotal{
     NSInteger total=0;
@@ -110,6 +153,7 @@
     };
     return [NSString stringWithFormat:@"Итого: %i руб.",total];
 }
+
 - (IBAction)checkOutButtonPressed:(id)sender {
     NSLog(@"checkOutButtonPressed");
 }

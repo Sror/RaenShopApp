@@ -13,12 +13,7 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     _communicator = [[RaenAPICommunicator alloc] init];
-#warning if first load app save cookie session!
-    NSArray* cookieDictionary = [[NSUserDefaults standardUserDefaults] valueForKey:@"cookieArray"];
-    NSLog(@"cookieDict %@",cookieDictionary);
-    if (cookieDictionary) {
-        //[_communicator restoreCookies];
-    }
+    [_communicator restoreCookies];
     
     return YES;
 }

@@ -27,6 +27,7 @@
     if ([self.link rangeOfString:@"iframe"].location !=NSNotFound) {
         NSLog(@"iframe found!");
         NSString *HTMLstring =[NSString stringWithFormat:@"<html><body><center><div style=\"width: 835px; margin: 0 auto;\">%@</div></center></body></html>",self.link];
+        NSLog(@"HTMLString %@",HTMLstring);
         [self.webView loadHTMLString:HTMLstring baseURL:nil];
         
     }
@@ -48,8 +49,13 @@
     [self.spinner startAnimating];
 }
 -(void)webViewDidFinishLoad:(UIWebView *)webView{
-
     [[UIApplication sharedApplication]setNetworkActivityIndicatorVisible:NO];
+#warning use title from html document
+    NSString *theTitle=[webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+    [self.navigationItem setTitle:theTitle];
     [self.spinner stopAnimating];
+}
+-(void)viewDidDisappear:(BOOL)animated{
+    self.webView = nil;
 }
 @end

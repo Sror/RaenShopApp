@@ -14,7 +14,7 @@ static NSString *CollectionViewCellIdentifier = @"cvCell";
 @interface TVCell : UITableViewCell
 
 @property (strong, nonatomic) IBOutlet IndexedCV *collectionView;
-@property (weak, nonatomic) IBOutlet UILabel *label;
+@property (weak, nonatomic) IBOutlet UILabel *categoryLabel;
 
 -(void)setCollectionViewDataSourceDelegate:(id<UICollectionViewDataSource, UICollectionViewDelegate>)dataSourceDelegate index:(NSInteger)index;
 

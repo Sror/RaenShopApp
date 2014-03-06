@@ -2,16 +2,13 @@
 //  NewsViewController.h
 //  raenapp
 //
-//  Created by Alexey Ivanov on 20.02.14.
+//  Created by Alexey Ivanov on 04.03.14.
 //  Copyright (c) 2014 Aleksey Ivanov. All rights reserved.
 //
 
-#import "TVController.h"
+#import <UIKit/UIKit.h>
 
-@interface NewsViewController : TVController <UICollectionViewDataSource,UICollectionViewDelegate,UITableViewDataSource,UITableViewDelegate>
-@property (strong,nonatomic) IBOutlet UILabel *mainLabel;
+@interface NewsViewController : UIViewController <UITableViewDataSource,UITableViewDelegate>
+
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
-
-
-
 @end

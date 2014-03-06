@@ -9,11 +9,12 @@
 #import "RaenAPICommunicator.h"
 #import "RaenAPICommunicatorDelegate.h"
 #import "JSONModelLib.h"
-
+#import "NewsModel.h"
 #import "CartItemModel.h"
 #import "GoodModel.h"
 #import "CategoryModel.h"
-#import "NewsCategoryModel.h"
+#import "SliderModel.h"
+#import "SaleOfDayModel.h"
 
 #define kRaenApiGetGuard @"http://raenshop.ru/api/catalog/goods_list/cat_id/81/" //get all guard items
 #define kRaenApiGetCategories @"http://raenshop.ru/api/catalog/categories" //get all categories
@@ -21,10 +22,13 @@
 #define kRaenApiGetItemCard @"http://raenshop.ru/api/catalog/goods/id/"
 #define kRaenApiGetSubcategoryItems @"http://raenshop.ru/api/catalog/goods_list/cat_id/"
 #define kRaenApiSendToCartItem @"http://raenshop.ru/api/catalog/to_cart/"
-#define kRaenApiGetNews @"http://raenshop.ru/api/news/categories/"
+#define kRaenApiGetNews @"http://raenshop.ru/api/news/list/"
+#define kRaenApiGetSliderItems @"http://raenshop.ru/api/news/slider/"
+#define kRaenApiGetSaleOfDay @"http://raenshop.ru/api/news/sale_of_day/"
 
 @implementation RaenAPICommunicator
 
+#pragma mark - get News
 -(void)getNews{
     NSLog(@"getting news from %@",kRaenApiGetNews);
     [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetNews completion:^(id json, JSONModelError *err) {
@@ -32,7 +36,8 @@
             NSLog(@"err %@",err.localizedDescription);
             [self.delegate fetchingFailedWithError:err];
         }
-        NSArray *news = [NewsCategoryModel arrayOfModelsFromDictionaries:json];
+        NSLog(@"json %@",json);
+        NSArray *news = [NewsModel arrayOfModelsFromDictionaries:json];
         if (news) {
             [self.delegate didReceiveNews:news];
         }else{
@@ -40,7 +45,7 @@
         }
     }];
 }
-
+#pragma mark - get Subcategory With id
 -(void)getSubcategoryWithId:(NSString*)subcategoryId{
    
     NSString *urlStr =[kRaenApiGetSubcategoryItems stringByAppendingString:subcategoryId];
@@ -49,7 +54,6 @@
         if (err) {
             NSLog(@"err %@",err.localizedDescription);
             [self.delegate fetchingFailedWithError:err];
-            
         }
         NSArray *subcategoryItems = [GoodModel arrayOfModelsFromDictionaries:json[@"goods"]];
         if (subcategoryItems) {
@@ -59,7 +63,7 @@
         }
     }];
 }
-
+#pragma mark -get Item Card With id
 -(void)getItemCardWithId:(NSString*)itemId{
    
     NSString *urlStr = [kRaenApiGetItemCard stringByAppendingString:itemId];
@@ -78,7 +82,7 @@
                                       }
                                   }];
 }
-
+#pragma mark - get All Categories
 - (void)getAllCategories{
     NSLog(@"getting all categories");
     [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetCategories
@@ -97,6 +101,43 @@
                                   }];
 
 }
+#pragma mark - Slider items
+- (void)getSliderItems{
+    NSLog(@"getting slider items");
+   [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetSliderItems completion:^(id json, JSONModelError *err) {
+       if (err) {
+           NSLog(@"err! %@",err.localizedDescription);
+           [self.delegate fetchingFailedWithError:err];
+       }
+       NSArray *sliderItems =[SliderModel arrayOfModelsFromDictionaries:json];
+       if (sliderItems) {
+           [self.delegate didReceiveSliderItems:sliderItems];
+       }else{
+           NSLog(@"----something went wrong with init JSONModel----");
+       }
+
+   }];
+    
+}
+#pragma mark - SaleOfDay
+- (void)getSaleOfDay{
+    NSLog(@"get sale of day");
+    [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetSaleOfDay completion:^(id json, JSONModelError *err) {
+        if (err) {
+            NSLog(@"eror to get sale of day %@",err.localizedDescription);
+            [self.delegate fetchingFailedWithError:err];
+        }else{
+            SaleOfDayModel *saleOfdayModel =[[SaleOfDayModel alloc]initWithDictionary:json error:nil ];
+            if (saleOfdayModel) {
+                [self.delegate didReceiveSaleOfDay:saleOfdayModel];
+            }else{
+                NSLog(@"----something went wrong with init JSONModel----");
+                
+            }
+        }
+    }];
+    
+}
 #pragma mark -
 #pragma mark CART methods
 -(void)getItemsFromCart{
@@ -109,7 +150,6 @@
                                           NSLog(@"err! %@",err.localizedDescription);
                                           [self.delegate fetchingFailedWithError:err];
                                       }
-                                      NSLog(@"json from cart %@",json);
                                       NSArray *cartItems =[CartItemModel arrayOfModelsFromDictionaries:json];
                                       if (cartItems) {
                                           [self.delegate didReceiveCartItems:cartItems];
@@ -120,7 +160,30 @@
                                   }];
    
 }
-
+-(void)removeItemFromCartWithID:(NSString*)id{
+    NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSURLSession *session =[NSURLSession sessionWithConfiguration:config];
+    NSURL *url =[NSURL URLWithString:kRaenApiSendToCartItem];
+    NSString*params = [NSString stringWithFormat:@"id=%@&qty=0",id];
+    NSMutableURLRequest *request = [ NSMutableURLRequest requestWithURL:url];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[params dataUsingEncoding:NSUTF8StringEncoding]];
+    NSURLSessionDataTask *dataTask =[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+        if (error!=nil){
+            NSDictionary *json = [ NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:Nil];
+            [self.delegate didRemoveItemFromCartWithResponse:json];
+        }else{
+#warning TODO notification when error to remove item from cart
+            NSLog(@"----error to remove item from cart!----");
+            NSLog(@"%@",error.localizedDescription);
+            NSLog(@"responce %@",response);
+            NSDictionary *json = [ NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:Nil];
+            NSLog(@"json %@",json);
+        }
+    }];
+    [dataTask resume];
+    
+}
 #warning fix add item to cart
 -(void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty{
     
@@ -135,7 +198,6 @@
     SpecItem *specItem = item.specItems[index];
     NSString *price =item.priceNew.length >2 ? item.priceNew : item.price;
     NSString *params =[NSString stringWithFormat:@"name=%@,%@&id=%@&price=%@&qty=1",item.title,specItem.color,specItem.db1cId,price];
-    
     NSLog(@"parameters %@",params);
     [request setHTTPBody:[params dataUsingEncoding:NSUTF8StringEncoding]];
     NSURLSessionDataTask *dataTask = [session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {

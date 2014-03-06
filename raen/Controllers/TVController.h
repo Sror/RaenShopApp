@@ -11,7 +11,6 @@
 
 @interface TVController : UIViewController <UICollectionViewDataSource,UICollectionViewDelegate,UITableViewDataSource,UITableViewDelegate>
 
-@property (strong,nonatomic) IBOutlet UILabel *mainLabel;
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
 
 

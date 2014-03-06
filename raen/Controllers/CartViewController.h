@@ -15,7 +15,10 @@
 @property (weak, nonatomic) IBOutlet UIView *subView;
 @property (weak, nonatomic) IBOutlet UILabel *subTotalLabel;
 @property (weak, nonatomic) IBOutlet UIButton *checkOutButton;
-- (IBAction)checkOutButtonPressed:(id)sender;
 @property (weak, nonatomic) IBOutlet UITabBarItem *tabBarItem;
+
+
+- (IBAction)checkOutButtonPressed:(id)sender;
 -(NSString*)itemsCount;
+
 @end

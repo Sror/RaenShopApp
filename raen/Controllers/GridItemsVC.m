@@ -49,6 +49,7 @@
 -(void)didReceiveSubcategoryItems:(NSArray *)items{
     
     _items = items;
+    [self.navigationItem setTitle:@"Товары"];
     [self.collectionView reloadData];
     [HUD hideUIBlockingIndicator];
     

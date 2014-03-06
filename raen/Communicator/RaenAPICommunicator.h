@@ -20,10 +20,12 @@
 - (void)getAllCategories;
 - (void)getSubcategoryWithId:(NSString*)subcategoryId;
 - (void)getItemCardWithId:(NSString*)itemId;
+- (void)getSliderItems;
+- (void)getSaleOfDay;
 //cart
 - (void)getItemsFromCart;
 - (void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty;
-
+-(void)removeItemFromCartWithID:(NSString*)id;
 -(void)deleteCookieFromLocalStorage;
 -(void)saveCookies;
 -(void)restoreCookies;
