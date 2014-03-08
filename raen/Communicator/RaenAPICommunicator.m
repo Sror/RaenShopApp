@@ -23,27 +23,35 @@
 #define kRaenApiGetSubcategoryItems @"http://raenshop.ru/api/catalog/goods_list/cat_id/"
 #define kRaenApiSendToCartItem @"http://raenshop.ru/api/catalog/to_cart/"
 #define kRaenApiGetNews @"http://raenshop.ru/api/news/list/"
+#define kRaenApiGetNewsByPage @"http://raenshop.ru/api/news/list/page/"
 #define kRaenApiGetSliderItems @"http://raenshop.ru/api/news/slider/"
 #define kRaenApiGetSaleOfDay @"http://raenshop.ru/api/news/sale_of_day/"
+#define kRaenApiUpdateCart @"http://raenshop.ru/api/catalog/update_cart/"
+
 
 @implementation RaenAPICommunicator
 
 #pragma mark - get News
--(void)getNews{
-    NSLog(@"getting news from %@",kRaenApiGetNews);
-    [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetNews completion:^(id json, JSONModelError *err) {
-        if (err) {
-            NSLog(@"err %@",err.localizedDescription);
-            [self.delegate fetchingFailedWithError:err];
-        }
-        NSLog(@"json %@",json);
-        NSArray *news = [NewsModel arrayOfModelsFromDictionaries:json];
-        if (news) {
-            [self.delegate didReceiveNews:news];
-        }else{
-            NSLog(@"----something went wrong with init JSONModel----");
-        }
+-(void)getNewsByPage:(NSInteger)page{
+    NSLog(@"getting news by page %d",page);
+    NSString *fullUrlString = [kRaenApiGetNewsByPage stringByAppendingString:[NSString stringWithFormat:@"%d",page]];
+    NSLog(@"fullURLString %@",fullUrlString);
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    [JSONHTTPClient getJSONFromURLWithString:fullUrlString
+                                  completion:^(id json, JSONModelError *err) {
+                                      [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                                      if (err) {
+                                          NSLog(@"err %@",err.localizedDescription);
+                                          [self.delegate fetchingFailedWithError:err];
+                                      }
+                                      NSArray *news = [NewsModel arrayOfModelsFromDictionaries:json];
+                                      if (news) {
+                                          [self.delegate didReceiveNews:news];
+                                      }else{
+                                          NSLog(@"----something went wrong with init JSONModel----");
+                                      }
     }];
+    
 }
 #pragma mark - get Subcategory With id
 -(void)getSubcategoryWithId:(NSString*)subcategoryId{
@@ -101,6 +109,8 @@
                                   }];
 
 }
+
+
 #pragma mark - Slider items
 - (void)getSliderItems{
     NSLog(@"getting slider items");
@@ -150,6 +160,7 @@
                                           NSLog(@"err! %@",err.localizedDescription);
                                           [self.delegate fetchingFailedWithError:err];
                                       }
+                                      NSLog(@"get items from cart json %@",json);
                                       NSArray *cartItems =[CartItemModel arrayOfModelsFromDictionaries:json];
                                       if (cartItems) {
                                           [self.delegate didReceiveCartItems:cartItems];
@@ -160,14 +171,19 @@
                                   }];
    
 }
--(void)removeItemFromCartWithID:(NSString*)id{
+-(void)deleteItemFromCartWithID:(NSString*)rowid{
+    /*
     NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
     NSURLSession *session =[NSURLSession sessionWithConfiguration:config];
-    NSURL *url =[NSURL URLWithString:kRaenApiSendToCartItem];
-    NSString*params = [NSString stringWithFormat:@"id=%@&qty=0",id];
-    NSMutableURLRequest *request = [ NSMutableURLRequest requestWithURL:url];
+    NSURL *url =[NSURL URLWithString:kRaenApiUpdateCart];
+    NSString*params = [NSString stringWithFormat:@"rowid=%@&qty=0",rowid];
+    NSLog(@"params %@",params);
+    NSMutableURLRequest *request = [ NSMutableURLRequest requestWithURL:url
+                                                            cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                                        timeoutInterval:60.0];
     [request setHTTPMethod:@"POST"];
     [request setHTTPBody:[params dataUsingEncoding:NSUTF8StringEncoding]];
+    NSLog(@"request %@",request);
     NSURLSessionDataTask *dataTask =[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
         if (error!=nil){
             NSDictionary *json = [ NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:Nil];
@@ -182,7 +198,14 @@
         }
     }];
     [dataTask resume];
-    
+    */
+    NSLog(@"rowid %@",rowid);
+    [JSONHTTPClient postJSONFromURLWithString:kRaenApiUpdateCart params:@{@"rowid":rowid,@"qty":@"0"}
+                                   completion:^(id json, JSONModelError *err) {
+                                       if ([json isKindOfClass:[NSDictionary class]]) {
+                                           [self.delegate didRemoveItemFromCartWithResponse:json];
+                                       }
+    }];
 }
 #warning fix add item to cart
 -(void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty{
@@ -252,8 +275,10 @@
     for (int i=0; i < cookieDictionary.count; i++)
     {
         NSLog(@"cookie found is %@",[cookieDictionary objectAtIndex:i]);
+       
         NSMutableDictionary* cookieDictionary1 = [[NSUserDefaults standardUserDefaults] valueForKey:cookieDictionary[i]];
         NSHTTPCookie *cookie = [NSHTTPCookie cookieWithProperties:cookieDictionary1];
+        NSLog(@"cookie %@",cookie);
         [[NSHTTPCookieStorage sharedHTTPCookieStorage] setCookie:cookie];
     }
 }

@@ -66,7 +66,6 @@
     [self.tableView setHidden:NO];
     [HUD hideUIBlockingIndicator];
     _items = items;
-    
     [self.tabBarItem setBadgeValue:[self itemsCount]];
     [self.tableView reloadData];
     [self.subTotalLabel setText:[self subtotal]];
@@ -79,9 +78,17 @@
 }
 -(void)didRemoveItemFromCartWithResponse:(NSDictionary *)response{
     NSLog(@"didRemoveItemFromCartWithResponse %@",response);
-    [_communicator saveCookies];
-    [HUD hideUIBlockingIndicator];
-    [self.tableView reloadData];
+    if (![response objectForKey:@"success"]) {
+        NSLog(@"error to remove item");
+        UIAlertView *alert  =[[UIAlertView alloc] initWithTitle:@"Error" message:response[@"error"] delegate:self cancelButtonTitle:@"ok" otherButtonTitles:nil];
+        [alert show];
+        [HUD hideUIBlockingIndicator];
+    }else{
+        [_communicator saveCookies];
+        [self.tabBarItem setBadgeValue:[self itemsCount]];
+        [HUD hideUIBlockingIndicator];
+        [_communicator getItemsFromCart];
+    }
 }
 
 #pragma mark - UITableViewDataSource
@@ -89,50 +96,43 @@
     return 1;
 }
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    if (_items.count>0) {
-        return _items.count;
-    } else{
-        return 1;
-    }
+    return _items.count;
 }
 -(UITableViewCell *)tableView:(UITableView *)tb cellForRowAtIndexPath:(NSIndexPath *)indexPath{
     static NSString *cellIdentifier = @"CartCell";
     CartCell *cell = [tb dequeueReusableCellWithIdentifier:cellIdentifier];
-    NSUInteger itemsCount = _items.count;
-    if (itemsCount == 0 && indexPath.row == 0)
-	{
-        cell.titleLabel.text = @"У вас еще нет товаров в корзине…";
-        cell.textView.text = nil;
-        cell.priceLabel.text = nil;
-		return cell;
-    }
-    if (itemsCount>0) {
-        CartItemModel *itemInCart = _items[indexPath.row];
-        cell.titleLabel.text = itemInCart.name;
-        [cell.spinner startAnimating];
-        [cell.itemImageView setImageWithURL:[NSURL URLWithString:itemInCart.image]
-                                  completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-                                      [cell.spinner stopAnimating];
-                                  }];
-        cell.priceLabel.text = [NSString stringWithFormat:@"%@ руб.",itemInCart.price];
-        cell.textView.text = itemInCart.params;
-        
-       // cell.textView.text = [self allParamsToString:itemInCart.params];
-        //cell.detailTextLabel.text = [NSString stringWithFormat:@"Кол-во: %@",itemInCart.qty];
-        
-    }
+    CartItemModel *itemInCart = _items[indexPath.row];
+    cell.titleLabel.text = itemInCart.name;
+    [cell.spinner startAnimating];
+    [cell.itemImageView setImageWithURL:[NSURL URLWithString:itemInCart.image]
+                              completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+                                  [cell.spinner stopAnimating];
+                              }];
+    cell.priceLabel.text = [NSString stringWithFormat:@"%@ руб.",itemInCart.price];
+    cell.textView.text = itemInCart.params;
+
     return cell;
 }
-
-
+-(NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath{
+    return @"Удалить";
+}
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+    if (_items.count==0) {
+        return @"Нет товаров в корзине";
+    }
+    
+    return nil;
+}
 // Override to support editing the table view.
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
         NSLog(@"delete item at Index %d",indexPath.row);
+        //[tableView  deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
+        //[tableView reloadData];
         [HUD showUIBlockingIndicator];
         CartItemModel *cartItem = _items[indexPath.row];
-        [_communicator removeItemFromCartWithID:cartItem.id];
+        [_communicator deleteItemFromCartWithID:cartItem.rowid];
     }
 }
 

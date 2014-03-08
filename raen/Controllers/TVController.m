@@ -9,7 +9,6 @@
 #import "TVController.h"
 #import "TVCell.h"
 #import "CVCell.h"
-#import "HUD.h"
 #import "JSONModelLib.h"
 #import "GoodModel.h"
 #import "CategoryModel.h"
@@ -20,7 +19,7 @@
 #import "MainSliderCell.h"
 #import "SliderModel.h"
 #import "BrowserViewController.h"
-
+#import "CategoryItemsGridViewController.h"
 #import "UIImageView+WebCache.h"
 
 #import "RaenAPICommunicator.h"
@@ -29,7 +28,6 @@
     NSArray *_categories;
     NSArray *_sliderItems;
     RaenAPICommunicator *_communicator;
-    BOOL didReceiveAllCategories;
 }
 
 @end
@@ -45,42 +43,46 @@
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
     
-    //set refresh button
-    UIBarButtonItem *refreshButton=[[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh target:self action:@selector(updateDataFromModel)];
-    [self.navigationItem setRightBarButtonItem:refreshButton];
-    
+    [self setupRefreshControl];
+    [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
+
+}
+#pragma mark - RefreshControl
+-(void)setupRefreshControl{
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(refreshView:) forControlEvents:UIControlEventValueChanged];
+    [self.tableView addSubview:self.refreshControl];
+}
+- (void)refreshView:(UIRefreshControl *)sender {
     [self updateDataFromModel];
 
 }
 -(void)updateDataFromModel{
     _categories = nil;
-    didReceiveAllCategories = NO;
-    [self.tableView reloadData];
-    [HUD showUIBlockingIndicatorWithText:@"Loading..."];
+
     [_communicator getAllCategories];
     [_communicator getSliderItems];
 
 }
 #pragma mark - RaenAPICommunicatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
-    didReceiveAllCategories = NO;
-    [HUD hideUIBlockingIndicator];
+    [self.tableView reloadData];
+    [self.refreshControl endRefreshing];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
     
 }
 -(void)didReceiveAllCategories:(NSArray *)array{
     NSLog(@"didReceiveAllCategories");
-    didReceiveAllCategories = YES;
-    [HUD hideUIBlockingIndicator];
     _categories = array;
     [self.tableView reloadData];
-    //[self reloadTableViewWithAnimation:YES];
+    [self.refreshControl endRefreshing];
 }
 -(void)didReceiveSliderItems:(NSArray *)array{
     NSLog(@"didReceiveSliderItems");
     _sliderItems = array;
-    [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:0] withRowAnimation:UITableViewRowAnimationFade];
+    [self.tableView reloadData];
+    [self.refreshControl endRefreshing];
     
 }
 -(void)reloadTableViewWithAnimation:(BOOL)animation{
@@ -131,7 +133,6 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"tableView cellForRowAtIndexPath");
     if (indexPath.section ==0) {
         MainSliderCell *sliderCell = [tableView dequeueReusableCellWithIdentifier:@"sliderCell"];
         NSInteger imagesCount =[self imagesCountInSliderItems];
@@ -148,14 +149,18 @@
     TVCell *tvCell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     CategoryModel *category = _categories[indexPath.row];
     tvCell.categoryLabel.text = category.title;
-    [tvCell.categoryLabel setTag:indexPath.row];
+    tvCell.categoryLabel.tag = indexPath.row;
+    UITapGestureRecognizer *tapOnLabel = [[UITapGestureRecognizer alloc]
+                                          initWithTarget:self action:@selector(handleLabelTap:)];
+    tapOnLabel.numberOfTapsRequired = 1;
+    [tvCell.categoryLabel addGestureRecognizer:tapOnLabel];
+    
     //[tvCell.categoryLabel addTarget:self action:@selector(categoryButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
     return tvCell;
 }
 
 -(void)tableView:(UITableView *)tableView willDisplayCell:(TVCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSLog(@"willDisplayCell");
     if (indexPath.section ==1) {
         [cell setCollectionViewDataSourceDelegate:self index:indexPath.row];
     }
@@ -255,11 +260,16 @@
     }
 
 }
-#pragma mark - Helpers
--(void)categoryButtonPressed:(id)sender{
-    NSInteger row = [sender tag];
-    NSLog(@"tapped categoryButton at row %i",row);
+#pragma mark - 
+-(void)handleLabelTap:(UITapGestureRecognizer*)tapGestureRecognizer{
+    NSInteger row = tapGestureRecognizer.view.tag;
+    NSLog(@"tapped on %d label",row);
+    CategoryModel *category = _categories[row];
+    NSLog(@"category.id %@",category.id);
+    [self performSegueWithIdentifier:@"toCategoryItemsGridVC" sender:category.id];
+    
 }
+
 #pragma mark -Prepare Segue
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
@@ -274,6 +284,10 @@
     if ([segue.identifier isEqualToString:@"toBrowser"]) {
         BrowserViewController *browserVC = segue.destinationViewController;
         browserVC.link = sender;
+    }
+    if ([segue.identifier isEqualToString:@"toCategoryItemsGridVC"]) {
+        CategoryItemsGridViewController *categoryItemsGridVC = segue.destinationViewController;
+        categoryItemsGridVC.currentCategoryId = sender;
     }
 }
 

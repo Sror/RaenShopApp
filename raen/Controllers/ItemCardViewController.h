@@ -13,7 +13,7 @@
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSString *itemID;
-
+@property (nonatomic,strong) UIRefreshControl *refreshControl;
 
 
 

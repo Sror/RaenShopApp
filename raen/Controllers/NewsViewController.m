@@ -15,7 +15,7 @@
 #import "NewsCell.h"
 
 @interface NewsViewController ()<RaenAPICommunicatorDelegate>{
-    NSArray *_news;
+    NSMutableArray *_news;
     RaenAPICommunicator *_communicator;
 }
 
@@ -29,30 +29,42 @@
     [super viewDidLoad];
     _communicator = [[RaenAPICommunicator alloc] init];
     [_communicator setDelegate:self];
-    [_communicator getNews];
+    [self setupRefreshControl];
+    _news = [NSMutableArray array];
     [HUD showUIBlockingIndicator];
-	[self.tableView setHidden:YES];
-    self.navigationItem.title = @"Загрузка...";
+    [_communicator getNewsByPage:1];
+    
 }
-
+-(void)setupRefreshControl{
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(refreshView:) forControlEvents:UIControlEventValueChanged];
+    [self.tableView addSubview:self.refreshControl];
+}
+- (void)refreshView:(UIRefreshControl *)sender {
+    [_news removeAllObjects];
+    [HUD showUIBlockingIndicator];
+    [_communicator getNewsByPage:1];
+}
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
+    [_news removeAllObjects];
     // Dispose of any resources that can be recreated.
 }
 #pragma mark - RaenAPICommunicatorDelegate Methods
 -(void)fetchingFailedWithError:(JSONModelError *)error{
+    [self.refreshControl endRefreshing];
     [HUD hideUIBlockingIndicator];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
     [alert show];
 }
 
 -(void)didReceiveNews:(NSArray *)news{
-    NSLog(@"didReceive %d news category",news.count);
+    NSLog(@"didReceive %d news",news.count);
+    [self.refreshControl endRefreshing];
     [HUD hideUIBlockingIndicator];
-    _news = news;
+    [_news  addObjectsFromArray:news];
     [self.tableView reloadData];
-    [self.tableView setHidden:NO];
     self.navigationItem.title = @"Новости";
 }
 #pragma mark - UITableViewDataSource Methods
@@ -89,6 +101,19 @@
     NewsModel *news = _news[indexPath.section];
     [self performSegueWithIdentifier:@"toBrowser" sender:news];
 }
+#pragma mark - UIScrollViewDelegate
+- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
+    NSInteger currentOffset = scrollView.contentOffset.y;
+    NSInteger maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height;
+    if (maximumOffset - currentOffset <= 50) {
+        NSLog(@"reload");
+        //TODO
+        NSInteger page = _news.count/10+1;
+        NSLog(@"page %d",page);
+        [_communicator getNewsByPage:page];
+    }
+}
+
 #pragma mark -
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);

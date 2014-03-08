@@ -18,5 +18,5 @@
 @property (nonatomic,strong) NSString *subtotal;
 @property (nonatomic,strong) NSString <Optional>*params;
 @property (nonatomic,strong) NSString <Optional> *image;
-
+@property (nonatomic,strong) NSString <Optional> *category;
 @end

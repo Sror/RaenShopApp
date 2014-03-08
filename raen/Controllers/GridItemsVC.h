@@ -13,5 +13,5 @@
 @interface GridItemsVC : UIViewController <UICollectionViewDataSource,UICollectionViewDelegate>
 @property (strong, nonatomic) IBOutlet UICollectionView *collectionView;
 @property (strong, nonatomic)NSString *subcategoryID;
-
+@property (nonatomic,strong) UIRefreshControl *refreshControl;
 @end

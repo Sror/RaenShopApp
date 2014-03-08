@@ -16,7 +16,7 @@
 @property (weak, nonatomic) id<RaenAPICommunicatorDelegate> delegate;
 
 
-- (void)getNews;
+- (void)getNewsByPage:(NSInteger)page;
 - (void)getAllCategories;
 - (void)getSubcategoryWithId:(NSString*)subcategoryId;
 - (void)getItemCardWithId:(NSString*)itemId;
@@ -25,10 +25,10 @@
 //cart
 - (void)getItemsFromCart;
 - (void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty;
--(void)removeItemFromCartWithID:(NSString*)id;
--(void)deleteCookieFromLocalStorage;
--(void)saveCookies;
--(void)restoreCookies;
--(void)deleteCookies;
+- (void)deleteItemFromCartWithID:(NSString*)id;
+- (void)deleteCookieFromLocalStorage;
+- (void)saveCookies;
+- (void)restoreCookies;
+- (void)deleteCookies;
 
 @end

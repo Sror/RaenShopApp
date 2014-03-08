@@ -8,7 +8,6 @@
 
 #import "GridItemsVC.h"
 #import "ItemCell.h"
-#import "HUD.h"
 #import "GoodModel.h"
 #import "UIImageView+WebCache.h"
 #import "ItemCardViewController.h"
@@ -25,18 +24,16 @@
 @implementation GridItemsVC
 
 
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
-    [_communicator getSubcategoryWithId:self.subcategoryID];
-    [HUD showUIBlockingIndicatorWithText:nil];
+    [self setupRefreshControl];
+    if (self.subcategoryID) {
+        [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
+    }
     
-}
-
--(void)viewWillDisappear:(BOOL)animated{
     
 }
 
@@ -45,17 +42,28 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+-(void)setupRefreshControl{
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(refreshView:) forControlEvents:UIControlEventValueChanged];
+    [self.collectionView addSubview:self.refreshControl];
+}
+- (void)refreshView:(UIRefreshControl *)sender {
+    _items = nil;
+    [_communicator getSubcategoryWithId:self.subcategoryID];
+    
+}
 #pragma mark - RaenAPICOmmunicationDelegate 
 -(void)didReceiveSubcategoryItems:(NSArray *)items{
-    
+    NSLog(@"didReceiveSubcategoryItems %d",items.count);
     _items = items;
     [self.navigationItem setTitle:@"Товары"];
     [self.collectionView reloadData];
-    [HUD hideUIBlockingIndicator];
-    
+    [self.refreshControl endRefreshing];
+
+   
 }
 -(void)fetchingFailedWithError:(JSONModelError *)error{
-    [HUD hideUIBlockingIndicator];
+    [self.refreshControl endRefreshing];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
 }
@@ -108,7 +116,6 @@
         
         //[self.raenAPI getItemCardWithId:sender];
         //[_communicator getItemCardWithId:sender];
-        
     }
 }
 

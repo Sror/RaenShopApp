@@ -12,7 +12,7 @@
 @interface TVController : UIViewController <UICollectionViewDataSource,UICollectionViewDelegate,UITableViewDataSource,UITableViewDelegate>
 
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
-
+@property (strong,nonatomic) UIRefreshControl* refreshControl;
 
 
 @end

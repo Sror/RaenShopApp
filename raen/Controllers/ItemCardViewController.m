@@ -19,7 +19,7 @@
 #import "ItemCardCell.h"
 #import "AvailableItemCell.h"
 #import "UIImageView+WebCache.h"
-#import "HUD.h"
+
 
 #define IS_IPHONE_5 ( fabs( ( double )[ [ UIScreen mainScreen ] bounds ].size.height - ( double )568 ) < DBL_EPSILON )
 
@@ -35,46 +35,53 @@
 @implementation ItemCardViewController
 
 
--(void)viewDidAppear:(BOOL)animated{
-    NSLog(@"ItemCardVC viewDid Appear");
-    
-    //[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(showItem) name:RaenAPIGotCurrentItem object:self.raenAPI];
-   
-}
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self.tableView setHidden:YES];
+    
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
-    [_communicator getItemCardWithId:self.itemID];
-    [HUD showUIBlockingIndicatorWithText:@"Fetching JSON"];
-}
--(void)viewWillDisappear:(BOOL)animated{
+    [self setupRefreshControl];
+    if (self.itemID) {
+        [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
+    }
     
+
 }
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
+#pragma mark - RefreshControl
+-(void)setupRefreshControl{
+    self.refreshControl = [[UIRefreshControl alloc] init];
+    [self.refreshControl addTarget:self action:@selector(refreshView:) forControlEvents:UIControlEventValueChanged];
+    [self.tableView addSubview:self.refreshControl];
+}
+- (void)refreshView:(UIRefreshControl *)sender {
+    _item = nil;
+    [_communicator getItemCardWithId:self.itemID];
+    
+}
+
 #pragma mark - RaenAPICommunicatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
-    [HUD hideUIBlockingIndicator];
+    [self.refreshControl endRefreshing];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
 }
 
 -(void)didReceiveItemCard:(id)itemCard{
     NSLog(@"didReceiveItemCard");
-    [HUD hideUIBlockingIndicator];
     _item = itemCard;
     self.navigationItem.title = _item.title;
     [self addReviewAndVideo];
-    [self.tableView setHidden:NO];
     [self.tableView reloadData];
+    [self.refreshControl endRefreshing];
 }
-
+#pragma mark - add item to cart
 -(void)didAddItemToCartWithResponse:(NSDictionary *)response{
     NSLog(@"succesful did add item to cart with response %@",response);
     NSString *totalItems=response[@"total_items"];

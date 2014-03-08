@@ -8,7 +8,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface NewsViewController : UIViewController <UITableViewDataSource,UITableViewDelegate>
+@interface NewsViewController : UIViewController <UITableViewDataSource,UITableViewDelegate, UIScrollViewDelegate>
 
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
+@property (strong,nonatomic) UIRefreshControl* refreshControl;
 @end

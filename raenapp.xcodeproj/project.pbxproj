@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		3304D66218ABF8FA00B9441E /* SpecItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3304D66118ABF8FA00B9441E /* SpecItem.m */; };
 		6C31236018B2852A00839A6E /* BrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C31235F18B2852A00839A6E /* BrowserViewController.m */; };
+		6C45CCEA18CB2B5D006440C2 /* CategoryItemsGridViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C45CCE918CB2B5D006440C2 /* CategoryItemsGridViewController.m */; };
+		6C45CCED18CB328E006440C2 /* GridCategoryItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C45CCEC18CB328E006440C2 /* GridCategoryItemCell.m */; };
 		6C4E6AF318C4876500A14E99 /* SliderModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C4E6AF218C4876500A14E99 /* SliderModel.m */; };
 		6C4E6AF618C489BE00A14E99 /* MainSliderCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C4E6AF518C489BE00A14E99 /* MainSliderCell.m */; };
 		6C5473C9188405130069E62B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473C8188405130069E62B /* Foundation.framework */; };
@@ -95,6 +97,10 @@
 		3304D66118ABF8FA00B9441E /* SpecItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpecItem.m; sourceTree = "<group>"; };
 		6C31235E18B2852A00839A6E /* BrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowserViewController.h; sourceTree = "<group>"; };
 		6C31235F18B2852A00839A6E /* BrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowserViewController.m; sourceTree = "<group>"; };
+		6C45CCE818CB2B5D006440C2 /* CategoryItemsGridViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CategoryItemsGridViewController.h; sourceTree = "<group>"; };
+		6C45CCE918CB2B5D006440C2 /* CategoryItemsGridViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CategoryItemsGridViewController.m; sourceTree = "<group>"; };
+		6C45CCEB18CB328E006440C2 /* GridCategoryItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GridCategoryItemCell.h; sourceTree = "<group>"; };
+		6C45CCEC18CB328E006440C2 /* GridCategoryItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GridCategoryItemCell.m; sourceTree = "<group>"; };
 		6C4E6AF118C4876500A14E99 /* SliderModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SliderModel.h; sourceTree = "<group>"; };
 		6C4E6AF218C4876500A14E99 /* SliderModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SliderModel.m; sourceTree = "<group>"; };
 		6C4E6AF418C489BE00A14E99 /* MainSliderCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MainSliderCell.h; path = raen/Cells/MainSliderCell.h; sourceTree = SOURCE_ROOT; };
@@ -420,6 +426,8 @@
 				6CEBC1D418C606DB0046F2A6 /* NewsCell.m */,
 				6CA770DA18C7442C00C195E5 /* CartCell.h */,
 				6CA770DB18C7442C00C195E5 /* CartCell.m */,
+				6C45CCEB18CB328E006440C2 /* GridCategoryItemCell.h */,
+				6C45CCEC18CB328E006440C2 /* GridCategoryItemCell.m */,
 			);
 			path = Cells;
 			sourceTree = "<group>";
@@ -443,6 +451,8 @@
 				6CBB386A18C5CB880097AFD0 /* SaleOfDayViewController.m */,
 				6CBB386C18C5F7100097AFD0 /* NewsViewController.h */,
 				6CBB386D18C5F7100097AFD0 /* NewsViewController.m */,
+				6C45CCE818CB2B5D006440C2 /* CategoryItemsGridViewController.h */,
+				6C45CCE918CB2B5D006440C2 /* CategoryItemsGridViewController.m */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -661,6 +671,7 @@
 				6CEBC1D518C606DB0046F2A6 /* NewsCell.m in Sources */,
 				6CBAF2EC18AB401B00426647 /* GridItemsVC.m in Sources */,
 				6CBAF2EE18AB401B00426647 /* ItemCardViewController.m in Sources */,
+				6C45CCED18CB328E006440C2 /* GridCategoryItemCell.m in Sources */,
 				6CBAF2C218AB3FF100426647 /* CategoryModel.m in Sources */,
 				6CBAF2C518AB3FF100426647 /* ImageModel.m in Sources */,
 				6CBAF2C418AB3FF100426647 /* GoodModel.m in Sources */,
@@ -686,6 +697,7 @@
 				6CBF689D18913082003ED717 /* SDWebImageDownloader.m in Sources */,
 				6CBF689B18913082003ED717 /* SDWebImageCompat.m in Sources */,
 				6CBF686F1890E22B003ED717 /* HUD.m in Sources */,
+				6C45CCEA18CB2B5D006440C2 /* CategoryItemsGridViewController.m in Sources */,
 				6CBAF2C118AB3FF100426647 /* CartItemModel.m in Sources */,
 				6CB89CDE18B67CB60048407B /* NewsModel.m in Sources */,
 				6CBF689818913082003ED717 /* MKAnnotationView+WebCache.m in Sources */,

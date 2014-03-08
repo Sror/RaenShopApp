@@ -111,9 +111,7 @@ static UIView* lastViewWithHUD = nil;
     MBProgressHUD *hud = [MBProgressHUD showHUDAddedTo:targetView animated:YES];
 	if (str!=nil) {
         hud.labelText = str;
-    } else {
-        hud.labelText = @"Loading...";
-    }
+    } 
     
     return hud;
 }
