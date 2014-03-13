@@ -11,7 +11,8 @@
 @interface NewsCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UIImageView *newsImageView;
 @property (weak, nonatomic) IBOutlet UILabel *titlelabel;
-@property (weak, nonatomic) IBOutlet UIWebView *descriptionWebView;
+@property (weak, nonatomic) IBOutlet UILabel *categoryLabel;
+@property (weak, nonatomic) IBOutlet UILabel *descriptionLabel;
 @property (weak, nonatomic) IBOutlet UIActivityIndicatorView *spinner;
 
 @end

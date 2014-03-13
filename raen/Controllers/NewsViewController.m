@@ -69,17 +69,17 @@
 }
 #pragma mark - UITableViewDataSource Methods
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    return _news.count;
+    return 1;
 }
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     //one news in each section
-    return 1;
+    return _news.count;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    
     NewsCell *cell = [tableView dequeueReusableCellWithIdentifier:@"newsCell"];
-    NewsModel *currentNews = _news[indexPath.section];
+    NewsModel *currentNews = _news[indexPath.row];
     cell.titlelabel.text = currentNews.title;
+    cell.categoryLabel.text = currentNews.type;
     if ([currentNews.image rangeOfString:@"http"].location !=NSNotFound) {
         [cell.spinner startAnimating];
         [cell.newsImageView setImageWithURL:[NSURL URLWithString:currentNews.image]
@@ -87,21 +87,37 @@
             [cell.spinner stopAnimating];
         }];
     }
-    [cell.descriptionWebView loadHTMLString:currentNews.text baseURL:nil];
+
+    cell.descriptionLabel.text = currentNews.text;
     return cell;
 }
+/*
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     NewsModel *news = _news[section];
     return news.type;
 }
-
+*/
 #pragma mark - UITableViewDelegate
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
-    NewsModel *news = _news[indexPath.section];
+    NewsModel *news = _news[indexPath.row];
     [self performSegueWithIdentifier:@"toBrowser" sender:news];
 }
 #pragma mark - UIScrollViewDelegate
+-(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
+    NSLog(@"scrollViewDidEndDecelerating");
+    float endScrolling = scrollView.contentOffset.y +scrollView.frame.size.height;
+    if (endScrolling >= scrollView.contentSize.height) {
+        NSLog(@"Scroll END Called!");
+        //TODO LOAD MORE ITEMS
+        
+       
+        NSInteger page = _news.count/10+1;
+        NSLog(@"page %d",page);
+        [_communicator getNewsByPage:page];
+    }
+}
+/*
 - (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
     NSInteger currentOffset = scrollView.contentOffset.y;
     NSInteger maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height;
@@ -113,6 +129,7 @@
         [_communicator getNewsByPage:page];
     }
 }
+ */
 
 #pragma mark -
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{

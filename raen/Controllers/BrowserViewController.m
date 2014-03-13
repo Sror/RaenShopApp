@@ -32,6 +32,7 @@
         
     }
     if (self.link) {
+        NSLog(@"browser link %@",self.link);
         NSURL *url =[NSURL URLWithString:self.link];
         [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
     }
