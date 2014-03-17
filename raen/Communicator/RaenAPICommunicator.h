@@ -10,6 +10,8 @@
 #import "RaenAPICommunicatorDelegate.h"
 #import "ItemModel.h"
 
+extern int RaenAPIdefaulSubcategoryItemsCountPerPage;
+extern int RaenAPIdefaultNewsItemsCountPerPage;
 @class RaenAPICommunicator;
 
 @interface RaenAPICommunicator : NSObject 
@@ -18,7 +20,7 @@
 
 - (void)getNewsByPage:(NSInteger)page;
 - (void)getAllCategories;
-- (void)getSubcategoryWithId:(NSString*)subcategoryId;
+-(void)getSubcategoryWithId:(NSString*)subcategoryId withParameters:(NSDictionary*)parameters;
 - (void)getItemCardWithId:(NSString*)itemId;
 - (void)getSliderItems;
 - (void)getSaleOfDay;

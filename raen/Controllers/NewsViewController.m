@@ -23,7 +23,6 @@
 
 @implementation NewsViewController
 
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -40,6 +39,7 @@
     [self.refreshControl addTarget:self action:@selector(refreshView:) forControlEvents:UIControlEventValueChanged];
     [self.tableView addSubview:self.refreshControl];
 }
+
 - (void)refreshView:(UIRefreshControl *)sender {
     [_news removeAllObjects];
     [HUD showUIBlockingIndicator];
@@ -72,7 +72,6 @@
     return 1;
 }
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
-    //one news in each section
     return _news.count;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -87,7 +86,6 @@
             [cell.spinner stopAnimating];
         }];
     }
-
     cell.descriptionLabel.text = currentNews.text;
     return cell;
 }
@@ -109,11 +107,9 @@
     float endScrolling = scrollView.contentOffset.y +scrollView.frame.size.height;
     if (endScrolling >= scrollView.contentSize.height) {
         NSLog(@"Scroll END Called!");
-        //TODO LOAD MORE ITEMS
-        
-       
-        NSInteger page = _news.count/10+1;
+        NSInteger page = _news.count/RaenAPIdefaultNewsItemsCountPerPage+1;
         NSLog(@"page %d",page);
+        [HUD showUIBlockingIndicator];
         [_communicator getNewsByPage:page];
     }
 }

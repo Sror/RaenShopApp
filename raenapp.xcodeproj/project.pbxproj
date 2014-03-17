@@ -77,6 +77,7 @@
 		6CBF68A418913082003ED717 /* UIImage+WebP.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBF689518913082003ED717 /* UIImage+WebP.m */; };
 		6CBF68A518913082003ED717 /* UIImageView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBF689718913082003ED717 /* UIImageView+WebCache.m */; };
 		6CBF68A718913097003ED717 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CBF68A618913097003ED717 /* ImageIO.framework */; };
+		6CC92F2618D6E848003E8DA5 /* SubcategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CC92F2518D6E848003E8DA5 /* SubcategoryModel.m */; };
 		6CEBC1D518C606DB0046F2A6 /* NewsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CEBC1D418C606DB0046F2A6 /* NewsCell.m */; };
 		6CF0820418B4DFE900AB3533 /* AvailableItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CF0820318B4DFE900AB3533 /* AvailableItemCell.m */; };
 		6CF584E218AE023E00549A79 /* RaenAPICommunicator.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CF584E118AE023E00549A79 /* RaenAPICommunicator.m */; };
@@ -223,6 +224,8 @@
 		6CBF689618913082003ED717 /* UIImageView+WebCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImageView+WebCache.h"; sourceTree = "<group>"; };
 		6CBF689718913082003ED717 /* UIImageView+WebCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIImageView+WebCache.m"; sourceTree = "<group>"; };
 		6CBF68A618913097003ED717 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
+		6CC92F2418D6E848003E8DA5 /* SubcategoryModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubcategoryModel.h; sourceTree = "<group>"; };
+		6CC92F2518D6E848003E8DA5 /* SubcategoryModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubcategoryModel.m; sourceTree = "<group>"; };
 		6CEBC1D318C606DB0046F2A6 /* NewsCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsCell.h; sourceTree = "<group>"; };
 		6CEBC1D418C606DB0046F2A6 /* NewsCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsCell.m; sourceTree = "<group>"; };
 		6CF0820218B4DFE900AB3533 /* AvailableItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AvailableItemCell.h; sourceTree = "<group>"; };
@@ -340,6 +343,8 @@
 				6CBAF2A018AB3FF100426647 /* ChildrenModel.m */,
 				6CBAF2A118AB3FF100426647 /* GoodModel.h */,
 				6CBAF2A218AB3FF100426647 /* GoodModel.m */,
+				6CC92F2418D6E848003E8DA5 /* SubcategoryModel.h */,
+				6CC92F2518D6E848003E8DA5 /* SubcategoryModel.m */,
 				6CBAF2A718AB3FF100426647 /* JSONModel */,
 			);
 			path = Model;
@@ -673,6 +678,7 @@
 				6CBAF2EE18AB401B00426647 /* ItemCardViewController.m in Sources */,
 				6C45CCED18CB328E006440C2 /* GridCategoryItemCell.m in Sources */,
 				6CBAF2C218AB3FF100426647 /* CategoryModel.m in Sources */,
+				6CC92F2618D6E848003E8DA5 /* SubcategoryModel.m in Sources */,
 				6CBAF2C518AB3FF100426647 /* ImageModel.m in Sources */,
 				6CBAF2C418AB3FF100426647 /* GoodModel.m in Sources */,
 				6CBF68A118913082003ED717 /* UIButton+WebCache.m in Sources */,

@@ -8,15 +8,17 @@
 
 #import "GridItemsVC.h"
 #import "ItemCell.h"
+#import "SubcategoryModel.h"
 #import "GoodModel.h"
 #import "UIImageView+WebCache.h"
 #import "ItemCardViewController.h"
-
 #import "RaenAPICommunicator.h"
+#import "HUD.h"
 
 @interface GridItemsVC ()<RaenAPICommunicatorDelegate>
 {   RaenAPICommunicator *_communicator;
-    NSArray *_items;
+    NSInteger _itemsCount;
+    NSMutableArray *_items;
 }
 
 @end
@@ -29,6 +31,7 @@
     [super viewDidLoad];
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
+    _items = [NSMutableArray array];
     [self setupRefreshControl];
     if (self.subcategoryID) {
         [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
@@ -48,26 +51,41 @@
     [self.collectionView addSubview:self.refreshControl];
 }
 - (void)refreshView:(UIRefreshControl *)sender {
-    _items = nil;
-    [_communicator getSubcategoryWithId:self.subcategoryID];
+    [_items removeAllObjects];
+    [HUD showUIBlockingIndicator];
+    [_communicator getSubcategoryWithId:self.subcategoryID withParameters:nil];
     
 }
 #pragma mark - RaenAPICOmmunicationDelegate 
+-(void)didReceiveSubcategory:(id)subcategoryModel{
+    NSLog(@"didReceiveSubcategory");
+    if ([subcategoryModel isKindOfClass:[SubcategoryModel class]]) {
+        SubcategoryModel *subcategory  = subcategoryModel;
+        _itemsCount = subcategory.count;
+        [_items addObjectsFromArray:subcategory.goods];
+        [HUD hideUIBlockingIndicator];
+        [self.navigationItem setTitle:@"Товары"];
+        [self.collectionView reloadData];
+        [self.refreshControl endRefreshing];
+    }
+    NSLog(@"\n_items.count = %d\n _itemsCount=%d",_items.count,_itemsCount);
+}
+/*
 -(void)didReceiveSubcategoryItems:(NSArray *)items{
     NSLog(@"didReceiveSubcategoryItems %d",items.count);
     _items = items;
     [self.navigationItem setTitle:@"Товары"];
     [self.collectionView reloadData];
     [self.refreshControl endRefreshing];
-
-   
 }
+ */
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
+    [HUD hideUIBlockingIndicator];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
 }
-#pragma mark UICollectionViewDataSource
+
 #pragma mark - UICollectionViewDataSource Methods
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section
@@ -107,6 +125,20 @@
     GoodModel *item = _items[indexPath.row];
     [self performSegueWithIdentifier:@"toItemCardView" sender:item.id];
 }
+#pragma mark - UIScrollViewDelegate
+-(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
+    float endScrolling = scrollView.contentOffset.y +scrollView.frame.size.height;
+    if (endScrolling >= scrollView.contentSize.height) {
+        NSLog(@"Scroll END Called!");
+        if (_items.count < _itemsCount) {
+            NSInteger page = _items.count/RaenAPIdefaulSubcategoryItemsCountPerPage+1;
+             NSLog(@"currentPage %d",page);
+           [_communicator getSubcategoryWithId:self.subcategoryID withParameters:@{@"page":[NSNumber numberWithInteger:page]}];
+        [HUD showUIBlockingIndicator];
+        }
+    }
+}
+
 #pragma mark - 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     if ([segue.identifier isEqualToString:@"toItemCardView"]) {

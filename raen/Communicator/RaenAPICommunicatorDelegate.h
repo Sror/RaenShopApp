@@ -15,7 +15,8 @@
 - (void)didReceiveNews:(NSArray*)news;
 - (void)didReceiveCartItems:(NSArray *)items;
 - (void)didAddItemToCartWithResponse:(NSDictionary*)response;
-- (void)didReceiveSubcategoryItems:(NSArray *)items;
+//- (void)didReceiveSubcategoryItems:(NSArray *)items;
+- (void)didReceiveSubcategory:(id)subcategoryModel;
 - (void)didReceiveItemCard:(id)itemCard;
 - (void)didReceiveAllCategories:(NSArray *)array;
 - (void)didReceiveSliderItems:(NSArray*)array;

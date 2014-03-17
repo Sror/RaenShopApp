@@ -10,11 +10,11 @@
 #import "RaenAPICommunicator.h"
 #import "HUD.h"
 #import "UIImageView+WebCache.h"
-
+#import "ItemCardViewController.h"
 #import "SaleOfDayModel.h"
 #import "SaleOfDayDescriptionModel.h"
 
-@interface SaleOfDayViewController  () <RaenAPICommunicatorDelegate>{
+@interface SaleOfDayViewController  () <RaenAPICommunicatorDelegate,UITextViewDelegate>{
     RaenAPICommunicator *_communicator;
 }
 
@@ -29,6 +29,7 @@
     _communicator.delegate = self;
     [_communicator getSaleOfDay];
     [HUD showUIBlockingIndicator];
+    [self.textView setDataDetectorTypes:UIDataDetectorTypeLink];
 	// Do any additional setup after loading the view.
 }
 
@@ -61,22 +62,47 @@
         NSLog(@"--- NO IMAGE For Sale of day");
     }
     //set text in textView
-    [self.textView setText:[self attributedStringFromDescriptions:saleOfDay.descriptions].string];
+    //[self.textView setText:[self attributedStringFromDescriptions:saleOfDay.descriptions]];
+    //self.textView.text = [self attributedStringFromDescriptions:saleOfDay.descriptions];
+    [self.textView setAttributedText:[self attributedStringFromDescriptions:saleOfDay.descriptions]];
     [HUD hideUIBlockingIndicator];
     
 }
 #pragma mark - Helpers
 -(NSAttributedString*)attributedStringFromDescriptions:(NSArray*)descriptions{
-   // NSMutableAttributedString *fullAttrString = [[NSMutableAttributedString alloc] init];
-    NSString *Fullstring = @"";
+    NSMutableAttributedString *fullAttrString = [[NSMutableAttributedString alloc] init];
+
     for (SaleOfDayDescriptionModel *description in descriptions) {
         if (description.text.length>0) {
-            Fullstring = [Fullstring stringByAppendingString:description.text];
+            NSAttributedString *tmpAttString = [[NSAttributedString alloc] init];
+            if (![description.id isEqualToString:@"0"]) {
+               tmpAttString = [tmpAttString initWithString:description.text
+                                                attributes:@{NSLinkAttributeName: description.id,
+                                                            }];
+            }else{
+                tmpAttString = [tmpAttString initWithString:description.text];
+            }
+            [fullAttrString appendAttributedString:tmpAttString];
         }
     }
-    NSLog(@"fullString =%@",Fullstring);
-    NSAttributedString *attrString = [[NSAttributedString alloc] initWithString:Fullstring];
-#warning TODO add links to item card view controller
-    return attrString;
+    return fullAttrString;
+}
+#pragma mark - UITextViewDelegate
+
+-(BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange{
+    
+    NSLog(@"textView should interactWith URL %@",URL);
+    if ([[URL absoluteString] rangeOfString:@"htto://"].location == NSNotFound) {
+        [self performSegueWithIdentifier:@"toItemCardView" sender:[URL absoluteString]];
+    }
+    return YES;
+}
+
+#pragma mark -
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if ([segue.identifier isEqualToString:@"toItemCardView"]) {
+        ItemCardViewController *itemCardVC=segue.destinationViewController;
+        itemCardVC.itemID = sender;
+    }
 }
 @end

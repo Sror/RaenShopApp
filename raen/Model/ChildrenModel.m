@@ -9,9 +9,11 @@
 #import "ChildrenModel.h"
 
 @implementation ChildrenModel
+
 +(JSONKeyMapper *)keyMapper{
     return [[JSONKeyMapper alloc] initWithDictionary:@{
                                                        @"image":@"imageLink"
                                                        }];
 }
+
 @end

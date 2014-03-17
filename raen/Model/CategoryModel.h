@@ -8,6 +8,7 @@
 
 #import "JSONModel.h"
 #import "ChildrenModel.h"
+
 @protocol CategoryModel @end
 @interface CategoryModel : JSONModel
 @property (nonatomic,strong) NSString *id;

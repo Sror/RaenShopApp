@@ -7,12 +7,11 @@
 //
 
 #import "JSONModel.h"
-
+@protocol GoodModel @end
 @interface GoodModel : JSONModel
 @property (nonatomic,strong) NSString *id;
 @property (nonatomic,strong) NSString *catId;
 @property (nonatomic,strong) NSString *title;
-
 @property (nonatomic,getter = isAvailable) BOOL available;
 @property (nonatomic,getter = isSale) BOOL sale;
 @property (nonatomic,strong) NSString *price;

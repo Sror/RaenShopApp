@@ -11,10 +11,15 @@
 #import "JSONModelLib.h"
 #import "NewsModel.h"
 #import "CartItemModel.h"
-#import "GoodModel.h"
+#import "SubcategoryModel.h"
+
+//#import "GoodModel.h"
 #import "CategoryModel.h"
 #import "SliderModel.h"
 #import "SaleOfDayModel.h"
+
+int RaenAPIdefaulSubcategoryItemsCountPerPage = 30;
+int RaenAPIdefaultNewsItemsCountPerPage = 10;
 
 #define kRaenApiGetGuard @"http://raenshop.ru/api/catalog/goods_list/cat_id/81/" //get all guard items
 #define kRaenApiGetCategories @"http://raenshop.ru/api/catalog/categories" //get all categories
@@ -54,18 +59,29 @@
     
 }
 #pragma mark - get Subcategory With id
--(void)getSubcategoryWithId:(NSString*)subcategoryId{
-   
+-(void)getSubcategoryWithId:(NSString*)subcategoryId withParameters:(NSDictionary*)parameters {
     NSString *urlStr =[kRaenApiGetSubcategoryItems stringByAppendingString:subcategoryId];
-    NSLog(@"getting items in subcategory from %@",urlStr);
-    [JSONHTTPClient getJSONFromURLWithString:urlStr completion:^(id json, JSONModelError *err) {
+    NSLog(@"getting items in subcategory from %@ with parameters %@",urlStr,parameters);
+    if (parameters) {
+#warning TODO parameters
+        if (parameters[@"page"]!=nil) {
+            urlStr = [urlStr stringByAppendingString:[NSString stringWithFormat:@"/page/%@",parameters[@"page"]]];
+        }
+    }
+    NSLog(@"fullUrlString %@",urlStr);
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    [JSONHTTPClient getJSONFromURLWithString:urlStr
+                                  completion:^(id json, JSONModelError *err) {
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
         if (err) {
             NSLog(@"err %@",err.localizedDescription);
             [self.delegate fetchingFailedWithError:err];
         }
-        NSArray *subcategoryItems = [GoodModel arrayOfModelsFromDictionaries:json[@"goods"]];
-        if (subcategoryItems) {
-            [self.delegate didReceiveSubcategoryItems:subcategoryItems];
+        SubcategoryModel *subcategoryModel = [[SubcategoryModel alloc] initWithDictionary:json error:nil];
+       // NSArray *subcategoryItems = [GoodModel arrayOfModelsFromDictionaries:json[@"goods"]];
+        if (subcategoryModel) {
+            //[self.delegate didReceiveSubcategoryItems:subcategoryItems];
+            [self.delegate didReceiveSubcategory:subcategoryModel];
         }else{
             NSLog(@"----something went wrong with init JSONModel----");
         }
@@ -73,11 +89,12 @@
 }
 #pragma mark -get Item Card With id
 -(void)getItemCardWithId:(NSString*)itemId{
-   
+   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     NSString *urlStr = [kRaenApiGetItemCard stringByAppendingString:itemId];
     NSLog(@"getting item json data from %@",urlStr);
     [JSONHTTPClient getJSONFromURLWithString:urlStr
                                   completion:^(id json, JSONModelError *err) {
+                                      [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
                                       if (err) {
                                           NSLog(@"err %@",err.localizedDescription);
                                           [self.delegate fetchingFailedWithError:err];
@@ -93,9 +110,10 @@
 #pragma mark - get All Categories
 - (void)getAllCategories{
     NSLog(@"getting all categories");
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetCategories
                                   completion:^(id json, JSONModelError *err) {
-
+                                      [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
                                       if (err) {
                                           NSLog(@"err %@",err.localizedDescription);
                                           [self.delegate fetchingFailedWithError:err];
@@ -114,17 +132,20 @@
 #pragma mark - Slider items
 - (void)getSliderItems{
     NSLog(@"getting slider items");
-   [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetSliderItems completion:^(id json, JSONModelError *err) {
-       if (err) {
-           NSLog(@"err! %@",err.localizedDescription);
-           [self.delegate fetchingFailedWithError:err];
-       }
-       NSArray *sliderItems =[SliderModel arrayOfModelsFromDictionaries:json];
-       if (sliderItems) {
-           [self.delegate didReceiveSliderItems:sliderItems];
-       }else{
-           NSLog(@"----something went wrong with init JSONModel----");
-       }
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+   [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetSliderItems
+                                 completion:^(id json, JSONModelError *err) {
+                                     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                                       if (err) {
+                                           NSLog(@"err! %@",err.localizedDescription);
+                                           [self.delegate fetchingFailedWithError:err];
+                                       }
+                                       NSArray *sliderItems =[SliderModel arrayOfModelsFromDictionaries:json];
+                                       if (sliderItems) {
+                                           [self.delegate didReceiveSliderItems:sliderItems];
+                                       }else{
+                                           NSLog(@"----something went wrong with init JSONModel----");
+                                       }
 
    }];
     
@@ -132,19 +153,22 @@
 #pragma mark - SaleOfDay
 - (void)getSaleOfDay{
     NSLog(@"get sale of day");
-    [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetSaleOfDay completion:^(id json, JSONModelError *err) {
-        if (err) {
-            NSLog(@"eror to get sale of day %@",err.localizedDescription);
-            [self.delegate fetchingFailedWithError:err];
-        }else{
-            SaleOfDayModel *saleOfdayModel =[[SaleOfDayModel alloc]initWithDictionary:json error:nil ];
-            if (saleOfdayModel) {
-                [self.delegate didReceiveSaleOfDay:saleOfdayModel];
-            }else{
-                NSLog(@"----something went wrong with init JSONModel----");
-                
-            }
-        }
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetSaleOfDay
+                                  completion:^(id json, JSONModelError *err) {
+                                      [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                                        if (err) {
+                                            NSLog(@"eror to get sale of day %@",err.localizedDescription);
+                                            [self.delegate fetchingFailedWithError:err];
+                                        }else{
+                                            SaleOfDayModel *saleOfdayModel =[[SaleOfDayModel alloc]initWithDictionary:json error:nil ];
+                                            if (saleOfdayModel) {
+                                                [self.delegate didReceiveSaleOfDay:saleOfdayModel];
+                                            }else{
+                                                NSLog(@"----something went wrong with init JSONModel----");
+                                                
+                                            }
+                                        }
     }];
     
 }
@@ -152,10 +176,12 @@
 #pragma mark CART methods
 -(void)getItemsFromCart{
     NSLog(@"getting items from cart");
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     //TODO add cookie !
     [self restoreCookies];
     [JSONHTTPClient getJSONFromURLWithString:kRaenApiGetCart
                                   completion:^(id json, JSONModelError *err) {
+                                      [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
                                       if (err) {
                                           NSLog(@"err! %@",err.localizedDescription);
                                           [self.delegate fetchingFailedWithError:err];
@@ -172,36 +198,11 @@
    
 }
 -(void)deleteItemFromCartWithID:(NSString*)rowid{
-    /*
-    NSURLSessionConfiguration *config = [NSURLSessionConfiguration defaultSessionConfiguration];
-    NSURLSession *session =[NSURLSession sessionWithConfiguration:config];
-    NSURL *url =[NSURL URLWithString:kRaenApiUpdateCart];
-    NSString*params = [NSString stringWithFormat:@"rowid=%@&qty=0",rowid];
-    NSLog(@"params %@",params);
-    NSMutableURLRequest *request = [ NSMutableURLRequest requestWithURL:url
-                                                            cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                                        timeoutInterval:60.0];
-    [request setHTTPMethod:@"POST"];
-    [request setHTTPBody:[params dataUsingEncoding:NSUTF8StringEncoding]];
-    NSLog(@"request %@",request);
-    NSURLSessionDataTask *dataTask =[session dataTaskWithRequest:request completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
-        if (error!=nil){
-            NSDictionary *json = [ NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:Nil];
-            [self.delegate didRemoveItemFromCartWithResponse:json];
-        }else{
-#warning TODO notification when error to remove item from cart
-            NSLog(@"----error to remove item from cart!----");
-            NSLog(@"%@",error.localizedDescription);
-            NSLog(@"responce %@",response);
-            NSDictionary *json = [ NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:Nil];
-            NSLog(@"json %@",json);
-        }
-    }];
-    [dataTask resume];
-    */
     NSLog(@"rowid %@",rowid);
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [JSONHTTPClient postJSONFromURLWithString:kRaenApiUpdateCart params:@{@"rowid":rowid,@"qty":@"0"}
                                    completion:^(id json, JSONModelError *err) {
+                                       [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
                                        if ([json isKindOfClass:[NSDictionary class]]) {
                                            [self.delegate didRemoveItemFromCartWithResponse:json];
                                        }
