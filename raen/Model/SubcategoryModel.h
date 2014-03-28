@@ -10,6 +10,6 @@
 #import "GoodModel.h"
 
 @interface SubcategoryModel : JSONModel
-@property (nonatomic,assign) NSInteger count;
+@property (nonatomic, assign) NSInteger count;
 @property (nonatomic, strong) NSArray <GoodModel,Optional> *goods;
 @end

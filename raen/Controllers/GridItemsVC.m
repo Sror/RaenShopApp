@@ -13,9 +13,10 @@
 #import "UIImageView+WebCache.h"
 #import "ItemCardViewController.h"
 #import "RaenAPICommunicator.h"
+#import "FiltersViewController.h"
 #import "HUD.h"
 
-@interface GridItemsVC ()<RaenAPICommunicatorDelegate>
+@interface GridItemsVC ()<RaenAPICommunicatorDelegate,FiltersViewControllerDelegate>
 {   RaenAPICommunicator *_communicator;
     NSInteger _itemsCount;
     NSMutableArray *_items;
@@ -62,6 +63,8 @@
     if ([subcategoryModel isKindOfClass:[SubcategoryModel class]]) {
         SubcategoryModel *subcategory  = subcategoryModel;
         _itemsCount = subcategory.count;
+        if (_itemsCount==0) {
+        }
         [_items addObjectsFromArray:subcategory.goods];
         [HUD hideUIBlockingIndicator];
         [self.navigationItem setTitle:@"Товары"];
@@ -70,20 +73,19 @@
     }
     NSLog(@"\n_items.count = %d\n _itemsCount=%d",_items.count,_itemsCount);
 }
-/*
--(void)didReceiveSubcategoryItems:(NSArray *)items{
-    NSLog(@"didReceiveSubcategoryItems %d",items.count);
-    _items = items;
-    [self.navigationItem setTitle:@"Товары"];
-    [self.collectionView reloadData];
-    [self.refreshControl endRefreshing];
-}
- */
+
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
     [HUD hideUIBlockingIndicator];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
+}
+
+#pragma mark -FiltersViewControllerDelegate method
+-(void)didSelectFilter:(NSDictionary *)filterParameters{
+    NSLog(@"didSelectFilter %@",filterParameters);
+    [_items removeAllObjects];
+    [_communicator getSubcategoryWithId:self.subcategoryID withParameters:filterParameters];
 }
 
 #pragma mark - UICollectionViewDataSource Methods
@@ -141,14 +143,29 @@
 
 #pragma mark - 
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
-    if ([segue.identifier isEqualToString:@"toItemCardView"]) {
-        
+    if ([segue.identifier isEqualToString:@"toItemCardView"])
+    {
         ItemCardViewController *itemCardVC=segue.destinationViewController;
         itemCardVC.itemID = sender;
-        
-        //[self.raenAPI getItemCardWithId:sender];
-        //[_communicator getItemCardWithId:sender];
     }
+    if ([segue.identifier isEqualToString:@"toFiltersVC"])
+    {
+        UINavigationController *navigationVC = segue.destinationViewController;
+        
+        FiltersViewController *filtersVC = [[navigationVC viewControllers] objectAtIndex:0];
+        filtersVC.delegate = self;
+        if ([sender isKindOfClass:[NSString class]]) {
+            filtersVC.subcategoryID = sender;
+        }else{
+            NSLog(@"unknow sender's class sent to filters view controller");
+        }
+        
+    }
+
+}
+- (IBAction)filterButtonPressed:(id)sender {
+    
+    [self performSegueWithIdentifier:@"toFiltersVC" sender:self.subcategoryID];
 }
 
 @end

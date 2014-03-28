@@ -22,6 +22,13 @@
 - (void)didReceiveSliderItems:(NSArray*)array;
 - (void)didReceiveSaleOfDay:(id)saleOfDayModel;
 - (void)didRemoveItemFromCartWithResponse:(NSDictionary*)response;
+
+- (void)didReceiveFilter:(id)filter;
+//authorization delegate methods
+- (void)didSuccessAPIAuthorizedWithResponse:(NSDictionary*)response;
+- (void)didEmailRequest;
+- (void)didFailuerAPIAuthorizationWithResponse:(NSDictionary*)response;
+
 @required
 - (void)fetchingFailedWithError:(JSONModelError *)error;
 @end

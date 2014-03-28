@@ -30,7 +30,6 @@
     
     [self.subView setHidden:YES];
     [HUD showUIBlockingIndicatorWithText:Nil];
-   
     [_communicator getItemsFromCart];
 }
 
@@ -41,6 +40,7 @@
         CartItemModel *currentItem = _items[i];
         itemsCount = itemsCount + [currentItem.qty intValue];
     }
+    NSLog(@"itemsCount %d",itemsCount);
     return [NSString stringWithFormat:@"%i",itemsCount];
 }
 - (void)viewDidLoad
@@ -48,7 +48,8 @@
     [super viewDidLoad];
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
-    //[[self tabBarController] tabBar] items] objectAtIndex:1] setBadgeValue:[self itemsCount]]];
+    //[[[[self tabBarController] tabBar] items] objectAtIndex:1] setBadgeValue:[self itemsCount]]];
+    [self.tabBarController.tabBar.items[2] setBadgeValue:[self itemsCount]];
     [self.tableView setHidden:YES];
     //User Interface
     [self.subView.layer setCornerRadius:3.0];
@@ -62,11 +63,11 @@
 
 #pragma mark - RaenAPICommunicationDelegate
 -(void)didReceiveCartItems:(NSArray *)items{
-    NSLog(@"didReceiveCartItems %@",items);
     [self.tableView setHidden:NO];
     [HUD hideUIBlockingIndicator];
     _items = items;
-    [self.tabBarItem setBadgeValue:[self itemsCount]];
+    NSLog(@"items in cart %@",_items);
+    [self.tabBarController.tabBar.items[2] setBadgeValue:[self itemsCount]];
     [self.tableView reloadData];
     [self.subTotalLabel setText:[self subtotal]];
     [self.subView setHidden:NO];
@@ -85,7 +86,7 @@
         [HUD hideUIBlockingIndicator];
     }else{
         [_communicator saveCookies];
-        [self.tabBarItem setBadgeValue:[self itemsCount]];
+        
         [HUD hideUIBlockingIndicator];
         [_communicator getItemsFromCart];
     }
@@ -102,7 +103,7 @@
     static NSString *cellIdentifier = @"CartCell";
     CartCell *cell = [tb dequeueReusableCellWithIdentifier:cellIdentifier];
     CartItemModel *itemInCart = _items[indexPath.row];
-    cell.titleLabel.text = itemInCart.name;
+    cell.titleLabel.text = [NSString stringWithFormat:@"%@, %@",itemInCart.category,itemInCart.name];
     [cell.spinner startAnimating];
     [cell.itemImageView setImageWithURL:[NSURL URLWithString:itemInCart.image]
                               completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
@@ -153,8 +154,16 @@
     };
     return [NSString stringWithFormat:@"Итого: %i руб.",total];
 }
+#pragma mark - IBActions
+- (IBAction)loginButtonPressed:(id)sender {
+    [self performSegueWithIdentifier:@"toLoginVC" sender:nil];
+}
 
 - (IBAction)checkOutButtonPressed:(id)sender {
     NSLog(@"checkOutButtonPressed");
+}
+#pragma mark - Navigation
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    NSLog(@"prepareForSegue %@",segue.identifier);
 }
 @end

@@ -63,7 +63,6 @@
 - (void)refreshView:(UIRefreshControl *)sender {
     _item = nil;
     [_communicator getItemCardWithId:self.itemID];
-    
 }
 
 #pragma mark - RaenAPICommunicatorDelegate
@@ -75,7 +74,7 @@
 
 -(void)didReceiveItemCard:(id)itemCard{
     NSLog(@"didReceiveItemCard");
-    _item = itemCard;
+    _item = (ItemModel*) itemCard;
     self.navigationItem.title = _item.title;
     [self addReviewAndVideo];
     [self.tableView reloadData];
@@ -319,7 +318,7 @@
 	pathAnimation.delegate=self;
 	
 	// tab-bar right side item frame-point = end point
-	CGPoint endPoint = CGPointMake(320 , 480);
+	CGPoint endPoint = CGPointZero;
     if (IS_IPHONE_5)
     {
         endPoint = CGPointMake(265, 550);

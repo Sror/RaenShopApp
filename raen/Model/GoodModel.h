@@ -7,6 +7,7 @@
 //
 
 #import "JSONModel.h"
+
 @protocol GoodModel @end
 @interface GoodModel : JSONModel
 @property (nonatomic,strong) NSString *id;
