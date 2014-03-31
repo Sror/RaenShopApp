@@ -12,7 +12,7 @@
 #import "UIImageView+WebCache.h"
 #import "BrowserViewController.h"
 #import "NewsCell.h"
-#import "HUD.h"
+#import "MBProgressHUD.h"
 //slider
 #import "MainSliderCell.h"
 #import "SliderModel.h"
@@ -48,7 +48,7 @@
 
 - (void)refreshView:(UIRefreshControl *)sender {
     [_news removeAllObjects];
-    [HUD showUIBlockingIndicator];
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [_communicator getNewsByPage:1];
     [_communicator getSliderItems];
 }
@@ -56,7 +56,7 @@
 #pragma mark - RaenAPICommunicatorDelegate Methods
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:error.localizedDescription delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
     [alert show];
 }
@@ -64,7 +64,7 @@
 -(void)didReceiveNews:(NSArray *)news{
     NSLog(@"didReceive %d news",news.count);
     [self.refreshControl endRefreshing];
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     [_news  addObjectsFromArray:news];
     [self.tableView reloadData];
 }
@@ -129,7 +129,7 @@
         NSLog(@"Scroll END Called!");
         NSInteger page = _news.count/RaenAPIdefaultNewsItemsCountPerPage+1;
         NSLog(@"page %d",page);
-        [HUD showUIBlockingIndicator];
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
         [_communicator getNewsByPage:page];
     }
 }

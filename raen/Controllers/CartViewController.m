@@ -13,7 +13,7 @@
 #import "RaenAPICommunicator.h"
 #import "CartCell.h"
 #import "UIImageView+WebCache.h"
-#import "HUD.h"
+#import "MBProgressHUD.h"
 
 @interface CartViewController () <RaenAPICommunicatorDelegate>
 {
@@ -30,7 +30,7 @@
 -(void)viewWillAppear:(BOOL)animated{
     
     [self.subView setHidden:YES];
-    [HUD showUIBlockingIndicator];
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [_communicator getItemsFromCart];
 }
 
@@ -61,7 +61,7 @@
 -(void)didReceiveCartItems:(NSArray *)items{
 
     [self.tableView setHidden:NO];
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     _items = items;
     NSLog(@"items in cart %@",_items);
     [self.tabBarController.tabBar.items[2] setBadgeValue:[self itemsCount]];
@@ -82,21 +82,21 @@
 }
 */
 -(void)fetchingFailedWithError:(JSONModelError *)error {
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
 }
 -(void)didRemoveItemFromCartWithResponse:(NSDictionary *)response{
     NSLog(@"didRemoveItemFromCartWithResponse %@",response);
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     if (![response objectForKey:@"success"]) {
         NSLog(@"error to remove item");
+        
         UIAlertView *alert  =[[UIAlertView alloc] initWithTitle:@"Error" message:response[@"error"] delegate:self cancelButtonTitle:@"ok" otherButtonTitles:nil];
         [alert show];
-        [HUD hideUIBlockingIndicator];
+
     }else{
         [_communicator saveCookies];
-        
-        [HUD hideUIBlockingIndicator];
         [_communicator getItemsFromCart];
     }
 }
@@ -137,10 +137,8 @@
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
-        NSLog(@"delete item at Index %d",indexPath.row);
-        //[tableView  deleteRowsAtIndexPaths:@[indexPath] withRowAnimation:UITableViewRowAnimationAutomatic];
-        //[tableView reloadData];
-        [HUD showUIBlockingIndicator];
+
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         CartItemModel *cartItem = _items[indexPath.row];
         [_communicator deleteItemFromCartWithID:cartItem.rowid];
     }

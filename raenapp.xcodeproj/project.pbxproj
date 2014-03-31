@@ -29,7 +29,6 @@
 		6C5473EF188405140069E62B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473C8188405130069E62B /* Foundation.framework */; };
 		6C5473F0188405140069E62B /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473CC188405130069E62B /* UIKit.framework */; };
 		6C63B5E118E97BDB00247C6A /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C63B5E018E97BDB00247C6A /* MBProgressHUD.m */; };
-		6C63B5E718E987F500247C6A /* HUD.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C63B5E518E987F500247C6A /* HUD.m */; };
 		6C6472CC18ABD845001028DE /* CartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C6472CB18ABD845001028DE /* CartViewController.m */; };
 		6CA770DC18C7442C00C195E5 /* CartCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA770DB18C7442C00C195E5 /* CartCell.m */; };
 		6CA770DF18C7681900C195E5 /* CartItemParamsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA770DE18C7681900C195E5 /* CartItemParamsModel.m */; };
@@ -188,8 +187,6 @@
 		6C5473ED188405130069E62B /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		6C63B5DF18E97BDB00247C6A /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
 		6C63B5E018E97BDB00247C6A /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
-		6C63B5E518E987F500247C6A /* HUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HUD.m; sourceTree = "<group>"; };
-		6C63B5E618E987F500247C6A /* HUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HUD.h; sourceTree = "<group>"; };
 		6C6472CA18ABD845001028DE /* CartViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CartViewController.h; sourceTree = "<group>"; };
 		6C6472CB18ABD845001028DE /* CartViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CartViewController.m; sourceTree = "<group>"; };
 		6CA770DA18C7442C00C195E5 /* CartCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CartCell.h; sourceTree = "<group>"; };
@@ -727,8 +724,6 @@
 		6CBF68661890E22B003ED717 /* HUD */ = {
 			isa = PBXGroup;
 			children = (
-				6C63B5E518E987F500247C6A /* HUD.m */,
-				6C63B5E618E987F500247C6A /* HUD.h */,
 				6C63B5DF18E97BDB00247C6A /* MBProgressHUD.h */,
 				6C63B5E018E97BDB00247C6A /* MBProgressHUD.m */,
 			);
@@ -1035,7 +1030,6 @@
 				6CBAF2EE18AB401B00426647 /* ItemCardViewController.m in Sources */,
 				6CD389DE18D8688F005D3FD4 /* VKPermissions.m in Sources */,
 				6C45CCED18CB328E006440C2 /* GridCategoryItemCell.m in Sources */,
-				6C63B5E718E987F500247C6A /* HUD.m in Sources */,
 				6CBAF2C218AB3FF100426647 /* CategoryModel.m in Sources */,
 				6CC92F2618D6E848003E8DA5 /* SubcategoryModel.m in Sources */,
 				6CBAF2C518AB3FF100426647 /* ImageModel.m in Sources */,

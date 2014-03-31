@@ -19,7 +19,7 @@
 #import "ItemCardCell.h"
 #import "AvailableItemCell.h"
 #import "UIImageView+WebCache.h"
-#import "HUD.h"
+#import "MBProgressHUD.h"
 
 #define IS_IPHONE_5 ( fabs( ( double )[ [ UIScreen mainScreen ] bounds ].size.height - ( double )568 ) < DBL_EPSILON )
 
@@ -63,14 +63,14 @@
 
 - (void)refreshView:(UIRefreshControl *)sender {
     _item = nil;
-    [HUD showUIBlockingIndicator];
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [_communicator getItemCardWithId:self.itemID];
 }
 
 #pragma mark - RaenAPICommunicatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
 }
@@ -78,7 +78,7 @@
 -(void)didReceiveItemCard:(id)itemCard{
     NSLog(@"didReceiveItemCard");
     _item = (ItemModel*) itemCard;
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     self.navigationItem.title = _item.title;
     [self addReviewAndVideo];
     [self.tableView reloadData];
@@ -87,7 +87,7 @@
 #pragma mark - add item to cart
 -(void)didAddItemToCartWithResponse:(NSDictionary *)response{
     NSLog(@"succesful did add item to cart with response %@",response);
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     NSString *totalItems=response[@"total_items"];
     NSLog(@"setting tabbar badge");
     

@@ -12,7 +12,7 @@
 #import "FilterModel.h"
 #import "ParametersModel.h"
 #import "PickParameterViewController.h"
-#import "HUD.h"
+#import "MBProgressHUD.h"
 
 @interface FiltersViewController ()<RaenAPICommunicatorDelegate>{
     RaenAPICommunicator *_communicator;
@@ -26,7 +26,7 @@
 @implementation FiltersViewController
 
 
--(void)viewWillAppear:(BOOL)animated{
+-(void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     if (_filterDictionary.count>0) {
         /*
@@ -48,7 +48,7 @@
     if (self.subcategoryID) {
         // _communicator get params of category
         [_communicator getParamsOfCategoryWithId:self.subcategoryID];
-        [HUD showUIBlockingIndicator];
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     }else{
         NSLog(@"there is NOT subcategory ID!");
     }
@@ -68,7 +68,8 @@
 
 #pragma mark - Raen api communicator delegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
-    [HUD hideUIBlockingIndicator];
+
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:error.localizedDescription delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alertView show];
     
@@ -77,7 +78,7 @@
     if ([filter isKindOfClass:[FilterModel class]]) {
         _filter= filter;
     }
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     [self.tableView reloadData];
 }
 

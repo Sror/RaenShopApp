@@ -11,7 +11,7 @@
 #import "RaenAPICommunicator.h"
 #import "Socializer.h"
 #import <FacebookSDK/FacebookSDK.h>
-#import "HUD.h"
+#import "MBProgressHUD.h"
 
 typedef enum SocialButtonTags {
     SocialButtonTwitter,
@@ -153,13 +153,25 @@ typedef enum SocialButtonTags {
 
 #pragma mark - SocializerDelegate methods
 -(void)didFailuerAPIAuthorizationWithResponse:(NSDictionary *)response{
-    [HUD showTimedAlertWithTitle:@"Error" text:response[@"error"] withTimeout:1.2];
+
+    MBProgressHUD *HUD = [[MBProgressHUD alloc] initWithView:self.view];
+    HUD.mode = MBProgressHUDModeDeterminate;
+    HUD.labelText= @"Error";
+    HUD.detailsLabelText = response[@"error"];
+    [HUD show:YES];
+    [HUD hide:YES afterDelay:1.3];
+    
 }
 -(void)didEmailRequest{
     NSLog(@"HAVE TO ADD EMAIL ADDRESS FOR LOGIN RAEN SHOP!");
 }
 -(void)didSuccessAPIAuthorizedWithResponse:(NSDictionary *)response{
-    [HUD showTimedAlertWithTitle:@"Success" text:response[@"success"] withTimeout:1.2];
+    MBProgressHUD *HUD = [[MBProgressHUD alloc] initWithView:self.view];
+    HUD.mode = MBProgressHUDModeDeterminate;
+    HUD.labelText= @"Success";
+    HUD.detailsLabelText = response[@"success"];
+    [HUD show:YES];
+    [HUD hide:YES afterDelay:1.3];
 }
 
 #pragma mark -

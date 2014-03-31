@@ -12,7 +12,8 @@
 #import "ItemCardViewController.h"
 #import "SaleOfDayModel.h"
 #import "SaleOfDayDescriptionModel.h"
-#import "HUD.h"
+#import "MBProgressHUD.h"
+
 @interface SaleOfDayViewController  () <RaenAPICommunicatorDelegate,UITextViewDelegate>{
     RaenAPICommunicator *_communicator;
 }
@@ -27,7 +28,7 @@
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
     [_communicator getSaleOfDay];
-    [HUD showUIBlockingIndicator];
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [self.textView setDataDetectorTypes:UIDataDetectorTypeLink];
 	// Do any additional setup after loading the view.
 }
@@ -39,7 +40,7 @@
 }
 #pragma mark - RaenAPICommunicatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles:nil];
     [alert show];
 }
@@ -64,7 +65,7 @@
     //[self.textView setText:[self attributedStringFromDescriptions:saleOfDay.descriptions]];
     //self.textView.text = [self attributedStringFromDescriptions:saleOfDay.descriptions];
     [self.textView setAttributedText:[self attributedStringFromDescriptions:saleOfDay.descriptions]];
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     
 }
 #pragma mark - Helpers

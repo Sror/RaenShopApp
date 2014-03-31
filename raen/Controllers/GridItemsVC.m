@@ -14,7 +14,8 @@
 #import "ItemCardViewController.h"
 #import "RaenAPICommunicator.h"
 #import "FiltersViewController.h"
-#import "HUD.h"
+
+#import "MBProgressHUD.h"
 
 @interface GridItemsVC ()<RaenAPICommunicatorDelegate,FiltersViewControllerDelegate>
 {   RaenAPICommunicator *_communicator;
@@ -51,7 +52,7 @@
 }
 - (void)refreshView:(UIRefreshControl *)sender {
     [_items removeAllObjects];
-    [HUD showUIBlockingIndicator];
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [_communicator getSubcategoryWithId:self.subcategoryID withParameters:nil];
     
 }
@@ -64,7 +65,7 @@
         if (_itemsCount==0) {
         }
         [_items addObjectsFromArray:subcategory.goods];
-        [HUD hideUIBlockingIndicator];
+        [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
         [self.navigationItem setTitle:@"Товары"];
         [self.collectionView reloadData];
         [self.refreshControl endRefreshing];
@@ -74,7 +75,7 @@
 
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
-    [HUD hideUIBlockingIndicator];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
 }
@@ -82,6 +83,7 @@
 #pragma mark -FiltersViewControllerDelegate method
 -(void)didSelectFilter:(NSDictionary *)filterParameters{
     NSLog(@"didSelectFilter %@",filterParameters);
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES]; 
     [_items removeAllObjects];
     [_communicator getSubcategoryWithId:self.subcategoryID withParameters:filterParameters];
 }
@@ -133,8 +135,8 @@
         if (_items.count < _itemsCount) {
             NSInteger page = _items.count/RaenAPIdefaulSubcategoryItemsCountPerPage+1;
              NSLog(@"currentPage %d",page);
-           [_communicator getSubcategoryWithId:self.subcategoryID withParameters:@{@"page":[NSNumber numberWithInteger:page]}];
-        [HUD showUIBlockingIndicator];
+            [_communicator getSubcategoryWithId:self.subcategoryID withParameters:@{@"page":[NSNumber numberWithInteger:page]}];
+            [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         }
     }
 }
