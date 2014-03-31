@@ -8,20 +8,26 @@
 
 #import "NewsViewController.h"
 #import "RaenAPICommunicator.h"
-#import "HUD.h"
 #import "NewsModel.h"
 #import "UIImageView+WebCache.h"
 #import "BrowserViewController.h"
 #import "NewsCell.h"
+#import "HUD.h"
+//slider
+#import "MainSliderCell.h"
+#import "SliderModel.h"
+
 
 @interface NewsViewController ()<RaenAPICommunicatorDelegate>{
     NSMutableArray *_news;
+    NSArray *_sliderItems;
     RaenAPICommunicator *_communicator;
 }
 
 @end
 
 @implementation NewsViewController
+
 
 - (void)viewDidLoad
 {
@@ -30,10 +36,10 @@
     [_communicator setDelegate:self];
     [self setupRefreshControl];
     _news = [NSMutableArray array];
-    [HUD showUIBlockingIndicator];
-    [_communicator getNewsByPage:1];
-    
+    [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
 }
+
+#pragma mark - UIRefreshControl
 -(void)setupRefreshControl{
     self.refreshControl = [[UIRefreshControl alloc] init];
     [self.refreshControl addTarget:self action:@selector(refreshView:) forControlEvents:UIControlEventValueChanged];
@@ -44,18 +50,14 @@
     [_news removeAllObjects];
     [HUD showUIBlockingIndicator];
     [_communicator getNewsByPage:1];
+    [_communicator getSliderItems];
 }
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    [_news removeAllObjects];
-    // Dispose of any resources that can be recreated.
-}
+
 #pragma mark - RaenAPICommunicatorDelegate Methods
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
     [HUD hideUIBlockingIndicator];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:error.localizedDescription delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
     [alert show];
 }
 
@@ -65,16 +67,39 @@
     [HUD hideUIBlockingIndicator];
     [_news  addObjectsFromArray:news];
     [self.tableView reloadData];
-    self.navigationItem.title = @"Новости";
+}
+
+-(void)didReceiveSliderItems:(NSArray *)array{
+    NSLog(@"didReceiveSliderItems");
+    _sliderItems = array;
+    [self.tableView reloadData];
+    [self.refreshControl endRefreshing];
+    
 }
 #pragma mark - UITableViewDataSource Methods
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    return 1;
+    
+    return 2;
 }
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    if (section==0) {
+        return 1;
+    }
     return _news.count;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (indexPath.section ==0) {
+        MainSliderCell *sliderCell = [tableView dequeueReusableCellWithIdentifier:@"sliderCell"];
+        NSInteger imagesCount =[self imagesCountInSliderItems];
+        [self setScrollViewSize:sliderCell.scrollView withPages:imagesCount];
+        sliderCell.pageControl.numberOfPages = imagesCount;
+        //sliderCell.selectionStyle = UITableViewCellSelectionStyleNone;
+        //load images in scrollview
+        for (NSInteger i=0; i<imagesCount; i++) {
+            [self loadPage:i forScrollView:sliderCell.scrollView withSpinner:sliderCell.spinner];
+        }
+        return sliderCell;
+    }
     NewsCell *cell = [tableView dequeueReusableCellWithIdentifier:@"newsCell"];
     NewsModel *currentNews = _news[indexPath.row];
     cell.titlelabel.text = currentNews.title;
@@ -89,17 +114,12 @@
     cell.descriptionLabel.text = currentNews.text;
     return cell;
 }
-/*
--(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
-    NewsModel *news = _news[section];
-    return news.type;
-}
-*/
+
 #pragma mark - UITableViewDelegate
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     NewsModel *news = _news[indexPath.row];
-    [self performSegueWithIdentifier:@"toBrowser" sender:news];
+    [self performSegueWithIdentifier:@"toBrowser" sender:news.link];
 }
 #pragma mark - UIScrollViewDelegate
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
@@ -113,28 +133,79 @@
         [_communicator getNewsByPage:page];
     }
 }
-/*
-- (void)scrollViewDidEndDragging:(UIScrollView *)scrollView willDecelerate:(BOOL)decelerate {
-    NSInteger currentOffset = scrollView.contentOffset.y;
-    NSInteger maximumOffset = scrollView.contentSize.height - scrollView.frame.size.height;
-    if (maximumOffset - currentOffset <= 50) {
-        NSLog(@"reload");
-        //TODO
-        NSInteger page = _news.count/10+1;
-        NSLog(@"page %d",page);
-        [_communicator getNewsByPage:page];
-    }
-}
- */
 
-#pragma mark -
+#pragma mark - Navigation
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
     if ([segue.identifier isEqualToString:@"toBrowser"]) {
-        BrowserViewController *browserVC = segue.destinationViewController;
-        NewsModel *news = sender;
-        [browserVC setLink:news.link];
-        [browserVC setTitle:news.title];
+        UINavigationController *navigationVC = segue.destinationViewController;
+        BrowserViewController *browserVC = [[navigationVC viewControllers] objectAtIndex:0];
+        [browserVC setLink:sender];
     }
+}
+
+#pragma mark - Slider Helpers
+- (NSInteger)imagesCountInSliderItems{
+    NSInteger count = 0;
+    for (SliderModel *slider in _sliderItems) {
+        if (slider.image) {
+            count ++;
+        }
+    }
+    NSLog(@"%i images in sliderItem",count);
+    return count;
+}
+-(void)setScrollViewSize:(UIScrollView*)scrollview withPages:(NSInteger)pages {
+    CGSize pagesScrollViewSize = scrollview.frame.size;
+    scrollview.contentSize = CGSizeMake(pagesScrollViewSize.width *pages, pagesScrollViewSize.height);
+}
+
+-(void)loadPage:(NSInteger)page forScrollView:(UIScrollView*)scrollView withSpinner:(UIActivityIndicatorView*)spinner {
+    CGRect frame = scrollView.bounds;
+    frame.origin.x = frame.size.width * page;
+    frame.origin.y = 0.0f;
+    UIImageView *imageView =[[UIImageView alloc] initWithFrame:frame];
+    //NSLog(@"current imageView frame x=%f , y=%f",frame.origin.x,frame.origin.y);
+    imageView.contentMode = UIViewContentModeScaleAspectFit;
+    imageView.tag = page;
+    imageView.userInteractionEnabled = YES;
+    [scrollView addSubview:imageView];
+    [spinner startAnimating];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    SliderModel *slider = _sliderItems[page];
+    
+    [imageView setImageWithURL:[NSURL URLWithString:slider.image] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+        [spinner stopAnimating];
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+    }];
+    
+    UITapGestureRecognizer *tapOnSlider = [[UITapGestureRecognizer alloc]
+                                           initWithTarget:self action:@selector(handleSlideTap:)];
+    tapOnSlider.numberOfTapsRequired = 1;
+    [imageView addGestureRecognizer:tapOnSlider];
+    
+}
+-(void)handleSlideTap:(UITapGestureRecognizer*)tapGestureRecognizer{
+    NSLog(@"Taped slide #%d", tapGestureRecognizer.view.tag);
+    SliderModel *slider = _sliderItems[tapGestureRecognizer.view.tag];
+    NSLog(@"slider action %@",slider.action);
+    if ([slider.action isEqualToString:@"toBrowser"]) {
+        [self performSegueWithIdentifier:@"toBrowser" sender:slider.link];
+    }else if ([slider.action isEqualToString:@"toItemCardView"]){
+        [self performSegueWithIdentifier:@"toItemCardView" sender:slider.id];
+    }else if ([slider.action isEqualToString:@"toSaleOfDay"]){
+        //TODO sender
+        [self performSegueWithIdentifier:@"toSaleOfDay" sender:nil];
+    }else if ([slider.action isEqualToString:@"toGridItemsVC"]){
+        [self performSegueWithIdentifier:@"toGridItemsVC" sender:slider.id];
+    }
+}
+#pragma mark - Memory Warning 
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    [_news removeAllObjects];
+    [self.tableView reloadData];
+    // Dispose of any resources that can be recreated.
 }
 @end

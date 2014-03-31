@@ -11,6 +11,8 @@
 #import "VKSdk.h"
 #import <GooglePlus/GooglePlus.h>
 
+NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
+
 @implementation AppDelegate
 
 
@@ -24,7 +26,13 @@
     self.communicator = [[RaenAPICommunicator alloc]init];
     self.socializer = [[Socializer alloc] init];
     NSLog(@"socializer is auth ?%@",self.socializer.isAuthorizedViaSocial ? @"YES":@"NO");
-    
+    //check items count in cart and update tab bar badge
+    /*
+    NSArray *cartItems=[[NSUserDefaults standardUserDefaults] objectForKey:RAENSHOP_CART_ITEMS];
+    NSLog(@"cartItems count %@",cartItems.count);
+    UITabBarController *tabController = (UITabBarController *)self.window.rootViewController;
+    [tabController.tabBar.items[2] setBadgeValue:[NSString stringWithFormat:@"%d",cartItems.count]];
+    */
     return YES;
 }
 

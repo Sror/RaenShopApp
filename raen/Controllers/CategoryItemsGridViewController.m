@@ -51,7 +51,6 @@
 - (void)refreshView:(UIRefreshControl *)sender {
     
     [_communicator getAllCategories];
-
 }
 #pragma mark - RaenAPICommunicatorDelegate Methods
 -(void)fetchingFailedWithError:(JSONModelError *)error{

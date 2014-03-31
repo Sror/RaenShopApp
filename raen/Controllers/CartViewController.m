@@ -7,21 +7,22 @@
 //
 
 #import "CartViewController.h"
-#import "HUD.h"
 #import "AppDelegate.h"
 #import "CartItemModel.h"
 #import "CartItemParamsModel.h"
 #import "RaenAPICommunicator.h"
 #import "CartCell.h"
 #import "UIImageView+WebCache.h"
+#import "HUD.h"
 
-@interface CartViewController ()<RaenAPICommunicatorDelegate>
+@interface CartViewController () <RaenAPICommunicatorDelegate>
 {
     RaenAPICommunicator *_communicator;
     NSArray *_items;
-
 }
 @end
+
+
 
 @implementation CartViewController
 @synthesize tabBarItem;
@@ -29,8 +30,20 @@
 -(void)viewWillAppear:(BOOL)animated{
     
     [self.subView setHidden:YES];
-    [HUD showUIBlockingIndicatorWithText:Nil];
+    [HUD showUIBlockingIndicator];
     [_communicator getItemsFromCart];
+}
+
+
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
+    _communicator = [[RaenAPICommunicator alloc] init];
+    _communicator.delegate = self;
+    [self.tabBarController.tabBar.items[2] setBadgeValue:[self itemsCount]];
+    [self.tableView setHidden:YES];
+    //User Interface
+    [self.subView.layer setCornerRadius:3.0];
 }
 
 
@@ -43,26 +56,10 @@
     NSLog(@"itemsCount %d",itemsCount);
     return [NSString stringWithFormat:@"%i",itemsCount];
 }
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
-    _communicator = [[RaenAPICommunicator alloc] init];
-    _communicator.delegate = self;
-    //[[[[self tabBarController] tabBar] items] objectAtIndex:1] setBadgeValue:[self itemsCount]]];
-    [self.tabBarController.tabBar.items[2] setBadgeValue:[self itemsCount]];
-    [self.tableView setHidden:YES];
-    //User Interface
-    [self.subView.layer setCornerRadius:3.0];
-}
-
-- (void)didReceiveMemoryWarning
-{
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
 
 #pragma mark - RaenAPICommunicationDelegate
 -(void)didReceiveCartItems:(NSArray *)items{
+
     [self.tableView setHidden:NO];
     [HUD hideUIBlockingIndicator];
     _items = items;
@@ -72,6 +69,18 @@
     [self.subTotalLabel setText:[self subtotal]];
     [self.subView setHidden:NO];
 }
+/*
+-(BOOL)saveCartItems{
+    NSMutableArray *archiveArray = [NSMutableArray arrayWithCapacity:_items.count];
+    for (CartItemModel *cartItem in _items) {
+        NSData *cartItemArchived = [NSKeyedArchiver archivedDataWithRootObject:cartItem];
+        [archiveArray addObject:cartItemArchived];
+    }
+    [[NSUserDefaults standardUserDefaults] setObject:archiveArray forKey:RAENSHOP_CART_ITEMS];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    return [[NSUserDefaults standardUserDefaults]objectForKey:RAENSHOP_CART_ITEMS]? YES:NO;
+}
+*/
 -(void)fetchingFailedWithError:(JSONModelError *)error {
     [HUD hideUIBlockingIndicator];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
@@ -166,4 +175,12 @@
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
 }
+
+#pragma mark - Memory Warning
+- (void)didReceiveMemoryWarning
+{
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
 @end

@@ -8,12 +8,11 @@
 
 #import "SaleOfDayViewController.h"
 #import "RaenAPICommunicator.h"
-#import "HUD.h"
 #import "UIImageView+WebCache.h"
 #import "ItemCardViewController.h"
 #import "SaleOfDayModel.h"
 #import "SaleOfDayDescriptionModel.h"
-
+#import "HUD.h"
 @interface SaleOfDayViewController  () <RaenAPICommunicatorDelegate,UITextViewDelegate>{
     RaenAPICommunicator *_communicator;
 }

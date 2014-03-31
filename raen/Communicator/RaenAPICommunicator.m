@@ -21,8 +21,8 @@
 int RaenAPIdefaulSubcategoryItemsCountPerPage = 30;
 int RaenAPIdefaultNewsItemsCountPerPage = 10;
 
-#warning add hash below
-#define kRaenAPIAuthValue @"Basic ="
+#warning add/remove before push hash below
+#define kRaenAPIAuthValue @"Basic =="
 
 #define kRaenApiGetGuard @"http://raenshop.ru/api/catalog/goods_list/cat_id/81/" //get all guard items
 #define kRaenApiGetParamsOfCategory @"http://raenshop.ru/api/catalog/category/id/"

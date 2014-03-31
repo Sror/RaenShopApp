@@ -8,7 +8,8 @@
 
 #import "BrowserViewController.h"
 
-@interface BrowserViewController ()
+@interface BrowserViewController ()<UIActionSheetDelegate>
+
 
 @end
 
@@ -36,7 +37,6 @@
         NSURL *url =[NSURL URLWithString:self.link];
         [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
     }
-   
 }
 
 - (void)didReceiveMemoryWarning
@@ -45,18 +45,39 @@
     // Dispose of any resources that can be recreated.
 }
 -(void)webViewDidStartLoad:(UIWebView *)webView{
-
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [self.spinner startAnimating];
+    
 }
 -(void)webViewDidFinishLoad:(UIWebView *)webView{
     [[UIApplication sharedApplication]setNetworkActivityIndicatorVisible:NO];
-#warning use title from html document
     NSString *theTitle=[webView stringByEvaluatingJavaScriptFromString:@"document.title"];
     [self.navigationItem setTitle:theTitle];
     [self.spinner stopAnimating];
 }
--(void)viewDidDisappear:(BOOL)animated{
-    self.webView = nil;
+
+#pragma mark - IBActions
+- (IBAction)shareButtonPressed:(id)sender {
+    NSLog(@"shareButtonPressed");
+    UIActionSheet *actionSheet = [[UIActionSheet alloc] initWithTitle:self.link delegate:self cancelButtonTitle:@"Отмена" destructiveButtonTitle:@"Открыть в Safari" otherButtonTitles:@"Скопировать ссылку", nil];
+    [actionSheet showInView:self.view];
 }
+
+- (IBAction)closeBrowserButtonPressed:(id)sender {
+    [self dismissViewControllerAnimated:YES completion:nil];
+}
+
+
+#pragma mark - UIActionSheetDelegate
+-(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if (buttonIndex==0){
+        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.link]];
+    }
+    if (buttonIndex==1){
+        UIPasteboard *pasteboard = [UIPasteboard generalPasteboard];
+        pasteboard.string = self.link;
+    }
+}
+
 @end

@@ -15,9 +15,7 @@
 #import "ChildrenModel.h"
 #import "ItemCardViewController.h"
 #import "GridItemsVC.h"
-#import "SliderModel.h"
-#import "MainSliderCell.h"
-#import "SliderModel.h"
+
 #import "BrowserViewController.h"
 #import "CategoryItemsGridViewController.h"
 #import "UIImageView+WebCache.h"
@@ -26,7 +24,6 @@
 
 @interface TVController ()<RaenAPICommunicatorDelegate> {
     NSArray *_categories;
-    NSArray *_sliderItems;
     RaenAPICommunicator *_communicator;
 }
 
@@ -42,11 +39,10 @@
     [self.tableView setDataSource:self];
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
-    
     [self setupRefreshControl];
     [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
-
 }
+
 #pragma mark - RefreshControl
 -(void)setupRefreshControl{
     self.refreshControl = [[UIRefreshControl alloc] init];
@@ -59,10 +55,7 @@
 }
 -(void)updateDataFromModel{
     _categories = nil;
-
     [_communicator getAllCategories];
-    [_communicator getSliderItems];
-
 }
 #pragma mark - RaenAPICommunicatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
@@ -78,13 +71,7 @@
     [self.tableView reloadData];
     [self.refreshControl endRefreshing];
 }
--(void)didReceiveSliderItems:(NSArray *)array{
-    NSLog(@"didReceiveSliderItems");
-    _sliderItems = array;
-    [self.tableView reloadData];
-    [self.refreshControl endRefreshing];
-    
-}
+
 -(void)reloadTableViewWithAnimation:(BOOL)animation{
     if (animation) {
         [self.tableView reloadData];
@@ -107,9 +94,6 @@
         [self.tableView reloadData];
     }
 }
--(void)viewDidAppear:(BOOL)animated {
-}
-
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -120,31 +104,17 @@
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
-    return 2;
+    return 1;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    if (section == 0) {
-        return 1;
-    }
+
     return _categories.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section ==0) {
-        MainSliderCell *sliderCell = [tableView dequeueReusableCellWithIdentifier:@"sliderCell"];
-        NSInteger imagesCount =[self imagesCountInSliderItems];
-        [self setScrollViewSize:sliderCell.scrollView withPages:imagesCount];
-        sliderCell.pageControl.numberOfPages = imagesCount;
-        //sliderCell.selectionStyle = UITableViewCellSelectionStyleNone;
-        //load images in scrollview
-        for (NSInteger i=0; i<imagesCount; i++) {
-            [self loadPage:i forScrollView:sliderCell.scrollView withSpinner:sliderCell.spinner];
-        }
-        return sliderCell;
-    }
     static NSString *CellIdentifier = @"tvCell";
     TVCell *tvCell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     CategoryModel *category = _categories[indexPath.row];
@@ -154,16 +124,15 @@
                                           initWithTarget:self action:@selector(handleLabelTap:)];
     tapOnLabel.numberOfTapsRequired = 1;
     [tvCell.categoryLabel addGestureRecognizer:tapOnLabel];
-    
-    //[tvCell.categoryLabel addTarget:self action:@selector(categoryButtonPressed:) forControlEvents:UIControlEventTouchUpInside];
+
     return tvCell;
 }
 
 -(void)tableView:(UITableView *)tableView willDisplayCell:(TVCell *)cell forRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    if (indexPath.section ==1) {
-        [cell setCollectionViewDataSourceDelegate:self index:indexPath.row];
-    }
+    
+    [cell setCollectionViewDataSourceDelegate:self index:indexPath.row];
+    
 }
 
 #pragma mark - UICollectionViewDataSource Methods
@@ -176,7 +145,7 @@
 -(UICollectionViewCell *)collectionView:(IndexedCV *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath
 {
     CVCell *cvCell = (CVCell*)[collectionView dequeueReusableCellWithReuseIdentifier:CollectionViewCellIdentifier forIndexPath:indexPath];
-    [cvCell.label.layer setCornerRadius:5.0];
+    //[cvCell.label.layer setCornerRadius:5.0];
     CategoryModel *category=_categories[collectionView.index];
     ChildrenModel *children = category.childrens[indexPath.row];
     cvCell.label.text = children.title.uppercaseString;
@@ -191,10 +160,11 @@
     return cvCell;
 }
 #pragma mark - UITableViewDelegate Methods
+/*
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     return indexPath.section ==0 ? 120 : 160;
 }
-
+*/
 #pragma mark UICollectionView delegate
 -(void)collectionView:(IndexedCV *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
     NSLog(@"indexedCV #%d, did selectItem at row %d",collectionView.index,indexPath.row);
@@ -203,64 +173,9 @@
     [self performSegueWithIdentifier:@"toGridItemsVC" sender:subCategory.id];
 }
 
-#pragma mark - Slider Helpers
-- (NSInteger)imagesCountInSliderItems{
-    NSInteger count = 0;
-    for (SliderModel *slider in _sliderItems) {
-        if (slider.image) {
-            count ++;
-        }
-    }
-    NSLog(@"%i images in sliderItem",count);
-    return count;
-}
--(void)setScrollViewSize:(UIScrollView*)scrollview withPages:(NSInteger)pages {
-    CGSize pagesScrollViewSize = scrollview.frame.size;
-    scrollview.contentSize = CGSizeMake(pagesScrollViewSize.width *pages, pagesScrollViewSize.height);
-    
-}
--(void)loadPage:(NSInteger)page forScrollView:(UIScrollView*)scrollView withSpinner:(UIActivityIndicatorView*)spinner {
-    CGRect frame = scrollView.bounds;
-    frame.origin.x = frame.size.width * page;
-    frame.origin.y = 0.0f;
-    UIImageView *imageView =[[UIImageView alloc] initWithFrame:frame];
-    //NSLog(@"current imageView frame x=%f , y=%f",frame.origin.x,frame.origin.y);
-    imageView.contentMode = UIViewContentModeScaleAspectFit;
-    imageView.tag = page;
-    imageView.userInteractionEnabled = YES;
-    [scrollView addSubview:imageView];
-    [spinner startAnimating];
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    SliderModel *slider = _sliderItems[page];
 
-    [imageView setImageWithURL:[NSURL URLWithString:slider.image] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-        [spinner stopAnimating];
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-    }];
 
-    UITapGestureRecognizer *tapOnSlider = [[UITapGestureRecognizer alloc]
-                                     initWithTarget:self action:@selector(handleSlideTap:)];
-    tapOnSlider.numberOfTapsRequired = 1;
-    [imageView addGestureRecognizer:tapOnSlider];
-    
-}
--(void)handleSlideTap:(UITapGestureRecognizer*)tapGestureRecognizer{
-    NSLog(@"Taped slide #%d", tapGestureRecognizer.view.tag);
-    SliderModel *slider = _sliderItems[tapGestureRecognizer.view.tag];
-    NSLog(@"slider action %@",slider.action);
-    if ([slider.action isEqualToString:@"toBrowser"]) {
-        [self performSegueWithIdentifier:@"toBrowser" sender:slider.link];
-    }else if ([slider.action isEqualToString:@"toItemCardView"]){
-        [self performSegueWithIdentifier:@"toItemCardView" sender:slider.id];
-    }else if ([slider.action isEqualToString:@"toSaleOfDay"]){
-//TODO sender
-        [self performSegueWithIdentifier:@"toSaleOfDay" sender:nil];
-    }else if ([slider.action isEqualToString:@"toGridItemsVC"]){
-        [self performSegueWithIdentifier:@"toGridItemsVC" sender:slider.id];
-    }
-
-}
-#pragma mark - 
+#pragma mark - Handle Label Tap
 -(void)handleLabelTap:(UITapGestureRecognizer*)tapGestureRecognizer{
     NSInteger row = tapGestureRecognizer.view.tag;
     NSLog(@"tapped on %d label",row);
@@ -270,7 +185,7 @@
     
 }
 
-#pragma mark -Prepare Segue
+#pragma mark -Navigation
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
     if ([segue.identifier isEqualToString:@"toItemCardView"]) {

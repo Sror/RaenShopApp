@@ -19,7 +19,7 @@
 #import "ItemCardCell.h"
 #import "AvailableItemCell.h"
 #import "UIImageView+WebCache.h"
-
+#import "HUD.h"
 
 #define IS_IPHONE_5 ( fabs( ( double )[ [ UIScreen mainScreen ] bounds ].size.height - ( double )568 ) < DBL_EPSILON )
 
@@ -60,14 +60,17 @@
     [self.refreshControl addTarget:self action:@selector(refreshView:) forControlEvents:UIControlEventValueChanged];
     [self.tableView addSubview:self.refreshControl];
 }
+
 - (void)refreshView:(UIRefreshControl *)sender {
     _item = nil;
+    [HUD showUIBlockingIndicator];
     [_communicator getItemCardWithId:self.itemID];
 }
 
 #pragma mark - RaenAPICommunicatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
+    [HUD hideUIBlockingIndicator];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
 }
@@ -75,6 +78,7 @@
 -(void)didReceiveItemCard:(id)itemCard{
     NSLog(@"didReceiveItemCard");
     _item = (ItemModel*) itemCard;
+    [HUD hideUIBlockingIndicator];
     self.navigationItem.title = _item.title;
     [self addReviewAndVideo];
     [self.tableView reloadData];
@@ -83,6 +87,7 @@
 #pragma mark - add item to cart
 -(void)didAddItemToCartWithResponse:(NSDictionary *)response{
     NSLog(@"succesful did add item to cart with response %@",response);
+    [HUD hideUIBlockingIndicator];
     NSString *totalItems=response[@"total_items"];
     NSLog(@"setting tabbar badge");
     
@@ -121,7 +126,6 @@
 -(void)setScrollViewSize:(UIScrollView*)scrollview withPages:(NSInteger)pages {
     CGSize pagesScrollViewSize = scrollview.frame.size;
     scrollview.contentSize = CGSizeMake(pagesScrollViewSize.width *pages, pagesScrollViewSize.height);
-    
 }
 
 #pragma mark - UITableViewDataSource
@@ -277,7 +281,8 @@
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
     if ([segue.identifier isEqualToString:@"toBrowser"]) {
-        BrowserViewController *browserVC= segue.destinationViewController;
+        UINavigationController *navContr = segue.destinationViewController;
+        BrowserViewController *browserVC=  [[navContr viewControllers] objectAtIndex:0];
         NSDictionary *tmpDict = sender;
         browserVC.navigationItem.title = [tmpDict allKeys][0];
         browserVC.link = [tmpDict allValues][0];

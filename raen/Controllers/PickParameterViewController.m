@@ -11,6 +11,7 @@
 #import "BrandModel.h"
 #import "ColorModel.h"
 #import "FiltersViewController.h"
+
 static NSString * RAENAPP_CURRENT_FILTER_DEFAULTS_KEY = @"RAENAPP_CURRENT_FILTER_DEFAULTS_KEY";
 
 @interface PickParameterViewController (){

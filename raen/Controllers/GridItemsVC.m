@@ -37,8 +37,6 @@
     if (self.subcategoryID) {
         [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
     }
-    
-    
 }
 
 - (void)didReceiveMemoryWarning
@@ -151,7 +149,6 @@
     if ([segue.identifier isEqualToString:@"toFiltersVC"])
     {
         UINavigationController *navigationVC = segue.destinationViewController;
-        
         FiltersViewController *filtersVC = [[navigationVC viewControllers] objectAtIndex:0];
         filtersVC.delegate = self;
         if ([sender isKindOfClass:[NSString class]]) {

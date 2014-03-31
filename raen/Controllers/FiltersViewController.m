@@ -12,7 +12,7 @@
 #import "FilterModel.h"
 #import "ParametersModel.h"
 #import "PickParameterViewController.h"
-
+#import "HUD.h"
 
 @interface FiltersViewController ()<RaenAPICommunicatorDelegate>{
     RaenAPICommunicator *_communicator;
@@ -48,6 +48,7 @@
     if (self.subcategoryID) {
         // _communicator get params of category
         [_communicator getParamsOfCategoryWithId:self.subcategoryID];
+        [HUD showUIBlockingIndicator];
     }else{
         NSLog(@"there is NOT subcategory ID!");
     }
@@ -62,12 +63,12 @@
 
 - (IBAction)cancelFilterButtonPressed:(id)sender {
     [_filterDictionary removeAllObjects];
-   
     [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 #pragma mark - Raen api communicator delegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
+    [HUD hideUIBlockingIndicator];
     UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:error.localizedDescription delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alertView show];
     
@@ -76,8 +77,10 @@
     if ([filter isKindOfClass:[FilterModel class]]) {
         _filter= filter;
     }
+    [HUD hideUIBlockingIndicator];
     [self.tableView reloadData];
 }
+
 #pragma mark - PickParameterViewControllerDelegate methods 
 -(void)didSelectBrand:(BrandModel *)brand{
     NSLog(@"didSelectBrand %@",brand);
