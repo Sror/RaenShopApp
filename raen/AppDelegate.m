@@ -26,6 +26,8 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
     self.communicator = [[RaenAPICommunicator alloc]init];
     self.socializer = [[Socializer alloc] init];
     NSLog(@"socializer is auth ?%@",self.socializer.isAuthorizedViaSocial ? @"YES":@"NO");
+    
+    
     //check items count in cart and update tab bar badge
     /*
     NSArray *cartItems=[[NSUserDefaults standardUserDefaults] objectForKey:RAENSHOP_CART_ITEMS];
@@ -39,12 +41,13 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 -(BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation{
     NSLog(@"application openURL %@ from sourceApplication %@",url,sourceApplication);
     BOOL wasHandled = NO;
+    //VK.com
     if ([[url absoluteString] rangeOfString:@"vk4237186"].location !=NSNotFound) {
         wasHandled = [VKSdk processOpenURL:url fromApplication:sourceApplication];
     }
+    //Facebook.com
     if ([[url absoluteString] rangeOfString:@"fb220082361532667"].location !=NSNotFound) {
         // Call FBAppCall's handleOpenURL:sourceApplication to handle Facebook app responses
-        
         wasHandled = [FBAppCall handleOpenURL:url sourceApplication:sourceApplication withSession:self.socializer.fbSession];
     }
     //Google

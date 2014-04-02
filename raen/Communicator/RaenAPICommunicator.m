@@ -20,8 +20,11 @@
 
 int RaenAPIdefaulSubcategoryItemsCountPerPage = 30;
 int RaenAPIdefaultNewsItemsCountPerPage = 10;
+NSString* kRAENAPISocialAuthDict = @"RAEN_API_SOCIAL_AUTH_DICT";
+NSString* kRAENAPISocialAccessToken =@"RAEN_API_SOCIAL_ACCESS_TOKEN";
+NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
 
-#warning add/remove before push hash below
+#warning add/remove hash below
 #define kRaenAPIAuthValue @"Basic =="
 
 #define kRaenApiGetGuard @"http://raenshop.ru/api/catalog/goods_list/cat_id/81/" //get all guard items
@@ -336,6 +339,7 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                        NSDictionary *jsonDict = json;
                                        NSLog(@"json RAEN API authorization %@",jsonDict);
                                        NSString *errorMsg = jsonDict[@"error"];
+                                       //if email required
                                        if ([errorMsg isEqualToString:@"Email is required"]) {
                                            
                                            [self.delegate didEmailRequest];
@@ -345,6 +349,9 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                        }
                                        if (jsonDict[@"success"]) {
                                            _raenAPIAccessToken = jsonDict[@"token"];
+                                           [self saveAuthDataToDefaultsWith:socialName accessToken:_raenAPIAccessToken];
+                                           NSLog(@"Did save AccessToken to UserDefaults? %@",[[NSUserDefaults standardUserDefaults]
+                                                                                              objectForKey:kRAENAPISocialAuthDict] ? @"YES":@"NO");
                                            [self.delegate didSuccessAPIAuthorizedWithResponse:jsonDict];
                                        }
                                        
@@ -355,7 +362,7 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                   
     
 }
-- (void)registrationNewUserWith:(NSString*)email
+- (void)registrationNewUserWithEmail:(NSString*)email
                       firstName:(NSString*)firstName
                        lastName:(NSString*)lastName
                           phone:(NSString*)phone
@@ -364,7 +371,19 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
     //[[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
 }
-
+#pragma mark - Save AccessToken
+- (void)saveAuthDataToDefaultsWith:(NSString*)socialId accessToken:(NSString*)accessToken {
+    NSDictionary *authDict = @{kRAENAPISocialIdentifier:socialId,kRAENAPISocialAccessToken:accessToken};
+	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+	[defaults setObject:authDict forKey:kRAENAPISocialAuthDict];
+    [defaults synchronize];
+    NSLog(@"Auth dict in userdefaults %@",[defaults objectForKey:kRAENAPISocialAuthDict]);
+}
+-(void)removeAuthDataFromDefaults{
+    [[NSUserDefaults standardUserDefaults] removeObjectForKey:kRAENAPISocialAuthDict];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+    NSLog(@"did remove Auth data from userDefaults? %@",![[NSUserDefaults standardUserDefaults] objectForKey:kRAENAPISocialAuthDict] ? @"YES":@"NO");
+}
 #pragma mark - Cookie manager methods
 -(void)deleteCookieFromLocalStorage{
     NSLog(@"deleting cookies from local storage");

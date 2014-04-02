@@ -35,24 +35,10 @@ NSString *kFacebookIdentifier = @"Facebook";
 @implementation Socializer
 
 
--(id)init{
-    NSLog(@"socializer initialization");
-    self = [super init];
-    if (self) {
-        if ([self whichSocialAuthorized]) {
-            _AuthorizedViaSocial = YES;
-        }else{
-            _AuthorizedViaSocial = NO;
-        }
-    }
-    return self;
-}
 
 -(FBSession *)fbSession{
     NSLog(@"fbSession initialization");
-    NSLog(@"fbSession %@",_fbSession);
     if (_fbSession == nil) {
-        NSLog(@"fbSession initWithPermissions");
         _fbSession = [[FBSession alloc] initWithPermissions:@[@"basic_info", @"email", @"user_likes"] ];
         NSLog(@"is fbSession open ? %@",_fbSession.isOpen ? @"YES":@"NO");
     }
@@ -76,28 +62,6 @@ NSString *kFacebookIdentifier = @"Facebook";
     return _googleSignIn;
 }
 
--(NSString*)whichSocialAuthorized{
-    NSLog(@"checking which social authorized");
-    if ([VKSdk wakeUpSession]) {
-        NSLog(@"authorized via Vkontakte");
-        
-        return kVkontakteIdentifier;
-        
-    }
-    if (self.fbSession.isOpen) {
-        NSLog(@"authorized via Facebook");
-        return  kFacebookIdentifier;
-    }
-    
-    if ([self.googleSignIn trySilentAuthentication]) {
-        NSLog(@"authorized via Google");
-        return kGoogleIdentifier;
-    }
-    NSLog(@"NOT authorized any social");
-    return nil;
-}
-
-
 
 -(void)loginVK{
     NSLog(@"logining VK.com in _socializer");
@@ -107,6 +71,7 @@ NSString *kFacebookIdentifier = @"Facebook";
     {
         _socialAccessToken = [VKSdk getAccessToken].accessToken;
         _socialUserId = [VKSdk getAccessToken].userId;
+        _AuthorizedViaSocial = YES;
         [self vkUserinfo];
     }else{
         NSArray *scope = @[VK_PER_FRIENDS,VK_PER_WALL,VK_PER_PHOTOS,VK_PER_NOHTTPS];
@@ -116,13 +81,6 @@ NSString *kFacebookIdentifier = @"Facebook";
 
 -(void)loginFacebook{
     NSLog(@"socialiser loggining facebook");
-    /*
-    if (_fbSession.state != FBSessionStateCreated) {
-        // Create a new, logged out session.
-       _fbSession = [[FBSession alloc] init];
-    }
-     */
-    
     [self.fbSession openWithCompletionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
         NSLog(@"error %@",error);
         if (!error) {
@@ -225,7 +183,8 @@ NSString *kFacebookIdentifier = @"Facebook";
 #pragma mark - VK.com methods
 -(void)vkUserinfo{
     NSLog(@"vkUserinfo");
-    if (_AuthorizedViaSocial==YES) {
+    if (_AuthorizedViaSocial==YES)
+    {
         VKRequest *userInfoRequest = [VKApi users].get;
         [userInfoRequest executeWithResultBlock:^(VKResponse *response) {
             NSArray *json = response.json;
@@ -242,11 +201,15 @@ NSString *kFacebookIdentifier = @"Facebook";
             NSLog(@"error to get user info %@",error.description);
             _AuthorizedViaSocial = NO;
         }];
+    }else{
+        //NOT AUTH VIA SOCIAL
+        NSLog(@"error: can't get vk user info , cause _AuthorizedViaSocial == NO");
     }
 }
 
 #pragma mark - Facebook 
 -(void)fbUserInfo{
+    NSLog(@"getting facebook user info");
     if ([_fbSession isOpen]) {
         [FBSession setActiveSession:_fbSession];
         [[FBRequest requestForMe] startWithCompletionHandler:^(FBRequestConnection *connection, id result, NSError *error) {
@@ -255,7 +218,6 @@ NSString *kFacebookIdentifier = @"Facebook";
                 NSLog(@"My dictionary: %@", my);
                 _socialUsername = [NSString stringWithFormat:@"%@ %@",my.first_name, my.last_name];
                 _socialUserId = my.id;
-#warning how to get user email from facebook ?
                 _socialUserEmail = result[@"email"];
                 
                 [self.delegate authorizedViaFaceBook];

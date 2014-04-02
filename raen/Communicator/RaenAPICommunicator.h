@@ -12,6 +12,10 @@
 
 extern int RaenAPIdefaulSubcategoryItemsCountPerPage;
 extern int RaenAPIdefaultNewsItemsCountPerPage;
+extern NSString* kRAENAPISocialAuthDict;
+extern NSString* kRAENAPISocialAccessToken;
+extern NSString* kRAENAPISocialIdentifier;
+
 
 @class RaenAPICommunicator;
 
@@ -32,12 +36,16 @@ extern int RaenAPIdefaultNewsItemsCountPerPage;
 - (void)deleteItemFromCartWithID:(NSString*)id;
 //authorization via socials
 - (void)authAPIVia:(NSString *)socialName withuserIdentifier:(NSString*)userId accessToken:(NSString*)token;
-- (void)registrationNewUserWith:(NSString*)email
+- (void)registrationNewUserWithEmail:(NSString*)email
                       firstName:(NSString*)firstName
                        lastName:(NSString*)lastName
                           phone:(NSString*)phone
                          avatar:(NSString*)avatarLink
                      socialLink:(NSString*)socialLink;
+//Auth data in userdefailts
+- (void)saveAuthDataToDefaultsWith:(NSString*)socialId accessToken:(NSString*)accessToken;
+- (void)removeAuthDataFromDefaults;
+
 
 //manage cookies
 - (void)deleteCookieFromLocalStorage;

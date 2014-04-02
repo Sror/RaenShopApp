@@ -20,9 +20,12 @@ typedef enum SocialButtonTags {
     SocialButtonGoogle
 } SocialButtonTags;
 
-@interface LoginViewController ()<RaenAPICommunicatorDelegate,SocializerDelegate>{
+@interface LoginViewController ()<RaenAPICommunicatorDelegate,SocializerDelegate,UIAlertViewDelegate,UITextFieldDelegate>
+{
     RaenAPICommunicator *_communicator;
     Socializer *_socializer;
+    UIAlertView *_emailAlert;
+    NSString* _userEmail;
 }
 @property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *avatar;
@@ -113,17 +116,22 @@ typedef enum SocialButtonTags {
 }
 
 - (IBAction)socialLogoutButtonPressed {
-#warning TODO logout current social
-    NSString *socialIdentifier = [_socializer whichSocialAuthorized];
-    if ([socialIdentifier isEqualToString:kVkontakteIdentifier]) {
+    //get dict from user defaults
+    NSDictionary *authDict = [[NSUserDefaults standardUserDefaults] objectForKey:kRAENAPISocialAuthDict];
+    
+    if ([authDict[kRAENAPISocialIdentifier] isEqualToString:kVkontakteIdentifier]) {
         [_socializer logOutVK];
     }
-    if ([socialIdentifier isEqualToString:kFacebookIdentifier]) {
-        [_socializer logOutFacebook];
-    }
-    if ([socialIdentifier isEqualToString:kGoogleIdentifier]) {
+    if ([authDict[kRAENAPISocialIdentifier] isEqualToString:kGoogleIdentifier]) {
         [_socializer logOutGoogle];
     }
+    if ([authDict[kRAENAPISocialIdentifier] isEqualToString:kTwitterIdentifier]) {
+        [_socializer loginTwitter];
+    }
+    if ([authDict[kRAENAPISocialIdentifier] isEqualToString:kFacebookIdentifier]) {
+        [_socializer logOutFacebook];
+    }
+    [_communicator removeAuthDataFromDefaults];
     [self updateUI];
 }
 - (IBAction)cancelButtonPressed:(id)sender {
@@ -153,7 +161,8 @@ typedef enum SocialButtonTags {
 
 #pragma mark - SocializerDelegate methods
 -(void)didFailuerAPIAuthorizationWithResponse:(NSDictionary *)response{
-
+    NSLog(@"didFailuerAPIAuthorizationWithResponse %@",response);
+    [_communicator removeAuthDataFromDefaults];
     MBProgressHUD *HUD = [[MBProgressHUD alloc] initWithView:self.view];
     HUD.mode = MBProgressHUDModeDeterminate;
     HUD.labelText= @"Error";
@@ -164,6 +173,8 @@ typedef enum SocialButtonTags {
 }
 -(void)didEmailRequest{
     NSLog(@"HAVE TO ADD EMAIL ADDRESS FOR LOGIN RAEN SHOP!");
+    //show alert view with textfield for email
+    [self showEmailAlertWithMessage:@"Пожалуйста введите Ваш email для завершения регистрации."];
 }
 -(void)didSuccessAPIAuthorizedWithResponse:(NSDictionary *)response{
     MBProgressHUD *HUD = [[MBProgressHUD alloc] initWithView:self.view];
@@ -171,26 +182,72 @@ typedef enum SocialButtonTags {
     HUD.labelText= @"Success";
     HUD.detailsLabelText = response[@"success"];
     [HUD show:YES];
-    [HUD hide:YES afterDelay:1.3];
+    [HUD hide:YES afterDelay:2];
 }
 
 #pragma mark -
-
 -(void)authorizedViaVK{
     NSLog(@"authorizedViaVK");
     [self updateUI];
-    [_communicator authAPIVia:kVkontakteIdentifier withuserIdentifier:_socializer.socialUserId accessToken:_socializer.socialAccessToken];
+    [_communicator authAPIVia:kVkontakteIdentifier
+           withuserIdentifier:_socializer.socialUserId
+                  accessToken:_socializer.socialAccessToken];
     
 }
 -(void)authorizedViaFaceBook{
     NSLog(@"authorizedViaFaceBook");
     [self updateUI];
-    [_communicator authAPIVia:kFacebookIdentifier withuserIdentifier:_socializer.socialUserId accessToken:_socializer.socialAccessToken];
+    [_communicator authAPIVia:kFacebookIdentifier
+           withuserIdentifier:_socializer.socialUserId
+                  accessToken:_socializer.socialAccessToken];
     
 }
 -(void)authorizedViaGoogle{
     NSLog(@"authorizedViaGoogle");
     [self updateUI];
-    [_communicator authAPIVia:kGoogleIdentifier withuserIdentifier:_socializer.socialUserId accessToken:_socializer.socialAccessToken];
+    [_communicator authAPIVia:kGoogleIdentifier
+           withuserIdentifier:_socializer.socialUserId
+                  accessToken:_socializer.socialAccessToken];
+}
+
+-(void)showEmailAlertWithMessage:(NSString*)message {
+    _emailAlert = [[UIAlertView alloc] initWithTitle:nil message:message delegate:self cancelButtonTitle:@"OK" otherButtonTitles:@"Отмена", nil];
+    _emailAlert.alertViewStyle = UIAlertViewStylePlainTextInput;
+    [[_emailAlert textFieldAtIndex:0] setDelegate:self];
+    [_emailAlert show];
+}
+
+#pragma mark - UIAlertViewDelegate
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    NSLog(@"alertView clickedButtonIndex %d",buttonIndex);
+    if (buttonIndex == 0) {
+        if (![self validateEmail:_userEmail]) {
+            [self showEmailAlertWithMessage:@"Вы ввели неверный email! Попробуйте еще раз"];
+        }else{
+            NSLog(@"finish registration with email %@",_userEmail);
+#warning TODO registration with email to RAEN API
+        }
+    }else{
+        //cancel authorization
+#warning TODO logout from social
+    }
+}
+
+#pragma mark - UITextFieldDelegate
+
+-(void)textFieldDidEndEditing:(UITextField *)textField{
+    _userEmail = textField.text;
+}
+-(BOOL)textFieldShouldReturn:(UITextField *)textField{
+    if ([self validateEmail:textField.text]) {
+        return YES;
+    }
+    return NO;
+}
+- (BOOL)validateEmail:(NSString *)emailStr
+{
+    NSString *emailRegex = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
+    NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
+    return [emailTest evaluateWithObject:emailStr];
 }
 @end

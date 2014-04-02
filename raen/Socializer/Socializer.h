@@ -32,8 +32,6 @@ extern NSString *kFacebookIdentifier;
 -(void)loginFacebook;
 -(void)loginGoogle;
 
--(NSString*)whichSocialAuthorized;
-
 -(void)logOutVK;
 -(void)logOutFacebook;
 -(void)logOutGoogle;
