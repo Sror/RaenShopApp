@@ -25,7 +25,6 @@ typedef enum SocialButtonTags {
     RaenAPICommunicator *_communicator;
     Socializer *_socializer;
     UIAlertView *_emailAlert;
-    NSString* _userEmail;
 }
 @property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
 @property (weak, nonatomic) IBOutlet UIImageView *avatar;
@@ -117,20 +116,7 @@ typedef enum SocialButtonTags {
 
 - (IBAction)socialLogoutButtonPressed {
     //get dict from user defaults
-    NSDictionary *authDict = [[NSUserDefaults standardUserDefaults] objectForKey:kRAENAPISocialAuthDict];
-    
-    if ([authDict[kRAENAPISocialIdentifier] isEqualToString:kVkontakteIdentifier]) {
-        [_socializer logOutVK];
-    }
-    if ([authDict[kRAENAPISocialIdentifier] isEqualToString:kGoogleIdentifier]) {
-        [_socializer logOutGoogle];
-    }
-    if ([authDict[kRAENAPISocialIdentifier] isEqualToString:kTwitterIdentifier]) {
-        [_socializer loginTwitter];
-    }
-    if ([authDict[kRAENAPISocialIdentifier] isEqualToString:kFacebookIdentifier]) {
-        [_socializer logOutFacebook];
-    }
+    [_socializer logOutFromSocial];
     [_communicator removeAuthDataFromDefaults];
     [self updateUI];
 }
@@ -173,9 +159,27 @@ typedef enum SocialButtonTags {
 }
 -(void)didEmailRequest{
     NSLog(@"HAVE TO ADD EMAIL ADDRESS FOR LOGIN RAEN SHOP!");
-    //show alert view with textfield for email
-    [self showEmailAlertWithMessage:@"Пожалуйста введите Ваш email для завершения регистрации."];
+    
+    if (_socializer.socialUserEmail) {
+       [_communicator registrationNewUserWithEmail:_socializer.socialUserEmail
+                                         firstName:_socializer.socialUsername
+                                          lastName:nil
+                                             phone:nil
+                                            avatar:nil
+                                        socialLink:nil
+                                  socialIdentifier:_socializer.socialIdentificator
+                                       accessToken:_socializer.socialAccessToken
+                                            userId:_socializer.socialUserId];
+    }else{
+        //show alert view with textfield for email
+        [self showEmailAlertWithMessage:@"Пожалуйста введите Ваш email для завершения регистрации."];
+    }
 }
+-(void)didExistEmail{
+    NSLog(@"current email already exist");
+    [self showEmailAlertWithMessage:[NSString stringWithFormat:@"%@ уже занят, пожалуйста введите другой email",_socializer.socialUserEmail]];
+}
+
 -(void)didSuccessAPIAuthorizedWithResponse:(NSDictionary *)response{
     MBProgressHUD *HUD = [[MBProgressHUD alloc] initWithView:self.view];
     HUD.mode = MBProgressHUDModeDeterminate;
@@ -189,9 +193,10 @@ typedef enum SocialButtonTags {
 -(void)authorizedViaVK{
     NSLog(@"authorizedViaVK");
     [self updateUI];
+    
     [_communicator authAPIVia:kVkontakteIdentifier
            withuserIdentifier:_socializer.socialUserId
-                  accessToken:_socializer.socialAccessToken];
+                  accessToken:_socializer.socialAccessToken optionalParameters:nil];
     
 }
 -(void)authorizedViaFaceBook{
@@ -199,7 +204,8 @@ typedef enum SocialButtonTags {
     [self updateUI];
     [_communicator authAPIVia:kFacebookIdentifier
            withuserIdentifier:_socializer.socialUserId
-                  accessToken:_socializer.socialAccessToken];
+                  accessToken:_socializer.socialAccessToken
+           optionalParameters:nil];
     
 }
 -(void)authorizedViaGoogle{
@@ -207,7 +213,8 @@ typedef enum SocialButtonTags {
     [self updateUI];
     [_communicator authAPIVia:kGoogleIdentifier
            withuserIdentifier:_socializer.socialUserId
-                  accessToken:_socializer.socialAccessToken];
+                  accessToken:_socializer.socialAccessToken
+           optionalParameters:nil];
 }
 
 -(void)showEmailAlertWithMessage:(NSString*)message {
@@ -219,24 +226,29 @@ typedef enum SocialButtonTags {
 
 #pragma mark - UIAlertViewDelegate
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    NSLog(@"alertView clickedButtonIndex %d",buttonIndex);
+    NSLog(@"_emailAlertView button clicked %d",buttonIndex);
     if (buttonIndex == 0) {
-        if (![self validateEmail:_userEmail]) {
+        if (![self validateEmail:_socializer.socialUserEmail]) {
             [self showEmailAlertWithMessage:@"Вы ввели неверный email! Попробуйте еще раз"];
         }else{
-            NSLog(@"finish registration with email %@",_userEmail);
-#warning TODO registration with email to RAEN API
+            NSLog(@"finish registration with email %@",_socializer.socialUserEmail);
+            if (_socializer.socialUserEmail) {
+                
+                [_communicator registrationNewUserWithEmail:_socializer.socialUserEmail firstName:_socializer.socialUsername lastName:nil phone:nil avatar:nil socialLink:nil socialIdentifier:_socializer.socialIdentificator accessToken:_socializer.socialAccessToken userId:_socializer.socialUserId];
+            }
         }
-    }else{
-        //cancel authorization
-#warning TODO logout from social
+    }
+    if (buttonIndex == 1) {
+        [_socializer logOutFromSocial];
+        [_communicator removeAuthDataFromDefaults];
+        [self updateUI];
     }
 }
 
 #pragma mark - UITextFieldDelegate
 
 -(void)textFieldDidEndEditing:(UITextField *)textField{
-    _userEmail = textField.text;
+    _socializer.socialUserEmail = textField.text;
 }
 -(BOOL)textFieldShouldReturn:(UITextField *)textField{
     if ([self validateEmail:textField.text]) {

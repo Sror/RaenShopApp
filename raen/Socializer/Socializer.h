@@ -26,11 +26,14 @@ extern NSString *kFacebookIdentifier;
 @property (nonatomic,strong) NSString *socialUserId;
 @property (nonatomic,strong) NSString *socialUsername;
 @property (nonatomic,strong) NSString *socialUserEmail;
+@property (nonatomic,strong) NSString *socialIdentificator;
 
 -(void)loginVK;
 -(void)loginTwitter;
 -(void)loginFacebook;
 -(void)loginGoogle;
+
+-(void)logOutFromSocial;
 
 -(void)logOutVK;
 -(void)logOutFacebook;

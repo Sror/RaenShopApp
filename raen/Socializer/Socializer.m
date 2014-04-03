@@ -34,10 +34,8 @@ NSString *kFacebookIdentifier = @"Facebook";
 @end
 @implementation Socializer
 
-
-
 -(FBSession *)fbSession{
-    NSLog(@"fbSession initialization");
+   
     if (_fbSession == nil) {
         _fbSession = [[FBSession alloc] initWithPermissions:@[@"basic_info", @"email", @"user_likes"] ];
         NSLog(@"is fbSession open ? %@",_fbSession.isOpen ? @"YES":@"NO");
@@ -72,6 +70,7 @@ NSString *kFacebookIdentifier = @"Facebook";
         _socialAccessToken = [VKSdk getAccessToken].accessToken;
         _socialUserId = [VKSdk getAccessToken].userId;
         _AuthorizedViaSocial = YES;
+        _socialIdentificator = kVkontakteIdentifier;
         [self vkUserinfo];
     }else{
         NSArray *scope = @[VK_PER_FRIENDS,VK_PER_WALL,VK_PER_PHOTOS,VK_PER_NOHTTPS];
@@ -86,6 +85,7 @@ NSString *kFacebookIdentifier = @"Facebook";
         if (!error) {
             _AuthorizedViaSocial = [_fbSession isOpen];
             if (_AuthorizedViaSocial) {
+                _socialIdentificator = kFacebookIdentifier;
                 _socialAccessToken = _fbSession.accessTokenData.accessToken;
                 [self fbUserInfo];
                 [self.delegate authorizedViaFaceBook];
@@ -93,7 +93,8 @@ NSString *kFacebookIdentifier = @"Facebook";
         }
     }];
 }
--(void)loginTwitter{
+-(void)loginTwitter
+{
     
 }
 -(void)loginGoogle{
@@ -102,15 +103,28 @@ NSString *kFacebookIdentifier = @"Facebook";
 }
 
 #pragma mark --- logout methods
+
+-(void)logOutFromSocial{
+    NSLog(@"logOutFromSocial %@",_socialIdentificator);
+    if ([_socialIdentificator isEqualToString:kFacebookIdentifier]) {
+        [self logOutFacebook];
+    }
+    if ([_socialIdentificator isEqualToString:kVkontakteIdentifier]) {
+        [self logOutVK];
+    }
+    if ([_socialIdentificator isEqualToString:kGoogleIdentifier]) {
+        [self logOutGoogle];
+    }
+    if ([_socialIdentificator isEqualToString:kTwitterIdentifier]) {
+        [self logoutTwitter];
+    }
+    [self removeSocialData];
+}
 -(void)logOutVK{
     NSLog(@"logOutVK");
     [VKSdk forceLogout];
     _AuthorizedViaSocial = [VKSdk isLoggedIn];
     NSLog(@"_AuthorizedViaSocial after log out vkontake %@",_AuthorizedViaSocial?@"YES":@"NO");
-    _socialUserId = nil;
-    _socialAccessToken = nil;
-    _socialUserEmail = nil;
-    _socialUsername = nil;
 }
 -(void)logOutFacebook{
     NSLog(@"logOutFacebook");
@@ -119,10 +133,6 @@ NSString *kFacebookIdentifier = @"Facebook";
     // users will simply close the app or switch away, without logging out; this will
     // cause the implicit cached-token login to occur on next launch of the application
     [_fbSession closeAndClearTokenInformation];
-    _socialUserId = nil;
-    _socialAccessToken = nil;
-    _socialUserEmail = nil;
-    _socialUsername = nil;
     _AuthorizedViaSocial = [_fbSession isOpen];
      NSLog(@"_fbSession isOpen? %@",_AuthorizedViaSocial ? @"YES":@"NO");
 }
@@ -130,18 +140,25 @@ NSString *kFacebookIdentifier = @"Facebook";
     NSLog(@"logOutGoogle");
     [[GPPSignIn sharedInstance] signOut];
     _AuthorizedViaSocial = [[GPPSignIn sharedInstance].authentication canAuthorize];
+     NSLog(@"_googleAuth isOpen? %@",_AuthorizedViaSocial ? @"YES":@"NO");
+}
+-(void)logoutTwitter{
+#warning TODO log out from twitter
+}
+-(void)removeSocialData
+{
+    _socialIdentificator = nil;
     _socialUserId = nil;
     _socialAccessToken = nil;
     _socialUserEmail = nil;
     _socialUsername = nil;
-     NSLog(@"_googleAuth isOpen? %@",_AuthorizedViaSocial ? @"YES":@"NO");
 }
-
 #pragma mark - VKDelegate methods
 -(void)vkSdkAcceptedUserToken:(VKAccessToken *)token{
     NSLog(@"vkSdkAcceptedUserToken %@",token);
     _socialAccessToken = token.accessToken;
     _socialUserId = token.userId;
+     _socialIdentificator = kVkontakteIdentifier;
     _AuthorizedViaSocial = YES;
     [self vkUserinfo];
 }
@@ -155,6 +172,7 @@ NSString *kFacebookIdentifier = @"Facebook";
     _AuthorizedViaSocial = YES;
     _socialAccessToken = newToken.accessToken;
     _socialUserId = newToken.userId;
+     _socialIdentificator = kVkontakteIdentifier;
     [self vkUserinfo];
 
 }
@@ -163,6 +181,7 @@ NSString *kFacebookIdentifier = @"Facebook";
     _AuthorizedViaSocial = YES;
     _socialAccessToken = newToken.accessToken;
     _socialUserId = newToken.userId;
+    _socialIdentificator = kVkontakteIdentifier;
     [self vkUserinfo];
 }
 -(void)vkSdkShouldPresentViewController:(UIViewController *)controller{
@@ -194,6 +213,7 @@ NSString *kFacebookIdentifier = @"Facebook";
                 NSDictionary *jsonDict = json.firstObject;
                 _socialUsername = [NSString stringWithFormat:@"%@ %@",jsonDict[@"first_name"],jsonDict[@"last_name"]];
                 _socialUserId = [NSString stringWithFormat:@"%@",jsonDict[@"id"]];
+               
                 _AuthorizedViaSocial = YES;
                 [self.delegate authorizedViaVK];
             }
@@ -231,9 +251,11 @@ NSString *kFacebookIdentifier = @"Facebook";
 -(void)finishedWithAuth:(GTMOAuth2Authentication *)auth error:(NSError *)error{
      NSLog(@"Finished Google Auth with received error %@ and auth object %@",error, auth);
     if (!error) {
+        _socialIdentificator = kGoogleIdentifier;
         _socialAccessToken = auth.accessToken;
         _socialUserEmail = auth.userEmail;
         _socialUserId = _googleSignIn.userID;
+        
 #warning how to get google + user name ?
         _socialUsername = nil;
         _AuthorizedViaSocial = [auth canAuthorize];

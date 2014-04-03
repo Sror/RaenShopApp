@@ -27,6 +27,7 @@
 //authorization delegate methods
 - (void)didSuccessAPIAuthorizedWithResponse:(NSDictionary*)response;
 - (void)didEmailRequest;
+- (void)didExistEmail;
 - (void)didFailuerAPIAuthorizationWithResponse:(NSDictionary*)response;
 
 @required

@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		3304D66218ABF8FA00B9441E /* SpecItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 3304D66118ABF8FA00B9441E /* SpecItem.m */; };
+		3314CFCF18EBF27900B146C1 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3314CFCE18EBF27900B146C1 /* FacebookSDK.framework */; };
+		3314CFD218EBF3A400B146C1 /* GooglePlus.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3314CFD018EBF3A400B146C1 /* GooglePlus.framework */; };
+		3314CFD318EBF3A400B146C1 /* GoogleOpenSource.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3314CFD118EBF3A400B146C1 /* GoogleOpenSource.framework */; };
 		6C31236018B2852A00839A6E /* BrowserViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C31235F18B2852A00839A6E /* BrowserViewController.m */; };
 		6C45CCEA18CB2B5D006440C2 /* CategoryItemsGridViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C45CCE918CB2B5D006440C2 /* CategoryItemsGridViewController.m */; };
 		6C45CCED18CB328E006440C2 /* GridCategoryItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C45CCEC18CB328E006440C2 /* GridCategoryItemCell.m */; };
@@ -77,8 +80,6 @@
 		6CBF68A418913082003ED717 /* UIImage+WebP.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBF689518913082003ED717 /* UIImage+WebP.m */; };
 		6CBF68A518913082003ED717 /* UIImageView+WebCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBF689718913082003ED717 /* UIImageView+WebCache.m */; };
 		6CBF68A718913097003ED717 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CBF68A618913097003ED717 /* ImageIO.framework */; };
-		6CC7FB9218E031FD00AB0278 /* GoogleOpenSource.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC7FB9018E031FD00AB0278 /* GoogleOpenSource.framework */; };
-		6CC7FB9318E031FD00AB0278 /* GooglePlus.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC7FB9118E031FD00AB0278 /* GooglePlus.framework */; };
 		6CC7FB9518E0321000AB0278 /* GooglePlus.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6CC7FB9418E0321000AB0278 /* GooglePlus.bundle */; };
 		6CC7FB9718E03A0E00AB0278 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC7FB9618E03A0E00AB0278 /* AddressBook.framework */; };
 		6CC7FB9918E03A1600AB0278 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC7FB9818E03A1600AB0278 /* AssetsLibrary.framework */; };
@@ -130,7 +131,6 @@
 		6CD389E818D8688F005D3FD4 /* VKUsersArray.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CD389C018D8688F005D3FD4 /* VKUsersArray.m */; };
 		6CD389E918D8688F005D3FD4 /* VKUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CD389C218D8688F005D3FD4 /* VKUtil.m */; };
 		6CD389EB18D86895005D3FD4 /* VKSdkResources.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6CD389EA18D86895005D3FD4 /* VKSdkResources.bundle */; };
-		6CD389ED18D86AE9005D3FD4 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD389EC18D86AE9005D3FD4 /* FacebookSDK.framework */; };
 		6CD6251218DA2B5E004A189B /* ExtendNSLog.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CD6251118DA2B5E004A189B /* ExtendNSLog.m */; };
 		6CEBC1D518C606DB0046F2A6 /* NewsCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CEBC1D418C606DB0046F2A6 /* NewsCell.m */; };
 		6CECDBD518E1F59C0086967F /* FiltersViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CECDBD418E1F59C0086967F /* FiltersViewController.m */; };
@@ -156,6 +156,9 @@
 /* Begin PBXFileReference section */
 		3304D66018ABF8FA00B9441E /* SpecItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SpecItem.h; sourceTree = "<group>"; };
 		3304D66118ABF8FA00B9441E /* SpecItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SpecItem.m; sourceTree = "<group>"; };
+		3314CFCE18EBF27900B146C1 /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = FacebookSDK.framework; path = ../../FacebookSDK/FacebookSDK.framework; sourceTree = "<group>"; };
+		3314CFD018EBF3A400B146C1 /* GooglePlus.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GooglePlus.framework; path = "../../../Downloads/google-plus-ios-sdk-1.5.1/GooglePlus.framework"; sourceTree = "<group>"; };
+		3314CFD118EBF3A400B146C1 /* GoogleOpenSource.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GoogleOpenSource.framework; path = "../../../Downloads/google-plus-ios-sdk-1.5.1/GoogleOpenSource.framework"; sourceTree = "<group>"; };
 		6C31235E18B2852A00839A6E /* BrowserViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BrowserViewController.h; sourceTree = "<group>"; };
 		6C31235F18B2852A00839A6E /* BrowserViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BrowserViewController.m; sourceTree = "<group>"; };
 		6C45CCE818CB2B5D006440C2 /* CategoryItemsGridViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CategoryItemsGridViewController.h; sourceTree = "<group>"; };
@@ -416,17 +419,17 @@
 				6CC7FBA118E03A4500AB0278 /* MediaPlayer.framework in Frameworks */,
 				6C5473CB188405130069E62B /* CoreGraphics.framework in Frameworks */,
 				6CC7FB9F18E03A3000AB0278 /* CoreText.framework in Frameworks */,
+				3314CFCF18EBF27900B146C1 /* FacebookSDK.framework in Frameworks */,
 				6CC7FB9D18E03A2500AB0278 /* CoreMotion.framework in Frameworks */,
-				6CC7FB9B18E03A1F00AB0278 /* CoreLocation.framework in Frameworks */,
 				6CC7FB9918E03A1600AB0278 /* AssetsLibrary.framework in Frameworks */,
+				6CC7FB9B18E03A1F00AB0278 /* CoreLocation.framework in Frameworks */,
 				6CC7FB9718E03A0E00AB0278 /* AddressBook.framework in Frameworks */,
 				6C4EBFE618D86BEB00F953D2 /* Social.framework in Frameworks */,
 				6C4EBFE418D86BE500F953D2 /* Accounts.framework in Frameworks */,
 				6CBF68A718913097003ED717 /* ImageIO.framework in Frameworks */,
-				6CD389ED18D86AE9005D3FD4 /* FacebookSDK.framework in Frameworks */,
 				6C5473CD188405130069E62B /* UIKit.framework in Frameworks */,
-				6CC7FB9218E031FD00AB0278 /* GoogleOpenSource.framework in Frameworks */,
-				6CC7FB9318E031FD00AB0278 /* GooglePlus.framework in Frameworks */,
+				3314CFD218EBF3A400B146C1 /* GooglePlus.framework in Frameworks */,
+				3314CFD318EBF3A400B146C1 /* GoogleOpenSource.framework in Frameworks */,
 				6C5473C9188405130069E62B /* Foundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -476,6 +479,9 @@
 		6C5473C7188405130069E62B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3314CFD018EBF3A400B146C1 /* GooglePlus.framework */,
+				3314CFD118EBF3A400B146C1 /* GoogleOpenSource.framework */,
+				3314CFCE18EBF27900B146C1 /* FacebookSDK.framework */,
 				6CC7FBA418E03A5900AB0278 /* SystemConfiguration.framework */,
 				6CC7FBA218E03A5100AB0278 /* Security.framework */,
 				6CC7FBA018E03A4500AB0278 /* MediaPlayer.framework */,
@@ -1245,7 +1251,10 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Users/alekseyivanov/Documents/iphone\\ develop/RaenShopApp",
+					/Users/alekseyivanov/Documents/iphone,
+					develop/RaenShopApp,
+					/Users/alexeyivanov/Documents/FacebookSDK,
+					"/Users/alexeyivanov/Downloads/google-plus-ios-sdk-1.5.1",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "raen/raenapp-Prefix.pch";
@@ -1263,7 +1272,10 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					"/Users/alekseyivanov/Documents/iphone\\ develop/RaenShopApp",
+					/Users/alekseyivanov/Documents/iphone,
+					develop/RaenShopApp,
+					/Users/alexeyivanov/Documents/FacebookSDK,
+					"/Users/alexeyivanov/Downloads/google-plus-ios-sdk-1.5.1",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "raen/raenapp-Prefix.pch";

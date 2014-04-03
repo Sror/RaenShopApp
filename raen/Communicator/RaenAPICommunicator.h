@@ -23,6 +23,8 @@ extern NSString* kRAENAPISocialIdentifier;
 @property (weak, nonatomic) id<RaenAPICommunicatorDelegate> delegate;
 @property (nonatomic,strong) NSString *raenAPIAccessToken;
 
+
+
 - (void)getNewsByPage:(NSInteger)page;
 - (void)getAllCategories;
 - (void)getParamsOfCategoryWithId:(NSString*)categoryId;
@@ -35,13 +37,20 @@ extern NSString* kRAENAPISocialIdentifier;
 - (void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty;
 - (void)deleteItemFromCartWithID:(NSString*)id;
 //authorization via socials
-- (void)authAPIVia:(NSString *)socialName withuserIdentifier:(NSString*)userId accessToken:(NSString*)token;
+- (void)authAPIVia:(NSString*)socialName
+withuserIdentifier:(NSString*)userId
+       accessToken:(NSString*)token
+optionalParameters:(NSDictionary*)optionalParametersDictionary;
+
 - (void)registrationNewUserWithEmail:(NSString*)email
-                      firstName:(NSString*)firstName
-                       lastName:(NSString*)lastName
-                          phone:(NSString*)phone
-                         avatar:(NSString*)avatarLink
-                     socialLink:(NSString*)socialLink;
+                           firstName:(NSString*)firstName
+                            lastName:(NSString*)lastName
+                               phone:(NSString*)phone
+                              avatar:(NSString*)avatarLink
+                          socialLink:(NSString*)socialLink
+                    socialIdentifier:(NSString*)socialId
+                         accessToken:(NSString*)accessToken
+                              userId:(NSString*)userId;
 //Auth data in userdefailts
 - (void)saveAuthDataToDefaultsWith:(NSString*)socialId accessToken:(NSString*)accessToken;
 - (void)removeAuthDataFromDefaults;

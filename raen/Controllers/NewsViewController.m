@@ -123,12 +123,10 @@
 }
 #pragma mark - UIScrollViewDelegate
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
-    NSLog(@"scrollViewDidEndDecelerating");
+    
     float endScrolling = scrollView.contentOffset.y +scrollView.frame.size.height;
     if (endScrolling >= scrollView.contentSize.height) {
-        NSLog(@"Scroll END Called!");
         NSInteger page = _news.count/RaenAPIdefaultNewsItemsCountPerPage+1;
-        NSLog(@"page %d",page);
         [MBProgressHUD hideHUDForView:self.view animated:YES];
         [_communicator getNewsByPage:page];
     }
