@@ -10,6 +10,8 @@
 #import "ItemCardViewController.h"
 #import "BrowserViewController.h"
 #import "RaenAPICommunicator.h"
+#import "ImageSliderViewController.h"
+
 //models
 #import "JSONModelLib.h"
 #import "ItemModel.h"
@@ -106,6 +108,8 @@
     UIImageView *imageView =[[UIImageView alloc] initWithFrame:frame];
     //NSLog(@"current imageView frame x=%f , y=%f",frame.origin.x,frame.origin.y);
     imageView.contentMode = UIViewContentModeScaleAspectFit;
+    imageView.userInteractionEnabled = YES;
+    imageView.tag = page;
     [scrollView addSubview:imageView];
     ImageModel *image = _item.images[page];
     UIActivityIndicatorView *activityIndicator =[[ UIActivityIndicatorView alloc]
@@ -120,8 +124,19 @@
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
         
     }];
+    UITapGestureRecognizer *tapOnSlider = [[UITapGestureRecognizer alloc]
+                                           initWithTarget:self action:@selector(handleSlideTap:)];
+    tapOnSlider.numberOfTapsRequired = 1;
+    tapOnSlider.numberOfTouchesRequired = 1;
+    [imageView addGestureRecognizer:tapOnSlider];
 }
 
+-(void)handleSlideTap:(UITapGestureRecognizer*)tapGestureRecognizer{
+    NSNumber * imageNmbr = [NSNumber numberWithInt:tapGestureRecognizer.view.tag];
+    NSLog(@"Taped image #%d", imageNmbr);
+    [self performSegueWithIdentifier:@"toImageSliderVC" sender:imageNmbr];
+  
+}
 
 -(void)setScrollViewSize:(UIScrollView*)scrollview withPages:(NSInteger)pages {
     CGSize pagesScrollViewSize = scrollview.frame.size;
@@ -170,16 +185,13 @@
                                                    attributes:@{NSFontAttributeName:font}
                                                       context:nil];
         CGSize boundingSize = boundingRect.size;
-        NSLog(@"boundingSize.height %f, weight %f",boundingSize.height,boundingSize.width);
+        //NSLog(@"boundingSize.height %f, weight %f",boundingSize.height,boundingSize.width);
         if (boundingSize.height<75) {
             return 80;
         }else{
             NSLog(@"cell size %f",10+boundingSize.height);
             return (10+boundingSize.height);
         }
-        
-        
-        //return 70;
     }
     //all other cells height =44px
     return 44;
@@ -242,6 +254,7 @@
                                          
                                       }else{
                                           NSLog(@"error to load image");
+#warning Do i have no_image.jpg ?
                                           [cell.thumbnail setImage:[UIImage imageNamed:@"no_image.jpg"]];
                                       }
                                   }];
@@ -286,6 +299,14 @@
         NSDictionary *tmpDict = sender;
         browserVC.navigationItem.title = [tmpDict allKeys][0];
         browserVC.link = [tmpDict allValues][0];
+    }
+    if ([segue.identifier isEqualToString:@"toImageSliderVC"]) {
+        ImageSliderViewController *imageSliderVC = segue.destinationViewController;
+        if ([sender isKindOfClass:[NSNumber class]]) {
+            [imageSliderVC setImages:_item.images];
+            [imageSliderVC setCurrentImageNmr:[sender intValue]];
+        }
+        
     }
 }
 #pragma mark - buy button pressed

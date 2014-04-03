@@ -180,6 +180,7 @@
     UITapGestureRecognizer *tapOnSlider = [[UITapGestureRecognizer alloc]
                                            initWithTarget:self action:@selector(handleSlideTap:)];
     tapOnSlider.numberOfTapsRequired = 1;
+    tapOnSlider.numberOfTouchesRequired = 1;
     [imageView addGestureRecognizer:tapOnSlider];
     
 }

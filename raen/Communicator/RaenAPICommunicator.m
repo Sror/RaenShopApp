@@ -25,7 +25,7 @@ NSString* kRAENAPISocialAccessToken =@"RAEN_API_SOCIAL_ACCESS_TOKEN";
 NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
 
 #warning add/remove hash below
-#define kRaenAPIAuthValue @"Basic =="
+#define kRaenAPIAuthValue @"Basic =cmFlbmlvc2FwcDp5V09tUTZTWXgyc00="
 
 #define kRaenApiGetGuard @"http://raenshop.ru/api/catalog/goods_list/cat_id/81/" //get all guard items
 #define kRaenApiGetParamsOfCategory @"http://raenshop.ru/api/catalog/category/id/"
