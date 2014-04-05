@@ -292,7 +292,6 @@ NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
     NSString *price =item.priceNew.length >2 ? item.priceNew : item.price;
     NSString *bodyParams =[NSString stringWithFormat:@"name=%@ %@,%@&id=%@&price=%@&qty=1",item.brand,item.title,specItem.color,specItem.db1cId,price];
     NSLog(@"parameters %@",bodyParams);
-    [self restoreCookies];
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [JSONHTTPClient JSONFromURLWithString:kRaenApiSendToCartItem
                                    method:@"POST"
@@ -315,11 +314,33 @@ NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
 
                                }];
 }
+-(void)changeCartItemQTY:(NSString*)qty byRowID:(NSString*)rowid{
+    [self restoreCookies];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    [JSONHTTPClient JSONFromURLWithString:kRaenApiUpdateCart
+                                   method:@"POST"
+                                   params:@{@"rowid":rowid,@"qty":qty}
+                             orBodyString:nil
+                                  headers:@{@"Authorization":kRaenAPIAuthValue}
+                               completion:^(id json, JSONModelError *err) {
+                                   [self saveCookies];
+                                   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                                   if ([json isKindOfClass:[NSDictionary class]]) {
+                                       [self.delegate didChangeCartItemQTYWithResponse:json];
+                                   }
+                                   if (err!=nil) {
+#warning add delegate method with error
+                                       NSLog(@"error to remove object from cart %@",err.localizedDescription);
+                                   }
+                               }];
+
+    
+}
+/*
 -(void)deleteItemFromCartWithID:(NSString*)rowid{
     NSLog(@"delete items with rowid %@",rowid);
     [self restoreCookies];
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    [self restoreCookies];
     [JSONHTTPClient JSONFromURLWithString:kRaenApiUpdateCart
                                    method:@"POST"
                                    params:@{@"rowid":rowid,@"qty":@"0"}
@@ -336,7 +357,7 @@ NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
                                    }
                                }];
 }
-
+*/
 #pragma mark - authorization via social networks
 -(void)authAPIVia:(NSString *)socialName withuserIdentifier:(NSString*)userId
       accessToken:(NSString*)token

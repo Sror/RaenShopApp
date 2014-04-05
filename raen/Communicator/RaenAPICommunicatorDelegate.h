@@ -21,7 +21,7 @@
 - (void)didReceiveAllCategories:(NSArray *)array;
 - (void)didReceiveSliderItems:(NSArray*)array;
 - (void)didReceiveSaleOfDay:(id)saleOfDayModel;
-- (void)didRemoveItemFromCartWithResponse:(NSDictionary*)response;
+- (void)didChangeCartItemQTYWithResponse:(NSDictionary*)response;
 
 - (void)didReceiveFilter:(id)filter;
 //authorization delegate methods

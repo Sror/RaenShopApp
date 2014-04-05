@@ -65,12 +65,22 @@
     NSLog(@"didReceive %d news",news.count);
     [self.refreshControl endRefreshing];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
+    NSInteger rowToScroll= _news.count;
     [_news  addObjectsFromArray:news];
-    [self.tableView reloadData];
+    NSMutableArray *animatedIndexPaths = [NSMutableArray arrayWithCapacity:news.count];
+    for (int i=0; i<news.count; i++) {
+        NSIndexPath *tmpIndexPath = [NSIndexPath indexPathForRow:i+rowToScroll inSection:1];
+        [animatedIndexPaths addObject:tmpIndexPath];
+    }
+    [self.tableView insertRowsAtIndexPaths:animatedIndexPaths withRowAnimation:UITableViewRowAnimationFade];
+    NSIndexPath *firstNewIndexPath = [NSIndexPath indexPathForRow:rowToScroll inSection:1];
+    if (_news.count/news.count !=1) {
+        [self.tableView scrollToRowAtIndexPath:firstNewIndexPath atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+    }
 }
 
 -(void)didReceiveSliderItems:(NSArray *)array{
-    NSLog(@"didReceiveSliderItems");
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
     _sliderItems = array;
     [self.tableView reloadData];
     [self.refreshControl endRefreshing];
@@ -127,7 +137,7 @@
     float endScrolling = scrollView.contentOffset.y +scrollView.frame.size.height;
     if (endScrolling >= scrollView.contentSize.height) {
         NSInteger page = _news.count/RaenAPIdefaultNewsItemsCountPerPage+1;
-        [MBProgressHUD hideHUDForView:self.view animated:YES];
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [_communicator getNewsByPage:page];
     }
 }
