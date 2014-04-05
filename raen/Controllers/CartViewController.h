@@ -11,14 +11,14 @@
 
 
 
-@interface CartViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,RaenAPICommunicatorDelegate>
+@interface CartViewController : UIViewController <UITableViewDataSource,UITableViewDelegate,RaenAPICommunicatorDelegate,UITextFieldDelegate>
 
-@property (weak, nonatomic) IBOutlet UITableView *tableView;
+
 @property (weak, nonatomic) IBOutlet UIView *subView;
 @property (weak, nonatomic) IBOutlet UILabel *subTotalLabel;
 @property (weak, nonatomic) IBOutlet UIButton *checkOutButton;
 @property (weak, nonatomic) IBOutlet UITabBarItem *tabBarItem;
-
+@property (weak, nonatomic) IBOutlet UITableView *tableView;
 
 - (IBAction)checkOutButtonPressed:(id)sender;
 -(NSString*)itemsCount;

@@ -52,7 +52,6 @@
 		6CBAF2CE18AB3FF100426647 /* JSONModel+networking.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2BB18AB3FF100426647 /* JSONModel+networking.m */; };
 		6CBAF2CF18AB3FF100426647 /* JSONKeyMapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2BE18AB3FF100426647 /* JSONKeyMapper.m */; };
 		6CBAF2D018AB3FF100426647 /* JSONValueTransformer.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2C018AB3FF100426647 /* JSONValueTransformer.m */; };
-		6CBAF2DC18AB3FFE00426647 /* CartItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2D318AB3FFE00426647 /* CartItemCell.m */; };
 		6CBAF2DD18AB3FFE00426647 /* CVCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2D518AB3FFE00426647 /* CVCell.m */; };
 		6CBAF2DE18AB3FFE00426647 /* ItemCardCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2D718AB3FFE00426647 /* ItemCardCell.m */; };
 		6CBAF2DF18AB3FFE00426647 /* ItemCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2D918AB3FFE00426647 /* ItemCell.m */; };
@@ -231,8 +230,6 @@
 		6CBAF2BE18AB3FF100426647 /* JSONKeyMapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONKeyMapper.m; sourceTree = "<group>"; };
 		6CBAF2BF18AB3FF100426647 /* JSONValueTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSONValueTransformer.h; sourceTree = "<group>"; };
 		6CBAF2C018AB3FF100426647 /* JSONValueTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = JSONValueTransformer.m; sourceTree = "<group>"; };
-		6CBAF2D218AB3FFE00426647 /* CartItemCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CartItemCell.h; sourceTree = "<group>"; };
-		6CBAF2D318AB3FFE00426647 /* CartItemCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CartItemCell.m; sourceTree = "<group>"; };
 		6CBAF2D418AB3FFE00426647 /* CVCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CVCell.h; sourceTree = "<group>"; };
 		6CBAF2D518AB3FFE00426647 /* CVCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CVCell.m; sourceTree = "<group>"; };
 		6CBAF2D618AB3FFE00426647 /* ItemCardCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemCardCell.h; sourceTree = "<group>"; };
@@ -633,8 +630,6 @@
 			children = (
 				6C4E6AF418C489BE00A14E99 /* MainSliderCell.h */,
 				6C4E6AF518C489BE00A14E99 /* MainSliderCell.m */,
-				6CBAF2D218AB3FFE00426647 /* CartItemCell.h */,
-				6CBAF2D318AB3FFE00426647 /* CartItemCell.m */,
 				6CBAF2D418AB3FFE00426647 /* CVCell.h */,
 				6CBAF2D518AB3FFE00426647 /* CVCell.m */,
 				6CBAF2D618AB3FFE00426647 /* ItemCardCell.h */,
@@ -1070,7 +1065,6 @@
 				6CD389E318D8688F005D3FD4 /* VKSdk.m in Sources */,
 				6CBF689918913082003ED717 /* NSData+ImageContentType.m in Sources */,
 				6CBB386E18C5F7100097AFD0 /* NewsViewController.m in Sources */,
-				6CBAF2DC18AB3FFE00426647 /* CartItemCell.m in Sources */,
 				6CBAF2D018AB3FF100426647 /* JSONValueTransformer.m in Sources */,
 				6CBAF2DD18AB3FFE00426647 /* CVCell.m in Sources */,
 				6CECDBD518E1F59C0086967F /* FiltersViewController.m in Sources */,
