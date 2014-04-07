@@ -20,6 +20,7 @@
 @property (weak, nonatomic) IBOutlet UITabBarItem *tabBarItem;
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 
+
 - (IBAction)checkOutButtonPressed:(id)sender;
 -(NSString*)itemsCount;
 

@@ -15,10 +15,12 @@
 #import "UIImageView+WebCache.h"
 #import "MBProgressHUD.h"
 
+
 @interface CartViewController () <RaenAPICommunicatorDelegate,UITextFieldDelegate>
 {
     RaenAPICommunicator *_communicator;
     NSArray *_items;
+    UITextField *_activeTextField;
 }
 @end
 
@@ -28,12 +30,21 @@
 @synthesize tabBarItem;
 
 -(void)viewWillAppear:(BOOL)animated{
+    [super viewWillAppear:animated];
     
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     [self.subView setHidden:YES];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [_communicator getItemsFromCart];
 }
 
+-(void)viewWillDisappear:(BOOL)animated{
+    [super viewWillDisappear:animated];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
+}
 
 - (void)viewDidLoad
 {
@@ -44,20 +55,6 @@
     [self.tableView setHidden:YES];
     //User Interface
     [self.subView.layer setCornerRadius:3.0];
-    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(hideKeyboard:)];
-    tapGesture.numberOfTouchesRequired = 1;
-    tapGesture.numberOfTapsRequired =1;
-    [self.view setUserInteractionEnabled:YES];
-    [self.tableView addGestureRecognizer:tapGesture];
-    
-
-}
-
-
--(void)hideKeyboard:(UITapGestureRecognizer*)recognizer{
-    NSLog(@"hideKeyboard");
-    [self.tableView endEditing:YES];
-    
 }
 
 -(NSString*)itemsCount{
@@ -82,18 +79,7 @@
     [self.subTotalLabel setText:[self subtotal]];
     [self.subView setHidden:NO];
 }
-/*
--(BOOL)saveCartItems{
-    NSMutableArray *archiveArray = [NSMutableArray arrayWithCapacity:_items.count];
-    for (CartItemModel *cartItem in _items) {
-        NSData *cartItemArchived = [NSKeyedArchiver archivedDataWithRootObject:cartItem];
-        [archiveArray addObject:cartItemArchived];
-    }
-    [[NSUserDefaults standardUserDefaults] setObject:archiveArray forKey:RAENSHOP_CART_ITEMS];
-    [[NSUserDefaults standardUserDefaults] synchronize];
-    return [[NSUserDefaults standardUserDefaults]objectForKey:RAENSHOP_CART_ITEMS]? YES:NO;
-}
-*/
+
 -(void)fetchingFailedWithError:(JSONModelError *)error {
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
@@ -110,22 +96,7 @@
     [_communicator getItemsFromCart];
     
 }
-/*
--(void)didRemoveItemFromCartWithResponse:(NSDictionary *)response{
-    NSLog(@"didRemoveItemFromCartWithResponse %@",response);
-    [MBProgressHUD hideHUDForView:self.view animated:YES];
-    if (![response objectForKey:@"success"]) {
-        NSLog(@"error to remove item");
-        
-        UIAlertView *alert  =[[UIAlertView alloc] initWithTitle:@"Error" message:response[@"error"] delegate:self cancelButtonTitle:@"ok" otherButtonTitles:nil];
-        [alert show];
 
-    }else{
-        [_communicator saveCookies];
-        [_communicator getItemsFromCart];
-    }
-}
-*/
 #pragma mark - UITableViewDataSource
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;
@@ -160,7 +131,7 @@
     
     return nil;
 }
-// Override to support editing the table view.
+
 - (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
 {
     if (editingStyle == UITableViewCellEditingStyleDelete) {
@@ -168,7 +139,6 @@
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         CartItemModel *cartItem = _items[indexPath.row];
         [_communicator changeCartItemQTY:@"0" byRowID:cartItem.rowid];
-       
     }
 }
 
@@ -187,8 +157,9 @@
     for (CartItemModel *cartItem in _items) {
         total = total + [cartItem.subtotal intValue];
     };
-    return [NSString stringWithFormat:@"Итого: %ld руб.",total];
+    return [NSString stringWithFormat:@"Итого: %ld руб.",(long)total];
 }
+
 #pragma mark - IBActions
 - (IBAction)loginButtonPressed:(id)sender {
     [self performSegueWithIdentifier:@"toLoginVC" sender:nil];
@@ -211,9 +182,7 @@
 
 #pragma mark - UITextField Delegate methods
 -(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
-    NSLog(@"textField at row %d",textField.tag);
     NSString* resultString = [textField.text stringByReplacingCharactersInRange:range withString:string];
-    
     if (resultString.length <= 2) {
         NSCharacterSet* charSet = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
         
@@ -221,27 +190,18 @@
             return YES;
         }
     }
-    
     return NO;
 }
-- (void) textFieldDidBeginEditing:(UITextField *)textField {
-    CartCell *cell;
-    
-    if (floor(NSFoundationVersionNumber) <= NSFoundationVersionNumber_iOS_6_1) {
-        // Load resources for iOS 6.1 or earlier
-        cell = (CartCell *) textField.superview.superview;
-        
-    } else {
-        // Load resources for iOS 7 or later
-        cell = (CartCell *) textField.superview.superview.superview;
-        // TextField -> UITableVieCellContentView -> (in iOS 7!)ScrollView -> Cell!
-    }
-    [self.tableView scrollToRowAtIndexPath:[self.tableView indexPathForCell:cell]
-                          atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+
+
+- (void)textFieldDidBeginEditing:(UITextField *)textField {    
+    _activeTextField = textField;
+    [textField setInputAccessoryView:[self keyboardToolBar]];
 }
 
 -(void)textFieldDidEndEditing:(UITextField *)textField{
-    NSLog(@"textField with tag %d DidEndEditing",textField.tag);
+    _activeTextField = nil;
+    
     CartItemModel *cartItem = _items[textField.tag];
     if (textField.text.length==0) {
         textField.text = @"1";
@@ -251,11 +211,45 @@
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         [_communicator changeCartItemQTY:textField.text byRowID:cartItem.rowid];
     }
-    if ([cartItem.qty isEqualToString:textField.text]) {
-        NSLog(@"changed qty == current qty");
-        //DO nothing
-    }
+}
+
+-(UIToolbar*)keyboardToolBar{
+    //portrait toolbar only
+    UIToolbar* keyboardToolBar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0, 0.0, 320.0, 40.0)];
+    [keyboardToolBar setBarStyle:UIBarStyleBlack];
+    [keyboardToolBar setTranslucent:YES];
+    [keyboardToolBar setTintColor:[UIColor lightGrayColor]];
+    UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
+    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(keyboardDonePressed)];
+    keyboardToolBar.items = @[flexSpace,doneButton];
+    [keyboardToolBar.layer setCornerRadius:3.0];
+    return keyboardToolBar;
+    
+}
+#pragma mark - Keyboard hide / show helpers
+- (void)keyboardDonePressed{
+    [self.tableView endEditing:YES];
+}
+- (void)keyboardWillShow:(NSNotification *)notification {
+    NSDictionary* info = [notification userInfo];
+    CGSize kbSize = [[info objectForKey:UIKeyboardFrameBeginUserInfoKey] CGRectValue].size;
    
+    UIEdgeInsets contentInsets;
+    if (UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation])) {
+        contentInsets = UIEdgeInsetsMake(0.0, 0.0, (kbSize.height), 0.0);
+    } else {
+        contentInsets = UIEdgeInsetsMake(0.0, 0.0, (kbSize.width), 0.0);
+    }
+    
+    self.tableView.contentInset = contentInsets;
+    self.tableView.scrollIndicatorInsets = contentInsets;
+    [self.tableView scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:_activeTextField.tag inSection:0]
+                          atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+}
+
+- (void)keyboardWillHide:(NSNotification *)notification {
+    [self.tableView setContentInset:UIEdgeInsetsMake(64, 0, 44, 0)];
+    [self.tableView setScrollIndicatorInsets:UIEdgeInsetsMake(64, 0, 44, 0)];
 }
 
 @end

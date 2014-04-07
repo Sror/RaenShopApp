@@ -447,6 +447,7 @@
 		6C4EBFE818D887B800F953D2 /* Socializer */ = {
 			isa = PBXGroup;
 			children = (
+				6CD3897018D8687B005D3FD4 /* VKsdk */,
 				6CC7FB9418E0321000AB0278 /* GooglePlus.bundle */,
 				6CCF23B018D98C4E00EFF08E /* SocializerDelegate.h */,
 				6C4EBFE918D887DA00F953D2 /* Socializer.h */,
@@ -511,7 +512,6 @@
 				6CBF68661890E22B003ED717 /* HUD */,
 				6C5473D7188405130069E62B /* AppDelegate.h */,
 				6C5473D8188405130069E62B /* AppDelegate.m */,
-				6CD3897018D8687B005D3FD4 /* VKsdk */,
 				6C5473E6188405130069E62B /* Images.xcassets */,
 				6C5473CF188405130069E62B /* Supporting Files */,
 				6C5473DA188405130069E62B /* Main_iPhone.storyboard */,
@@ -773,6 +773,7 @@
 				6CD3897118D8688F005D3FD4 /* sdk */,
 			);
 			name = VKsdk;
+			path = ..;
 			sourceTree = "<group>";
 		};
 		6CD3897118D8688F005D3FD4 /* sdk */ = {
@@ -1245,11 +1246,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/alekseyivanov/Documents/iphone,
-					develop/RaenShopApp,
-					/Users/alexeyivanov/Documents/FacebookSDK,
-					"/Users/alexeyivanov/Downloads/google-plus-ios-sdk-1.5.1",
-					"/Users/alekseyivanov/Documents/iphone\\ develop/RaenShopApp/raen",
+					"\"$(SRCROOT)/raen/\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "raen/raenapp-Prefix.pch";
@@ -1267,11 +1264,7 @@
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
-					/Users/alekseyivanov/Documents/iphone,
-					develop/RaenShopApp,
-					/Users/alexeyivanov/Documents/FacebookSDK,
-					"/Users/alexeyivanov/Downloads/google-plus-ios-sdk-1.5.1",
-					"/Users/alekseyivanov/Documents/iphone\\ develop/RaenShopApp/raen",
+					"\"$(SRCROOT)/raen/\"",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "raen/raenapp-Prefix.pch";

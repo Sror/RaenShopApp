@@ -15,6 +15,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *bottonToolbarLabel;
 @property (nonatomic,strong) NSArray* images;
 @property (nonatomic,assign) NSInteger currentImageNmr;
+
 - (IBAction)doneButtonPressed:(id)sender;
 
 @end

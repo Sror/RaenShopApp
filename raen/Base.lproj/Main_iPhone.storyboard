@@ -510,7 +510,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <userGuides>
-                            <userLayoutGuide location="160" affinity="minX"/>
+                            <userLayoutGuide location="161" affinity="minX"/>
                         </userGuides>
                         <subviews>
                             <tableView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsSelectionDuringEditing="YES" rowHeight="121" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="80K-hl-Qsv">
@@ -620,13 +620,12 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Корзина" id="MdL-rU-dLD">
-                        <barButtonItem key="rightBarButtonItem" title="login" id="9yk-pa-cqe">
+                        <barButtonItem key="rightBarButtonItem" title="Вход" id="9yk-pa-cqe">
                             <connections>
                                 <action selector="loginButtonPressed:" destination="QUy-BD-bpt" id="WMl-rb-2ad"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
-                    <simulatedTabBarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="checkOutButton" destination="ymR-Q0-4G1" id="cS6-7i-n2l"/>
                         <outlet property="subTotalLabel" destination="iUn-PN-R4s" id="bdM-ww-xQe"/>
