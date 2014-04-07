@@ -97,8 +97,10 @@
     [_communicator saveCookies];
     
 }
-
-
+-(void)didFailureAddingItemToCartWithError:(JSONModelError *)error{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:error.description delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
+}
 #pragma  mark - ScrollView
 -(void)loadPage:(NSInteger)page forScrollView:(UIScrollView*)scrollView {
     

@@ -22,7 +22,8 @@
 - (void)didReceiveSliderItems:(NSArray*)array;
 - (void)didReceiveSaleOfDay:(id)saleOfDayModel;
 - (void)didChangeCartItemQTYWithResponse:(NSDictionary*)response;
-
+- (void)didFailureChangeCartItemQTYWithError:(JSONModelError*)error;
+- (void)didFailureAddingItemToCartWithError:(JSONModelError*)error;
 - (void)didReceiveFilter:(id)filter;
 //authorization delegate methods
 - (void)didSuccessAPIAuthorizedWithResponse:(NSDictionary*)response;

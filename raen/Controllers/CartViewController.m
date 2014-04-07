@@ -73,7 +73,7 @@
     [self.tableView setHidden:NO];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     _items = items;
-    NSLog(@"items in cart %@",_items);
+   // NSLog(@"items in cart %@",_items);
     [self.tabBarController.tabBar.items[2] setBadgeValue:[self itemsCount]];
     [self.tableView reloadData];
     [self.subTotalLabel setText:[self subtotal]];
@@ -85,6 +85,7 @@
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
 }
+
 -(void)didChangeCartItemQTYWithResponse:(NSDictionary *)response{
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     if (![response objectForKey:@"success"]) {
@@ -96,7 +97,10 @@
     [_communicator getItemsFromCart];
     
 }
-
+-(void)didFailureChangeCartItemQTYWithError:(JSONModelError *)error{
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:error.description delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alert show];
+}
 #pragma mark - UITableViewDataSource
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;

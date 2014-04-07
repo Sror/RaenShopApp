@@ -25,7 +25,7 @@ NSString* kRAENAPISocialAccessToken =@"RAEN_API_SOCIAL_ACCESS_TOKEN";
 NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
 
 #warning add/remove hash below
-#define kRaenAPIAuthValue @"Basic =cmFlbmlvc2FwcDp5V09tUTZTWXgyc00="
+#define kRaenAPIAuthValue @"Basic =="
 
 #define kRaenApiGetGuard @"http://raenshop.ru/api/catalog/goods_list/cat_id/81/" //get all guard items
 #define kRaenApiGetParamsOfCategory @"http://raenshop.ru/api/catalog/category/id/"
@@ -259,11 +259,16 @@ NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
 #pragma mark -
 #pragma mark CART methods
 -(void)getItemsFromCart{
-    
     [self restoreCookies];
-    NSLog(@"getting items from cart");
+    
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    [JSONHTTPClient JSONFromURLWithString:kRaenApiGetCart
+    NSString *urlStr= kRaenApiGetCart;
+    
+    if ([self accessTokenFromDefaults]) {
+        urlStr =   [urlStr stringByAppendingString:[NSString stringWithFormat:@"token/%@",[self accessTokenFromDefaults]]];
+    }
+    NSLog(@"getting items from cart %@",urlStr);
+    [JSONHTTPClient JSONFromURLWithString:urlStr
                                    method:@"GET"
                                    params:nil
                              orBodyString:nil
@@ -275,7 +280,7 @@ NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
                                           NSLog(@"err! %@",err.localizedDescription);
                                           [self.delegate fetchingFailedWithError:err];
                                       }
-                                      NSLog(@"get items from cart json %@",json);
+                                      //NSLog(@"get items from cart json %@",json);
                                       NSArray *cartItems =[CartItemModel arrayOfModelsFromDictionaries:json];
                                       if (cartItems) {
                                           [self.delegate didReceiveCartItems:cartItems];
@@ -288,9 +293,9 @@ NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
 -(void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty{
     [self restoreCookies];
     SpecItem *specItem = item.specItems[index];
-    NSLog(@"adding item in cart  %@",item);
+    //NSLog(@"adding item in cart  %@",item);
     NSString *price =item.priceNew.length >2 ? item.priceNew : item.price;
-    NSString *bodyParams =[NSString stringWithFormat:@"name=%@ %@,%@&id=%@&price=%@&qty=1",item.brand,item.title,specItem.color,specItem.db1cId,price];
+    NSString *bodyParams =[NSString stringWithFormat:@"name=%@ %@,%@&id=%@&price=%@&qty=1&token=%@",item.brand,item.title,specItem.color,specItem.db1cId,price,[self accessTokenFromDefaults]];
     NSLog(@"parameters %@",bodyParams);
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [JSONHTTPClient JSONFromURLWithString:kRaenApiSendToCartItem
@@ -307,8 +312,7 @@ NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
                                        [self.delegate didAddItemToCartWithResponse:json];
                                        }
                                    }else{
-#warning TODO notification when had error to add item to cart
-                                    
+                                       [self.delegate didFailureAddingItemToCartWithError:err];
                                        NSLog(@"---error to add item to cart------");
                                    }
 
@@ -317,9 +321,11 @@ NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
 -(void)changeCartItemQTY:(NSString*)qty byRowID:(NSString*)rowid{
     [self restoreCookies];
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    NSDictionary *params = @{@"rowid":rowid,@"qty":qty,@"token":[self accessTokenFromDefaults]};
+    NSLog(@"changing cart item QTY with params %@",params);
     [JSONHTTPClient JSONFromURLWithString:kRaenApiUpdateCart
                                    method:@"POST"
-                                   params:@{@"rowid":rowid,@"qty":qty}
+                                   params:params
                              orBodyString:nil
                                   headers:@{@"Authorization":kRaenAPIAuthValue}
                                completion:^(id json, JSONModelError *err) {
@@ -329,35 +335,12 @@ NSString* kRAENAPISocialIdentifier = @"RAEN_API_SOCIAL_IDENTIFIER";
                                        [self.delegate didChangeCartItemQTYWithResponse:json];
                                    }
                                    if (err!=nil) {
-#warning add delegate method with error
+                                       [self.delegate didFailureChangeCartItemQTYWithError:err];
                                        NSLog(@"error to remove object from cart %@",err.localizedDescription);
                                    }
                                }];
+}
 
-    
-}
-/*
--(void)deleteItemFromCartWithID:(NSString*)rowid{
-    NSLog(@"delete items with rowid %@",rowid);
-    [self restoreCookies];
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    [JSONHTTPClient JSONFromURLWithString:kRaenApiUpdateCart
-                                   method:@"POST"
-                                   params:@{@"rowid":rowid,@"qty":@"0"}
-                             orBodyString:nil
-                                  headers:@{@"Authorization":kRaenAPIAuthValue}
-                               completion:^(id json, JSONModelError *err) {
-                                   [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-                                   if ([json isKindOfClass:[NSDictionary class]]) {
-                                       [self.delegate didRemoveItemFromCartWithResponse:json];
-                                   }
-                                   if (err!=nil) {
-#warning add delegate method with error
-                                       NSLog(@"error to remove object from cart %@",err.localizedDescription);
-                                   }
-                               }];
-}
-*/
 #pragma mark - authorization via social networks
 -(void)authAPIVia:(NSString *)socialName withuserIdentifier:(NSString*)userId
       accessToken:(NSString*)token
@@ -455,12 +438,19 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
     }
 }
 #pragma mark - Save AccessToken
+
 - (void)saveAuthDataToDefaultsWith:(NSString*)socialId accessToken:(NSString*)accessToken {
     NSDictionary *authDict = @{kRAENAPISocialIdentifier:socialId,kRAENAPISocialAccessToken:accessToken};
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
 	[defaults setObject:authDict forKey:kRAENAPISocialAuthDict];
     [defaults synchronize];
     NSLog(@"Auth dict in userdefaults %@",[defaults objectForKey:kRAENAPISocialAuthDict]);
+}
+- (NSString*)accessTokenFromDefaults{
+    NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
+    NSDictionary *tmpDict = [defaults objectForKey:kRAENAPISocialAuthDict];
+    NSLog(@"return accessToken From Defaults %@",tmpDict[kRAENAPISocialAccessToken]);
+    return  tmpDict[kRAENAPISocialAccessToken];
 }
 -(void)removeAuthDataFromDefaults{
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:kRAENAPISocialAuthDict];

@@ -35,7 +35,7 @@ extern NSString* kRAENAPISocialIdentifier;
 //cart
 - (void)getItemsFromCart;
 - (void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty;
--(void)changeCartItemQTY:(NSString*)qty byRowID:(NSString*)rowid;
+- (void)changeCartItemQTY:(NSString*)qty byRowID:(NSString*)rowid;
 //- (void)deleteItemFromCartWithID:(NSString*)id;
 //authorization via socials
 - (void)authAPIVia:(NSString*)socialName
