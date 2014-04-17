@@ -15,8 +15,7 @@
 #import "ChildrenModel.h"
 #import "ItemCardViewController.h"
 #import "GridItemsVC.h"
-
-#import "BrowserViewController.h"
+#import "MBProgressHUD.h"
 #import "CategoryItemsGridViewController.h"
 #import "UIImageView+WebCache.h"
 
@@ -55,10 +54,12 @@
 }
 -(void)updateDataFromModel{
     _categories = nil;
+    [MBProgressHUD showHUDAddedTo:self.tableView animated:YES];
     [_communicator getAllCategories];
 }
 #pragma mark - RaenAPICommunicatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
+    [MBProgressHUD hideHUDForView:self.tableView animated:YES];
     [self.tableView reloadData];
     [self.refreshControl endRefreshing];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
@@ -66,34 +67,13 @@
     
 }
 -(void)didReceiveAllCategories:(NSArray *)array{
-    NSLog(@"didReceiveAllCategories");
+    [MBProgressHUD hideHUDForView:self.tableView animated:YES];
     _categories = array;
     [self.tableView reloadData];
     [self.refreshControl endRefreshing];
 }
 
--(void)reloadTableViewWithAnimation:(BOOL)animation{
-    if (animation) {
-        [self.tableView reloadData];
-        [self.tableView numberOfRowsInSection:_categories.count];
-        NSMutableArray *evenIndexPaths = [NSMutableArray array];
-        NSMutableArray *oddIntexPath= [NSMutableArray array];
-        for (int i =0; i<_categories.count; i++) {
-            NSIndexPath *indexPath= [NSIndexPath indexPathForRow:i inSection:1];
-            if (i % 2==0) {
-                [evenIndexPaths addObject:indexPath];
-            }else{
-                [oddIntexPath addObject:indexPath];
-            }
-        }
-        [self.tableView reloadRowsAtIndexPaths:evenIndexPaths withRowAnimation:UITableViewRowAnimationLeft];
-        [self.tableView reloadRowsAtIndexPaths:oddIntexPath withRowAnimation:UITableViewRowAnimationRight];
-        [self.tableView endUpdates];
-    }
-    else{
-        [self.tableView reloadData];
-    }
-}
+
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
@@ -196,10 +176,11 @@
         GridItemsVC *gridItemsVC = segue.destinationViewController;
         gridItemsVC.subcategoryID = sender;
     }
-    if ([segue.identifier isEqualToString:@"toBrowser"]) {
-        BrowserViewController *browserVC = segue.destinationViewController;
-        browserVC.link = sender;
-    }
+    
+//    if ([segue.identifier isEqualToString:@"toBrowser"]) {
+//        BrowserViewController *browserVC = segue.destinationViewController;
+//        browserVC.link = sender;
+//    }
     if ([segue.identifier isEqualToString:@"toCategoryItemsGridVC"]) {
         CategoryItemsGridViewController *categoryItemsGridVC = segue.destinationViewController;
         categoryItemsGridVC.currentCategoryId = sender;

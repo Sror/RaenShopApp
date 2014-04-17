@@ -90,9 +90,9 @@
 #pragma mark - UITextViewDelegate
 
 -(BOOL)textView:(UITextView *)textView shouldInteractWithURL:(NSURL *)URL inRange:(NSRange)characterRange{
-    
+#warning ???
     NSLog(@"textView should interactWith URL %@",URL);
-    if ([[URL absoluteString] rangeOfString:@"htto://"].location == NSNotFound) {
+    if ([[URL absoluteString] rangeOfString:@"http://"].location == NSNotFound) {
         [self performSegueWithIdentifier:@"toItemCardView" sender:[URL absoluteString]];
     }
     return YES;

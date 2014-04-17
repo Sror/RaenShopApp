@@ -18,7 +18,7 @@
 
 @interface CartViewController () <RaenAPICommunicatorDelegate,UITextFieldDelegate>
 {
-    RaenAPICommunicator *_communicator;
+  
     NSArray *_items;
     UITextField *_activeTextField;
 }
@@ -29,14 +29,28 @@
 @implementation CartViewController
 @synthesize tabBarItem;
 
--(void)viewWillAppear:(BOOL)animated{
-    [super viewWillAppear:animated];
+
+-(void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
     
+    //User Interface
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
+    [RaenAPICommunicator sharedManager].delegate = self;
+    [self updateDataFromAPI];
+
+}
+
+-(void)updateDataFromAPI{
+    [self.tableView setHidden:YES];
     [self.subView setHidden:YES];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    [_communicator getItemsFromCart];
+    [[RaenAPICommunicator sharedManager] getItemsFromCart];
+}
+
+-(void)updateTabbarBadge
+{
+    [self.tabBarController.tabBar.items[2] setBadgeValue:[self itemsCount]];
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
@@ -49,12 +63,8 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    _communicator = [[RaenAPICommunicator alloc] init];
-    _communicator.delegate = self;
-    [self.tabBarController.tabBar.items[2] setBadgeValue:[self itemsCount]];
-    [self.tableView setHidden:YES];
-    //User Interface
-    [self.subView.layer setCornerRadius:3.0];
+    
+    [self.subView.layer setCornerRadius:10.0];
 }
 
 -(NSString*)itemsCount{
@@ -63,44 +73,51 @@
         CartItemModel *currentItem = _items[i];
         itemsCount = itemsCount + [currentItem.qty intValue];
     }
-    NSLog(@"itemsCount %d",itemsCount);
     return [NSString stringWithFormat:@"%i",itemsCount];
 }
 
 #pragma mark - RaenAPICommunicationDelegate
 -(void)didReceiveCartItems:(NSArray *)items{
-
-    [self.tableView setHidden:NO];
-    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    NSLog(@"didReceiveCartItems %@",items);
     _items = items;
-   // NSLog(@"items in cart %@",_items);
-    [self.tabBarController.tabBar.items[2] setBadgeValue:[self itemsCount]];
     [self.tableView reloadData];
-    [self.subTotalLabel setText:[self subtotal]];
+    [self.tableView setHidden:NO];
     [self.subView setHidden:NO];
+    [self.subTotalLabel setText:[self subtotal]];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    
+    [self updateTabbarBadge];
 }
 
--(void)fetchingFailedWithError:(JSONModelError *)error {
+-(void)fetchingFailedWithError:(JSONModelError *)error
+{
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
     [alert show];
 }
 
--(void)didChangeCartItemQTYWithResponse:(NSDictionary *)response{
+-(void)didChangeCartItemQTYWithResponse:(NSDictionary *)response
+{
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     if (![response objectForKey:@"success"]) {
-        NSLog(@"error to change QTY item in cart");
-    
         UIAlertView *alert  =[[UIAlertView alloc] initWithTitle:@"Error" message:response[@"error"] delegate:self cancelButtonTitle:@"ok" otherButtonTitles:nil];
         [alert show];
     }
-    [_communicator getItemsFromCart];
+    [[RaenAPICommunicator sharedManager] getItemsFromCart];
     
 }
 -(void)didFailureChangeCartItemQTYWithError:(JSONModelError *)error{
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:error.description delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
 }
+
+-(void)didCheckoutWithResponse:(NSDictionary *)response{
+    UIAlertView *alert = [[ UIAlertView alloc] initWithTitle:nil message:response[@"text"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    [alert show];
+    [self viewWillAppear:YES];
+}
+
 #pragma mark - UITableViewDataSource
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     return 1;
@@ -125,6 +142,10 @@
 
     return cell;
 }
+-(BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath{
+    [_activeTextField resignFirstResponder];
+    return YES;
+}
 -(NSString *)tableView:(UITableView *)tableView titleForDeleteConfirmationButtonForRowAtIndexPath:(NSIndexPath *)indexPath{
     return @"Удалить";
 }
@@ -142,7 +163,7 @@
 
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         CartItemModel *cartItem = _items[indexPath.row];
-        [_communicator changeCartItemQTY:@"0" byRowID:cartItem.rowid];
+        [[RaenAPICommunicator sharedManager] changeCartItemQTY:@"0" byRowID:cartItem.rowid];
     }
 }
 
@@ -171,7 +192,14 @@
 
 - (IBAction)checkOutButtonPressed:(id)sender {
     NSLog(@"checkOutButtonPressed");
+    NSDictionary *fastTmpParameters = @{@"firstname": @"test from ios app",
+                                    @"phone":@"+79050002233",
+                                    @"delivery":@"fast"};
+    
+    [[RaenAPICommunicator sharedManager]checkoutWithParameters:fastTmpParameters];
 }
+
+
 #pragma mark - Navigation
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
@@ -198,13 +226,13 @@
 }
 
 
-- (void)textFieldDidBeginEditing:(UITextField *)textField {    
+- (void)textFieldDidBeginEditing:(UITextField *)textField {
+    [self.tableView setEditing:NO];
     _activeTextField = textField;
     [textField setInputAccessoryView:[self keyboardToolBar]];
 }
 
 -(void)textFieldDidEndEditing:(UITextField *)textField{
-    _activeTextField = nil;
     
     CartItemModel *cartItem = _items[textField.tag];
     if (textField.text.length==0) {
@@ -213,8 +241,9 @@
     }
     if (![cartItem.qty isEqualToString:textField.text]) {
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-        [_communicator changeCartItemQTY:textField.text byRowID:cartItem.rowid];
+        [[RaenAPICommunicator sharedManager] changeCartItemQTY:textField.text byRowID:cartItem.rowid];
     }
+    _activeTextField = nil;
 }
 
 -(UIToolbar*)keyboardToolBar{
@@ -222,7 +251,7 @@
     UIToolbar* keyboardToolBar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0, 0.0, 320.0, 40.0)];
     [keyboardToolBar setBarStyle:UIBarStyleBlack];
     [keyboardToolBar setTranslucent:YES];
-    [keyboardToolBar setTintColor:[UIColor lightGrayColor]];
+    
     UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
     UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(keyboardDonePressed)];
     keyboardToolBar.items = @[flexSpace,doneButton];
@@ -240,9 +269,9 @@
    
     UIEdgeInsets contentInsets;
     if (UIInterfaceOrientationIsPortrait([[UIApplication sharedApplication] statusBarOrientation])) {
-        contentInsets = UIEdgeInsetsMake(0.0, 0.0, (kbSize.height), 0.0);
+        contentInsets = UIEdgeInsetsMake(64.0, 0.0, (kbSize.height), 0.0);
     } else {
-        contentInsets = UIEdgeInsetsMake(0.0, 0.0, (kbSize.width), 0.0);
+        contentInsets = UIEdgeInsetsMake(64.0, 0.0, (kbSize.width), 0.0);
     }
     
     self.tableView.contentInset = contentInsets;

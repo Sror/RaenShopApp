@@ -15,7 +15,6 @@
 #import "MBProgressHUD.h"
 
 @interface FiltersViewController ()<RaenAPICommunicatorDelegate>{
-    RaenAPICommunicator *_communicator;
     FilterModel *_filter;
     NSMutableDictionary *_filterDictionary;
 }
@@ -26,28 +25,15 @@
 @implementation FiltersViewController
 
 
--(void)viewWillAppear:(BOOL)animated {
-    [super viewWillAppear:animated];
-    if (_filterDictionary.count>0) {
-        /*
-        UIBarButtonItem *revokeFilterButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"settings.png"]
-                                                                           style:UIBarButtonItemStyleBordered target:self
-                                                                        action:@selector(revokeFilter)];
-        [self.navigationItem setRightBarButtonItem:revokeFilterButton animated:YES];
-         */
-    }
-    
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    _communicator = [[AppDelegate instance] communicator];
-    _communicator.delegate = self;
+    [RaenAPICommunicator sharedManager].delegate = self;
+    
     _filterDictionary = [NSMutableDictionary dictionary];
     if (self.subcategoryID) {
-        // _communicator get params of category
-        [_communicator getParamsOfCategoryWithId:self.subcategoryID];
+        // [RaenAPICommunicator sharedManager] get params of category
+        [[RaenAPICommunicator sharedManager] getParamsOfCategoryWithId:self.subcategoryID];
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     }else{
         NSLog(@"there is NOT subcategory ID!");

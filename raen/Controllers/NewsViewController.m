@@ -10,7 +10,7 @@
 #import "RaenAPICommunicator.h"
 #import "NewsModel.h"
 #import "UIImageView+WebCache.h"
-#import "BrowserViewController.h"
+#import "TOWebViewController.h"
 #import "NewsCell.h"
 #import "MBProgressHUD.h"
 //slider
@@ -21,6 +21,8 @@
 @interface NewsViewController ()<RaenAPICommunicatorDelegate>{
     NSMutableArray *_news;
     NSArray *_sliderItems;
+    BOOL _gotNews;
+    BOOL _gotSlider;
     RaenAPICommunicator *_communicator;
 }
 
@@ -49,6 +51,8 @@
 - (void)refreshView:(UIRefreshControl *)sender {
     [_news removeAllObjects];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    _gotNews = NO;
+    _gotSlider = NO;
     [_communicator getNewsByPage:1];
     [_communicator getSliderItems];
 }
@@ -57,14 +61,22 @@
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:error.localizedDescription delegate:self cancelButtonTitle:@"Ok" otherButtonTitles: nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка"
+                                                    message:error.localizedDescription
+                                                   delegate:self
+                                          cancelButtonTitle:@"Ok"
+                                          otherButtonTitles: nil];
     [alert show];
 }
 
 -(void)didReceiveNews:(NSArray *)news{
     NSLog(@"didReceive %d news",news.count);
+    _gotNews = YES;
+    if (_gotSlider) {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
+    }
     [self.refreshControl endRefreshing];
-    [MBProgressHUD hideHUDForView:self.view animated:YES];
+
     NSInteger rowToScroll= _news.count;
     [_news  addObjectsFromArray:news];
     NSMutableArray *animatedIndexPaths = [NSMutableArray arrayWithCapacity:news.count];
@@ -80,7 +92,11 @@
 }
 
 -(void)didReceiveSliderItems:(NSArray *)array{
-    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    _gotSlider= YES;
+    if (_gotNews) {
+         [MBProgressHUD hideHUDForView:self.view animated:YES];
+    }
+
     _sliderItems = array;
     [self.tableView reloadData];
     [self.refreshControl endRefreshing];
@@ -129,7 +145,11 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     NewsModel *news = _news[indexPath.row];
-    [self performSegueWithIdentifier:@"toBrowser" sender:news.link];
+    
+    TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:news.link]];
+    webBrowser.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:webBrowser animated:YES];
+   
 }
 #pragma mark - UIScrollViewDelegate
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
@@ -146,9 +166,9 @@
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
     if ([segue.identifier isEqualToString:@"toBrowser"]) {
-        UINavigationController *navigationVC = segue.destinationViewController;
-        BrowserViewController *browserVC = [[navigationVC viewControllers] objectAtIndex:0];
-        [browserVC setLink:sender];
+        TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:sender]];
+        webBrowser.hidesBottomBarWhenPushed = YES;
+        
     }
 }
 
@@ -199,7 +219,9 @@
     SliderModel *slider = _sliderItems[tapGestureRecognizer.view.tag];
     NSLog(@"slider action %@",slider.action);
     if ([slider.action isEqualToString:@"toBrowser"]) {
-        [self performSegueWithIdentifier:@"toBrowser" sender:slider.link];
+        TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:slider.link]];
+        webBrowser.hidesBottomBarWhenPushed = YES;
+        [self.navigationController pushViewController:webBrowser animated:YES];
     }else if ([slider.action isEqualToString:@"toItemCardView"]){
         [self performSegueWithIdentifier:@"toItemCardView" sender:slider.id];
     }else if ([slider.action isEqualToString:@"toSaleOfDay"]){

@@ -12,10 +12,6 @@
 
 extern int RaenAPIdefaulSubcategoryItemsCountPerPage;
 extern int RaenAPIdefaultNewsItemsCountPerPage;
-extern NSString* kRAENAPISocialAuthDict;
-extern NSString* kRAENAPISocialAccessToken;
-extern NSString* kRAENAPISocialIdentifier;
-
 
 @class RaenAPICommunicator;
 
@@ -23,7 +19,7 @@ extern NSString* kRAENAPISocialIdentifier;
 @property (weak, nonatomic) id<RaenAPICommunicatorDelegate> delegate;
 @property (nonatomic,strong) NSString *raenAPIAccessToken;
 
-
++ (RaenAPICommunicator*)sharedManager;
 
 - (void)getNewsByPage:(NSInteger)page;
 - (void)getAllCategories;
@@ -36,7 +32,9 @@ extern NSString* kRAENAPISocialIdentifier;
 - (void)getItemsFromCart;
 - (void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty;
 - (void)changeCartItemQTY:(NSString*)qty byRowID:(NSString*)rowid;
-//- (void)deleteItemFromCartWithID:(NSString*)id;
+
+- (void)checkoutWithParameters:(NSDictionary*)orderParams;
+
 //authorization via socials
 - (void)authAPIVia:(NSString*)socialName
 withuserIdentifier:(NSString*)userId
@@ -52,11 +50,9 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary;
                     socialIdentifier:(NSString*)socialId
                          accessToken:(NSString*)accessToken
                               userId:(NSString*)userId;
-//Auth data in userdefailts
-- (void)saveAuthDataToDefaultsWith:(NSString*)socialId accessToken:(NSString*)accessToken;
-- (void)removeAuthDataFromDefaults;
 
-
+-(void)userInfo;
+-(void)userOrders;
 //manage cookies
 - (void)deleteCookieFromLocalStorage;
 - (void)saveCookies;

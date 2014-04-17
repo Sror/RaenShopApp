@@ -8,9 +8,9 @@
 
 //controllers
 #import "ItemCardViewController.h"
-#import "BrowserViewController.h"
 #import "RaenAPICommunicator.h"
-#import "ImageSliderViewController.h"
+#import "MWPhotoBrowser.h"
+#import "TOWebViewController.h"
 
 //models
 #import "JSONModelLib.h"
@@ -25,7 +25,7 @@
 
 #define IS_IPHONE_5 ( fabs( ( double )[ [ UIScreen mainScreen ] bounds ].size.height - ( double )568 ) < DBL_EPSILON )
 
-@interface ItemCardViewController ()<RaenAPICommunicatorDelegate> {
+@interface ItemCardViewController ()<RaenAPICommunicatorDelegate,MWPhotoBrowserDelegate> {
     
     ItemModel *_item;
     NSMutableArray *_properties;
@@ -113,7 +113,7 @@
     imageView.userInteractionEnabled = YES;
     imageView.tag = page;
     [scrollView addSubview:imageView];
-    ImageModel *image = _item.images[page];
+   
     UIActivityIndicatorView *activityIndicator =[[ UIActivityIndicatorView alloc]
                                                  initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
     activityIndicator.center = imageView.center;
@@ -121,6 +121,7 @@
     [imageView addSubview:activityIndicator];
     [activityIndicator startAnimating];
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    ImageModel *image = _item.images[page];
     [imageView setImageWithURL:[NSURL URLWithString:image.big] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
         [activityIndicator stopAnimating];
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
@@ -132,12 +133,33 @@
     tapOnSlider.numberOfTouchesRequired = 1;
     [imageView addGestureRecognizer:tapOnSlider];
 }
+-(NSArray*)photoBrowserPhotos{
+    NSMutableArray *photos = [NSMutableArray array];
+    for (ImageModel* image in _item.images) {
+        [photos addObject:[MWPhoto photoWithURL:[NSURL URLWithString:image.big]]];
+    }
+    return photos;
+}
 
 -(void)handleSlideTap:(UITapGestureRecognizer*)tapGestureRecognizer{
-    NSNumber * imageNmbr = [NSNumber numberWithInt:tapGestureRecognizer.view.tag];
-    NSLog(@"Taped image #%d", imageNmbr);
-    [self performSegueWithIdentifier:@"toImageSliderVC" sender:imageNmbr];
-  
+    NSInteger imageTag = tapGestureRecognizer.view.tag;
+
+    MWPhotoBrowser *photoBrowser = [[MWPhotoBrowser alloc] initWithDelegate:self];
+    
+    // Set options
+    photoBrowser.displayActionButton = YES; // Show action button to allow sharing, copying, etc (defaults to YES)
+    photoBrowser.displayNavArrows = NO; // Whether to display left and right nav arrows on toolbar (defaults to NO)
+    photoBrowser.displaySelectionButtons = NO; // Whether selection buttons are shown on each image (defaults to NO)
+    photoBrowser.zoomPhotosToFill = YES; // Images that almost fill the screen will be initially zoomed to fill (defaults to YES)
+    photoBrowser.alwaysShowControls = NO; // Allows to control whether the bars and controls are always visible or whether they fade away to show the photo full (defaults to NO)
+    photoBrowser.enableGrid = YES; // Whether to allow the viewing of all the photo thumbnails on a grid (defaults to YES)
+
+    [photoBrowser showNextPhotoAnimated:YES];
+    [photoBrowser showPreviousPhotoAnimated:YES];
+
+    [photoBrowser setCurrentPhotoIndex:imageTag];
+    
+    [self.navigationController pushViewController:photoBrowser animated:YES];
 }
 
 -(void)setScrollViewSize:(UIScrollView*)scrollview withPages:(NSInteger)pages {
@@ -289,28 +311,31 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     if (indexPath.section==1) {
         NSDictionary *tmpDict =_properties[indexPath.row];
-        [self performSegueWithIdentifier:@"toBrowser" sender:tmpDict];
+        NSString *rawstring = [tmpDict allValues][0];
+        NSURL *url = [[NSURL alloc] init];
+        NSLog(@"rawString %@",rawstring);
+        TOWebViewController *webBrowser = [[TOWebViewController alloc] init];
+        if ([rawstring rangeOfString:@"iframe"].location !=NSNotFound) {
+            NSLog(@"IFRAME FOUND");
+            NSString *htmlString = [NSString stringWithFormat:@"<html><body><center><div style=\"width: 835px; margin: 0 auto;\">%@</div></center></body></html>",rawstring];
+            webBrowser.HTMLString = htmlString;
+            
+        }
+        if ([rawstring rangeOfString:@"http"].location != NSNotFound) {
+            url = [NSURL URLWithString:rawstring];
+            webBrowser.url = url;
+        }
+        
+        [webBrowser setHidesBottomBarWhenPushed:YES];
+        [self.navigationController pushViewController:webBrowser animated:YES];
     }
 }
 #pragma mark - prepare for segue
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
-    if ([segue.identifier isEqualToString:@"toBrowser"]) {
-        UINavigationController *navContr = segue.destinationViewController;
-        BrowserViewController *browserVC=  [[navContr viewControllers] objectAtIndex:0];
-        NSDictionary *tmpDict = sender;
-        browserVC.navigationItem.title = [tmpDict allKeys][0];
-        browserVC.link = [tmpDict allValues][0];
-    }
-    if ([segue.identifier isEqualToString:@"toImageSliderVC"]) {
-        ImageSliderViewController *imageSliderVC = segue.destinationViewController;
-        if ([sender isKindOfClass:[NSNumber class]]) {
-            [imageSliderVC setImages:_item.images];
-            [imageSliderVC setCurrentImageNmr:[sender intValue]];
-        }
-        
-    }
+    
 }
+
 #pragma mark - buy button pressed
 -(void)buyButtonPressed:(id)sender{
     NSInteger row = [sender tag];
@@ -319,14 +344,13 @@
     [self animateCellWithRow:row];
     [_communicator addItemToCart:_item withSpecItemAtIndex:row andQty:1];
 }
-#pragma mark - Helpers
+#pragma mark - Cell animation
 -(void)animateCellWithRow:(NSInteger)row{
     NSIndexPath *indexPath =[NSIndexPath indexPathForRow:row inSection:2];
     AvailableItemCell *cell =(AvailableItemCell*)[self.tableView cellForRowAtIndexPath:indexPath];
     UIImageView *imgView =cell.thumbnail;
     CGRect rect =[imgView.superview convertRect:imgView.frame fromView:nil];
     rect = CGRectMake(rect.origin.x+35, (rect.origin.y*-1)+35, imgView.frame.size.width, imgView.frame.size.height);
-	NSLog(@"rect is %f,%f,%f,%f",rect.origin.x,rect.origin.y,rect.size.width,rect.size.height);
     // create new duplicate image
 	UIImageView *starView = [[UIImageView alloc] initWithImage:imgView.image];
     [starView setFrame:rect];
@@ -353,7 +377,6 @@
     }else{
         endPoint = CGPointMake(265, 440);
     }
-    NSLog(@"endpoint.x %f , endpoint.y %f",endPoint.x,endPoint.y);
 	CGMutablePathRef curvedPath = CGPathCreateMutable();
     CGPathMoveToPoint(curvedPath, NULL, starView.frame.origin.x, starView.frame.origin.y);
     CGPathAddCurveToPoint(curvedPath, NULL, endPoint.x, starView.frame.origin.y, endPoint.x, starView.frame.origin.y, endPoint.x, endPoint.y);
@@ -373,6 +396,7 @@
 	[starView performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:0.8];
     
 }
+#pragma mark - Helpers
 -(void)addReviewAndVideo{
     _properties =[NSMutableArray array];
     if ([_item.review rangeOfString:@"http"].location != NSNotFound) {
@@ -416,5 +440,18 @@
         }
     }
     return availabledSpecItems;
+}
+
+
+#pragma mark - MWPhotoBrowser delegation methods
+- (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser {
+    return [self photoBrowserPhotos].count;
+}
+
+- (id <MWPhoto>)photoBrowser:(MWPhotoBrowser *)photoBrowser photoAtIndex:(NSUInteger)index {
+    if (index<[self photoBrowserPhotos].count) {
+        return [[self photoBrowserPhotos] objectAtIndex:index];
+    }
+    return nil;
 }
 @end

@@ -16,18 +16,13 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 @implementation AppDelegate
 
 
-+(AppDelegate*)instance {
-    return (AppDelegate*)[[UIApplication sharedApplication] delegate];
-}
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-    NSLog(@"didFinishLaunchingWithOptions");
-    self.communicator = [[RaenAPICommunicator alloc]init];
-    self.socializer = [[Socializer alloc] init];
-    NSLog(@"socializer is auth ?%@",self.socializer.isAuthorizedViaSocial ? @"YES":@"NO");
+    NSLog(@"didFinishLaunchingWithOptions %@",launchOptions);
+    //check which social signed
+    //[[Socializer sharedManager] removeAuthDataFromDefaults];
     
-    
+    NSLog(@"currentSocial id %@",[[Socializer sharedManager] socialIdFromDefaults]);
     //check items count in cart and update tab bar badge
     /*
     NSArray *cartItems=[[NSUserDefaults standardUserDefaults] objectForKey:RAENSHOP_CART_ITEMS];
@@ -48,7 +43,7 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
     //Facebook.com
     if ([[url absoluteString] rangeOfString:@"fb220082361532667"].location !=NSNotFound) {
         // Call FBAppCall's handleOpenURL:sourceApplication to handle Facebook app responses
-        wasHandled = [FBAppCall handleOpenURL:url sourceApplication:sourceApplication withSession:self.socializer.fbSession];
+        wasHandled = [FBAppCall handleOpenURL:url sourceApplication:sourceApplication withSession:[Socializer sharedManager].fbSession];
     }
     //Google
     if ([[url absoluteString] rangeOfString:@"ru.raen.raenapp"].location !=NSNotFound) {
@@ -77,20 +72,21 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+    NSLog(@"applicationDidBecomeActive");
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [FBAppCall handleDidBecomeActive];
-    NSLog(@"applicationDidBecomeActive");
-    [FBAppCall handleDidBecomeActiveWithSession:self.socializer.fbSession];
+
+    [FBAppCall handleDidBecomeActiveWithSession:[Socializer sharedManager].fbSession];
     
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     NSLog(@"applicationWillTerminate");
-    [_communicator saveCookies];
+    [[RaenAPICommunicator sharedManager] saveCookies];
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     NSLog(@"closing facebook session");
-    [self.socializer.fbSession close];
+    [[Socializer sharedManager].fbSession close];
 }
 
 @end

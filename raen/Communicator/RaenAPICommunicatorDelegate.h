@@ -25,11 +25,15 @@
 - (void)didFailureChangeCartItemQTYWithError:(JSONModelError*)error;
 - (void)didFailureAddingItemToCartWithError:(JSONModelError*)error;
 - (void)didReceiveFilter:(id)filter;
+- (void)didCheckoutWithResponse:(NSDictionary*)response;
 //authorization delegate methods
 - (void)didSuccessAPIAuthorizedWithResponse:(NSDictionary*)response;
 - (void)didEmailRequest;
 - (void)didExistEmail;
 - (void)didFailuerAPIAuthorizationWithResponse:(NSDictionary*)response;
+
+- (void)didReceiveUserInfo:(NSDictionary*)userInfo;
+- (void)didReceiveUserOrders:(NSDictionary*)userOrders;
 
 @required
 - (void)fetchingFailedWithError:(JSONModelError *)error;
