@@ -78,7 +78,6 @@
 
 #pragma mark - RaenAPICommunicationDelegate
 -(void)didReceiveCartItems:(NSArray *)items{
-    NSLog(@"didReceiveCartItems %@",items);
     _items = items;
     [self.tableView reloadData];
     [self.tableView setHidden:NO];
@@ -86,14 +85,13 @@
     [self.subTotalLabel setText:[self subtotal]];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     
-    
     [self updateTabbarBadge];
 }
 
 -(void)fetchingFailedWithError:(JSONModelError *)error
 {
     [MBProgressHUD hideHUDForView:self.view animated:YES];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:error.localizedDescription delegate:self cancelButtonTitle:@"ОК" otherButtonTitles: nil];
     [alert show];
 }
 
@@ -101,7 +99,7 @@
 {
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     if (![response objectForKey:@"success"]) {
-        UIAlertView *alert  =[[UIAlertView alloc] initWithTitle:@"Error" message:response[@"error"] delegate:self cancelButtonTitle:@"ok" otherButtonTitles:nil];
+        UIAlertView *alert  =[[UIAlertView alloc] initWithTitle:@"Ошибка" message:response[@"error"] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }
     [[RaenAPICommunicator sharedManager] getItemsFromCart];

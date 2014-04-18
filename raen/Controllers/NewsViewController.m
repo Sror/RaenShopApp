@@ -121,9 +121,7 @@
         sliderCell.pageControl.numberOfPages = imagesCount;
         //sliderCell.selectionStyle = UITableViewCellSelectionStyleNone;
         //load images in scrollview
-        for (NSInteger i=0; i<imagesCount; i++) {
-            [self loadPage:i forScrollView:sliderCell.scrollView withSpinner:sliderCell.spinner];
-        }
+        [self setImagesInScrollview:sliderCell.scrollView];
         return sliderCell;
     }
     NewsCell *cell = [tableView dequeueReusableCellWithIdentifier:@"newsCell"];
@@ -180,7 +178,6 @@
             count ++;
         }
     }
-    NSLog(@"%i images in sliderItem",count);
     return count;
 }
 -(void)setScrollViewSize:(UIScrollView*)scrollview withPages:(NSInteger)pages {
@@ -188,32 +185,47 @@
     scrollview.contentSize = CGSizeMake(pagesScrollViewSize.width *pages, pagesScrollViewSize.height);
 }
 
--(void)loadPage:(NSInteger)page forScrollView:(UIScrollView*)scrollView withSpinner:(UIActivityIndicatorView*)spinner {
-    CGRect frame = scrollView.bounds;
-    frame.origin.x = frame.size.width * page;
-    frame.origin.y = 0.0f;
-    UIImageView *imageView =[[UIImageView alloc] initWithFrame:frame];
-    //NSLog(@"current imageView frame x=%f , y=%f",frame.origin.x,frame.origin.y);
-    imageView.contentMode = UIViewContentModeScaleAspectFit;
-    imageView.tag = page;
-    imageView.userInteractionEnabled = YES;
-    [scrollView addSubview:imageView];
-    [spinner startAnimating];
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    SliderModel *slider = _sliderItems[page];
+-(void)setImagesInScrollview:(UIScrollView*)scrollview{
+    //remove all subviews
+//    for (UIView *subview in scrollview.subviews) {
+//        if([subview isKindOfClass:[UIImageView class]] || [subview isKindOfClass:[UIActivityIndicatorView class]])
+//            [subview removeFromSuperview];
+//    }
+    //set new images
+    for (int i=0;i<[self imagesCountInSliderItems];i++) {
+        CGRect frame = scrollview.bounds;
+        frame.origin.x = frame.size.width * i;
+        frame.origin.y = 0.0f;
+        UIImageView *imageView =[[UIImageView alloc] initWithFrame:frame];
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        imageView.tag = i;
+        imageView.userInteractionEnabled = YES;
+        [scrollview addSubview:imageView];
+        
+        UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        [spinner setCenter:imageView.center];
+        [spinner setHidesWhenStopped:YES];
+        [scrollview addSubview:spinner];
+        imageView.tag = i;
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        [spinner startAnimating];
+        SliderModel *slide = _sliderItems[i];
+        [imageView setImageWithURL:[NSURL URLWithString:slide.image]
+                         completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+                             [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                             [spinner stopAnimating];
+                         }];
     
-    [imageView setImageWithURL:[NSURL URLWithString:slider.image] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-        [spinner stopAnimating];
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-    }];
-    
-    UITapGestureRecognizer *tapOnSlider = [[UITapGestureRecognizer alloc]
-                                           initWithTarget:self action:@selector(handleSlideTap:)];
-    tapOnSlider.numberOfTapsRequired = 1;
-    tapOnSlider.numberOfTouchesRequired = 1;
-    [imageView addGestureRecognizer:tapOnSlider];
+        UITapGestureRecognizer *tapOnSlider = [[UITapGestureRecognizer alloc]
+                                               initWithTarget:self action:@selector(handleSlideTap:)];
+        tapOnSlider.numberOfTapsRequired = 1;
+        tapOnSlider.numberOfTouchesRequired = 1;
+        [imageView addGestureRecognizer:tapOnSlider];
+        
+    }
     
 }
+
 -(void)handleSlideTap:(UITapGestureRecognizer*)tapGestureRecognizer{
     NSLog(@"Taped slide #%d", tapGestureRecognizer.view.tag);
     SliderModel *slider = _sliderItems[tapGestureRecognizer.view.tag];

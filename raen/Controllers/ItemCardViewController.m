@@ -78,7 +78,6 @@
 }
 
 -(void)didReceiveItemCard:(id)itemCard{
-    NSLog(@"didReceiveItemCard");
     _item = (ItemModel*) itemCard;
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     self.navigationItem.title = _item.title;
@@ -88,11 +87,11 @@
 }
 #pragma mark - add item to cart
 -(void)didAddItemToCartWithResponse:(NSDictionary *)response{
-    NSLog(@"succesful did add item to cart with response %@",response);
+    NSLog(@"succesful did add item to cart");
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     NSString *totalItems=response[@"total_items"];
-    NSLog(@"setting tabbar badge");
     
+    NSLog(@"setting tabbar badge");
     [[[[[self tabBarController]tabBar]items]objectAtIndex:2] setBadgeValue:[NSString stringWithFormat:@"%@",totalItems]];
     [_communicator saveCookies];
     
@@ -102,37 +101,47 @@
     [alert show];
 }
 #pragma  mark - ScrollView
--(void)loadPage:(NSInteger)page forScrollView:(UIScrollView*)scrollView {
-    
-    CGRect frame = scrollView.bounds;
-    frame.origin.x = frame.size.width * page;
-    frame.origin.y = 0.0f;
-    UIImageView *imageView =[[UIImageView alloc] initWithFrame:frame];
-    //NSLog(@"current imageView frame x=%f , y=%f",frame.origin.x,frame.origin.y);
-    imageView.contentMode = UIViewContentModeScaleAspectFit;
-    imageView.userInteractionEnabled = YES;
-    imageView.tag = page;
-    [scrollView addSubview:imageView];
-   
-    UIActivityIndicatorView *activityIndicator =[[ UIActivityIndicatorView alloc]
-                                                 initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    activityIndicator.center = imageView.center;
-    [activityIndicator setHidesWhenStopped:YES];
-    [imageView addSubview:activityIndicator];
-    [activityIndicator startAnimating];
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    ImageModel *image = _item.images[page];
-    [imageView setImageWithURL:[NSURL URLWithString:image.big] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-        [activityIndicator stopAnimating];
-        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+-(void)setImagesInScrollview:(UIScrollView*)scrollview{
+    //remove all subviews
+    //    for (UIView *subview in scrollview.subviews) {
+    //        if([subview isKindOfClass:[UIImageView class]] || [subview isKindOfClass:[UIActivityIndicatorView class]])
+    //            [subview removeFromSuperview];
+    //    }
+    //set new images
+    for (int i=0;i<_item.images.count;i++) {
+        CGRect frame = scrollview.bounds;
+        frame.origin.x = frame.size.width * i;
+        frame.origin.y = 0.0f;
+        UIImageView *imageView =[[UIImageView alloc] initWithFrame:frame];
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        imageView.tag = i;
+        imageView.userInteractionEnabled = YES;
+        [scrollview addSubview:imageView];
         
-    }];
-    UITapGestureRecognizer *tapOnSlider = [[UITapGestureRecognizer alloc]
-                                           initWithTarget:self action:@selector(handleSlideTap:)];
-    tapOnSlider.numberOfTapsRequired = 1;
-    tapOnSlider.numberOfTouchesRequired = 1;
-    [imageView addGestureRecognizer:tapOnSlider];
+        UIActivityIndicatorView *spinner = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+        [spinner setCenter:imageView.center];
+        [spinner setHidesWhenStopped:YES];
+        [scrollview addSubview:spinner];
+        imageView.tag = i;
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        [spinner startAnimating];
+        ImageModel *image = _item.images[i];
+        [imageView setImageWithURL:[NSURL URLWithString:image.big]
+                         completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
+                             [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+                             [spinner stopAnimating];
+                         }];
+        
+        UITapGestureRecognizer *tapOnSlider = [[UITapGestureRecognizer alloc]
+                                               initWithTarget:self action:@selector(handleSlideTap:)];
+        tapOnSlider.numberOfTapsRequired = 1;
+        tapOnSlider.numberOfTouchesRequired = 1;
+        [imageView addGestureRecognizer:tapOnSlider];
+        
+    }
+    
 }
+
 -(NSArray*)photoBrowserPhotos{
     NSMutableArray *photos = [NSMutableArray array];
     for (ImageModel* image in _item.images) {
@@ -146,18 +155,7 @@
 
     MWPhotoBrowser *photoBrowser = [[MWPhotoBrowser alloc] initWithDelegate:self];
     
-    // Set options
-    photoBrowser.displayActionButton = YES; // Show action button to allow sharing, copying, etc (defaults to YES)
-    photoBrowser.displayNavArrows = NO; // Whether to display left and right nav arrows on toolbar (defaults to NO)
-    photoBrowser.displaySelectionButtons = NO; // Whether selection buttons are shown on each image (defaults to NO)
-    photoBrowser.zoomPhotosToFill = YES; // Images that almost fill the screen will be initially zoomed to fill (defaults to YES)
-    photoBrowser.alwaysShowControls = NO; // Allows to control whether the bars and controls are always visible or whether they fade away to show the photo full (defaults to NO)
-    photoBrowser.enableGrid = YES; // Whether to allow the viewing of all the photo thumbnails on a grid (defaults to YES)
-
-    [photoBrowser showNextPhotoAnimated:YES];
-    [photoBrowser showPreviousPhotoAnimated:YES];
-
-    [photoBrowser setCurrentPhotoIndex:imageTag];
+    [self setupPhotoBrowser:photoBrowser withCurrentPhotoIndex:imageTag];
     
     [self.navigationController pushViewController:photoBrowser animated:YES];
 }
@@ -209,7 +207,6 @@
                                                    attributes:@{NSFontAttributeName:font}
                                                       context:nil];
         CGSize boundingSize = boundingRect.size;
-        //NSLog(@"boundingSize.height %f, weight %f",boundingSize.height,boundingSize.width);
         if (boundingSize.height<75) {
             return 80;
         }else{
@@ -221,7 +218,7 @@
     return 44;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-
+    //Photo slider
     if (indexPath.section == 0) {
         //item card cell
         static NSString *CellIdentifier = @"itemCardCell";
@@ -231,9 +228,8 @@
         cell.pageControl.numberOfPages =_item.images.count;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         //load images for scrollview
-        for (NSInteger i=0; i<_item.images.count; i++) {
-            [self loadPage:i forScrollView:cell.scrollView];
-        }
+        [self setImagesInScrollview:cell.scrollView];
+
         //TITLE
         cell.nameLabel.text = _item.title;
         //PRICE LABELS
@@ -269,8 +265,16 @@
         [cell.addToCartButton setTag:indexPath.row];
         [cell.addToCartButton addTarget:self action:@selector(buyButtonPressed:)
                        forControlEvents:UIControlEventTouchUpInside];
+        
         if ([specItem.image rangeOfString:@"http"].location !=NSNotFound) {
             [cell.spinner startAnimating];
+            cell.thumbnail.tag = indexPath.row;
+            cell.thumbnail.userInteractionEnabled = YES;
+            UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(tappedOnThumbnail:)];
+            tap.numberOfTapsRequired = 1;
+            tap.numberOfTouchesRequired = 1;
+            [cell.thumbnail addGestureRecognizer:tap];
+           
             [cell.thumbnail setImageWithURL:[NSURL URLWithString:specItem.image]
                                   completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
                                       [cell.spinner stopAnimating];
@@ -278,8 +282,6 @@
                                          
                                       }else{
                                           NSLog(@"error to load image");
-#warning Do i have no_image.jpg ?
-                                          [cell.thumbnail setImage:[UIImage imageNamed:@"no_image.jpg"]];
                                       }
                                   }];
         }else{
@@ -294,6 +296,7 @@
     cell.textLabel.text = @"empty cell";
     return cell;
 }
+
 -(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
     if (section==1 &&_properties.count) {
         return @"Подробнее:";
@@ -313,7 +316,6 @@
         NSDictionary *tmpDict =_properties[indexPath.row];
         NSString *rawstring = [tmpDict allValues][0];
         NSURL *url = [[NSURL alloc] init];
-        NSLog(@"rawString %@",rawstring);
         TOWebViewController *webBrowser = [[TOWebViewController alloc] init];
         if ([rawstring rangeOfString:@"iframe"].location !=NSNotFound) {
             NSLog(@"IFRAME FOUND");
@@ -354,7 +356,6 @@
     // create new duplicate image
 	UIImageView *starView = [[UIImageView alloc] initWithImage:imgView.image];
     [starView setFrame:rect];
-    //do i need this?
     
 	starView.layer.cornerRadius=5;
 	starView.layer.borderColor=[[UIColor blackColor] CGColor];
@@ -443,7 +444,31 @@
 }
 
 
-#pragma mark - MWPhotoBrowser delegation methods
+#pragma mark - MWPhotoBrowser methods
+
+-(void)setupPhotoBrowser:(MWPhotoBrowser*)photoBrowser withCurrentPhotoIndex:(NSInteger)index{
+    // Set options
+    photoBrowser.displayActionButton = YES; // Show action button to allow sharing, copying, etc (defaults to YES)
+    photoBrowser.displayNavArrows = NO; // Whether to display left and right nav arrows on toolbar (defaults to NO)
+    photoBrowser.displaySelectionButtons = NO; // Whether selection buttons are shown on each image (defaults to NO)
+    photoBrowser.zoomPhotosToFill = YES; // Images that almost fill the screen will be initially zoomed to fill (defaults to YES)
+    photoBrowser.alwaysShowControls = NO; // Allows to control whether the bars and controls are always visible or whether they fade away to show the photo full (defaults to NO)
+    photoBrowser.enableGrid = YES; // Whether to allow the viewing of all the photo thumbnails on a grid (defaults to YES)
+    
+    [photoBrowser showNextPhotoAnimated:YES];
+    [photoBrowser showPreviousPhotoAnimated:YES];
+    
+    [photoBrowser setCurrentPhotoIndex:index];
+}
+
+-(void)tappedOnThumbnail:(UITapGestureRecognizer*)gestureRecognizer{
+    NSInteger tag = gestureRecognizer.view.tag;
+    NSLog(@"tapped on thumbnail %i",tag);
+    MWPhotoBrowser *photoBrowser = [[MWPhotoBrowser alloc] initWithDelegate:self];
+    [self setupPhotoBrowser:photoBrowser withCurrentPhotoIndex:0];
+    [self.navigationController pushViewController:photoBrowser animated:YES];
+}
+
 - (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser {
     return [self photoBrowserPhotos].count;
 }

@@ -284,13 +284,14 @@ typedef enum SocialButtonTags {
     if (![TWAPIManager isLocalTwitterAccountAvailable]) {
         UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Twitter" message:@"Вы должны добавить twitter аккаунт в настройках телефона"  delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
     }
     else {
         [[Socializer sharedManager] obtainAccessToAccountsWithBlock:^(BOOL granted) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (granted) {
                     NSLog(@"GRANTED!");
-                    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Выберите аккаунт"
+                    UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Выберите Twitter аккаунт"
                                                                        delegate:self
                                                               cancelButtonTitle:nil
                                                          destructiveButtonTitle:nil
@@ -302,8 +303,10 @@ typedef enum SocialButtonTags {
                     [sheet showInView:self.view];
                 }
                 else {
-                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Title" message:@"Не получен доступ к twitter аккаунтам" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+                    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Twitter" message:@"Не получен доступ к Twitter аккаунтам" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
                     [alert show];
+                    [[Socializer sharedManager] logOutFromCurrentSocial];
+                    [MBProgressHUD hideHUDForView:self.view animated:YES];
                     NSLog(@"You were not granted access to the Twitter accounts.");
                 }
             });

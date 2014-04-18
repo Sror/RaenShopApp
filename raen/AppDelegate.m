@@ -11,6 +11,8 @@
 #import "VKSdk.h"
 #import <GooglePlus/GooglePlus.h>
 
+
+
 NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 
 @implementation AppDelegate
@@ -30,6 +32,7 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
     UITabBarController *tabController = (UITabBarController *)self.window.rootViewController;
     [tabController.tabBar.items[2] setBadgeValue:[NSString stringWithFormat:@"%d",cartItems.count]];
     */
+    [self updateCartBadge];
     return YES;
 }
 
@@ -89,4 +92,17 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
     [[Socializer sharedManager].fbSession close];
 }
 
+#pragma mark - RAEN API cummunitator methods
+-(void)updateCartBadge{
+    [RaenAPICommunicator sharedManager].delegate = self;
+    [[RaenAPICommunicator sharedManager] getItemsFromCart];
+}
+#pragma mark - RAEN API Delegation methods
+-(void)didReceiveCartItems:(NSArray *)items{
+    UITabBarController *tabController = (UITabBarController *) self.window.rootViewController;
+    [tabController.tabBar.items[2] setBadgeValue:[NSString stringWithFormat:@"%i",items.count]];
+}
+-(void)fetchingFailedWithError:(JSONModelError *)error{
+    NSLog(@"error to update cart icon badge");
+}
 @end
