@@ -7,11 +7,13 @@
 //
 
 #import "LoginViewController.h"
-
 #import "RaenAPICommunicator.h"
 #import "Socializer.h"
-
+#import "ProfileCell.h"
 #import "MBProgressHUD.h"
+#import "UserInfoModel.h"
+#import "UIImageView+WebCache.h"
+#import "OrderCell.h"
 
 typedef enum SocialButtonTags {
     SocialButtonTwitter,
@@ -25,33 +27,30 @@ typedef enum SocialButtonTags {
     UIAlertView *_emailAlert;
     NSString * _tmpUserEmail;
     NSString* _userPassword;
+    UserInfoModel* _userInfo;
 }
-@property (weak, nonatomic) IBOutlet UILabel *usernameLabel;
-@property (weak, nonatomic) IBOutlet UIImageView *avatar;
+
 @property (weak, nonatomic) IBOutlet UIView *signInSubview;
 
 @property (weak, nonatomic) IBOutlet UIButton *twitterButton;
 @property (weak, nonatomic) IBOutlet UIButton *FacebookButton;
 @property (weak, nonatomic) IBOutlet UIButton *vkontakteButton;
 @property (weak, nonatomic) IBOutlet UIButton *googleButton;
-@property (weak, nonatomic) IBOutlet UIButton *socialLogoutButton;
 @property (weak, nonatomic) IBOutlet UILabel *loginViaLabel;
 @property (weak, nonatomic) IBOutlet UITextField *emailTextField;
 @property (weak, nonatomic) IBOutlet UITextField *passwordTextField;
 @property (weak, nonatomic) IBOutlet UIButton *signInButton;
 
 - (IBAction)socialButtonTapped:(id)sender;
-- (IBAction)socialLogoutButtonPressed;
+
+
 
 
 @end
 
 @implementation LoginViewController
 
-
-- (void)viewDidLoad
-{
-    [super viewDidLoad];
+-(void)viewDidAppear:(BOOL)animated{
     [RaenAPICommunicator sharedManager].delegate = self;
     [Socializer sharedManager].delegate = self;
     //add observer for twitter accounts store
@@ -60,51 +59,69 @@ typedef enum SocialButtonTags {
     }
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
-
+    
     [self.signInSubview.layer setCornerRadius:5.0];
     [self.signInButton.layer setCornerRadius:5.0];
+    
+    self.tableView.hidden = YES;
     [self updateUI];
+}
+- (void)viewDidLoad
+{
+    [super viewDidLoad];
     
-    
-    NSLog(@"center of signInSubview x=%f y=%f",self.signInSubview.center.x,self.signInSubview.center.y);
+
+   // [self updateUI];
+
 }
 -(void)viewWillDisappear:(BOOL)animated{
     [[NSNotificationCenter defaultCenter]removeObserver:self];
 }
 
 #pragma mark - setupUI
--(void)updateUI{
-    
+-(void)updateUI
+{
     if ([Socializer sharedManager].isAuthorizedAnySocial)
     {
         [[RaenAPICommunicator sharedManager]  userInfo];
         [[RaenAPICommunicator sharedManager] userOrders];
+        UIBarButtonItem *logoutButton = [[UIBarButtonItem alloc]
+                                         initWithTitle:@"Выход"
+                                         style:UIBarButtonItemStylePlain
+                                         target:self
+                                         action:@selector(logoutButtonPressed)];
+        
+        [self.navigationItem setRightBarButtonItem:logoutButton animated:YES];
         [self.signInSubview setHidden:YES];
-        [self.usernameLabel setHidden:NO];
-        [self.avatar setHidden:NO];
-        self.usernameLabel.text = [NSString stringWithFormat:@"%@ добро пожаловать в ваш личный кабинет.",[Socializer sharedManager].socialUsername];
-
-        [self.socialLogoutButton setHidden:NO];
-    }else{
-        [self.usernameLabel setHidden:YES];
-        [self.avatar setHidden:YES];
+       // [self.tableView reloadData];
+        [self.tableView setHidden:NO];
+    }else
+    {
+        [self.navigationItem setRightBarButtonItem:nil];
+        [self.tableView setHidden:YES];
         [self.signInSubview setHidden:NO];
-        [self.socialLogoutButton setHidden:YES];
     }
 }
 
 #pragma mark - RaenAPICommunocatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error {
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription
+                                                   delegate:self
+                                          cancelButtonTitle:@"OK"
+                                          otherButtonTitles: nil];
     [alert show];
 }
 
--(void)didReceiveUserInfo:(NSDictionary *)userInfo{
-    NSLog(@"didReceiveUserInfo %@",userInfo);
+-(void)didReceiveUserInfo:(id)userInfo{
+    NSLog(@"didReceiveUserInfo %@",(UserInfoModel*)userInfo);
+    _userInfo = (UserInfoModel*)userInfo;
+    [self.tableView reloadData];
+    
 }
 -(void)didReceiveUserOrders:(NSDictionary *)userOrders{
     NSLog(@"didReceiveUserOrders %@",userOrders);
 }
+
 #pragma mark - socialButtonTapped
 
 - (IBAction)socialButtonTapped:(id)sender {
@@ -128,18 +145,10 @@ typedef enum SocialButtonTags {
     
 }
 
-- (IBAction)socialLogoutButtonPressed
-{
+-(void)logoutButtonPressed{
     [[Socializer sharedManager] logOutFromCurrentSocial];
     [[RaenAPICommunicator sharedManager]deleteCookies];
     [[RaenAPICommunicator sharedManager]deleteCookieFromLocalStorage];
-    
-    
-}
-#pragma mark - Dismiss Login View Controller
-- (IBAction)cancelButtonPressed:(id)sender {
-    [RaenAPICommunicator sharedManager].delegate = nil;
-    [self dismissViewControllerAnimated:YES completion:nil];
 }
 
 
@@ -168,7 +177,6 @@ typedef enum SocialButtonTags {
     
 }
 
-
 #pragma mark - STEP2 RESPONSES
 #pragma mark - RaenAPICommunicator delegation methods
 -(void)didSuccessAPIAuthorizedWithResponse:(NSDictionary *)response{
@@ -180,12 +188,8 @@ typedef enum SocialButtonTags {
     NSLog(@"didFailuerAPIAuthorizationWithResponse %@",response);
     [[Socializer sharedManager] logOutFromCurrentSocial];
     
-    MBProgressHUD *HUD = [[MBProgressHUD alloc] initWithView:self.view];
-    HUD.mode = MBProgressHUDModeDeterminate;
-    HUD.labelText= @"Error";
-    HUD.detailsLabelText = response[@"error"];
-    [HUD show:YES];
-    [HUD hide:YES afterDelay:1.3];
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:response[@"login_error"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    [alertView show];
     
 }
 
@@ -211,6 +215,8 @@ typedef enum SocialButtonTags {
     NSLog(@"current email already exist");
     [self showEmailAlertWithMessage:[NSString stringWithFormat:@"%@ уже занят, пожалуйста введите другой email",[Socializer sharedManager].socialUserEmail]];
 }
+
+
 
 #pragma mark - Email Alert view initialization
 -(void)showEmailAlertWithMessage:(NSString*)message {
@@ -248,7 +254,63 @@ typedef enum SocialButtonTags {
     }
 }
 
-#pragma mark - UITextFieldDelegate
+#pragma mark - UITableView DataSource
+-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (indexPath.section == 0) {
+        return 90;
+    }
+
+    return 44;
+}
+-(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
+    return 2;
+}
+-(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
+    
+    if (section ==0) {
+        return 1;
+    }
+    return 5;
+}
+-(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+   //UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"defaultCell"];
+    //USER PROFILE
+    if (indexPath.section == 0)
+    {
+        ProfileCell *cell = [tableView dequeueReusableCellWithIdentifier:@"profileCell"];
+        cell.usernameLabel.text = _userInfo.username;
+        cell.userEmailLabel.text = _userInfo.email;
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+        [cell.avatarImageView setImageWithURL:[NSURL URLWithString:_userInfo.avatar]
+                                    completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType)
+        {
+            [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+            if (!image) {
+                [cell.avatarImageView setImage:[UIImage imageNamed:@"no_avatar.png"]];
+            }
+            
+        }];
+       return  cell;
+    }
+    //ORDER CELL
+    if (indexPath.section == 1) {
+        OrderCell *cell = [tableView dequeueReusableCellWithIdentifier:@"orderCell"];
+        cell.numberAndDateLabel.text = @"order #1234 22.12.12";
+        cell.statusLabel.text = @"orderStatus";
+        return  cell;
+    }
+    
+    return nil;
+}
+
+
+-(NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section{
+    if (section == 1) {
+        return @"Заказы";
+    }
+    return nil;
+}
+#pragma mark - UITextField delegation methods
 -(void)textFieldDidBeginEditing:(UITextField *)textField{
     NSLog(@"textFieldDidBeginEditing");
 }
@@ -262,8 +324,6 @@ typedef enum SocialButtonTags {
         _userPassword = textField.text;
         NSLog(@"user password %@",_userPassword);
     }
-   
-    
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField{
@@ -300,7 +360,7 @@ typedef enum SocialButtonTags {
                         [sheet addButtonWithTitle:account.username];
                     }
                     sheet.cancelButtonIndex = [sheet addButtonWithTitle:@"Отмена"];
-                    [sheet showInView:self.view];
+                    [sheet showInView:self.tableView];
                 }
                 else {
                     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Twitter" message:@"Не получен доступ к Twitter аккаунтам" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -344,6 +404,7 @@ typedef enum SocialButtonTags {
     //[self.view endEditing:YES];
 }
  */
+#pragma mark - Sign in view email/pass button pressed
 - (IBAction)signInButtonPressed:(id)sender {
     [self.emailTextField resignFirstResponder];
     [self.passwordTextField resignFirstResponder];
@@ -354,7 +415,7 @@ typedef enum SocialButtonTags {
             UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Ошибка" message:@"Вы ввели неверный email! Попробуйте еще раз" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
             [alert show];
         }else{
-            NSLog(@"SIGN IN RAEN API!");
+            [[RaenAPICommunicator sharedManager] authViaEmail:_tmpUserEmail andPassword:_userPassword];
         }
     }
 }
@@ -368,7 +429,8 @@ typedef enum SocialButtonTags {
     }else if (screenHeight>480 && screenHeight<=568){
          newPoint.y  = self.view.center.y - 100;
     }
-
+    NSLog(@"newPoin x=%f y=%f",newPoint.x,newPoint.y);
+    
     [UIView animateWithDuration:0.5 animations:^{
         self.signInSubview.center = newPoint;
     }];

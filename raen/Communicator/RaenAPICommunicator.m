@@ -20,6 +20,8 @@
 #import "CategoryModel.h"
 #import "SliderModel.h"
 #import "SaleOfDayModel.h"
+#import "UserInfoModel.h"
+
 
 int RaenAPIdefaulSubcategoryItemsCountPerPage = 30;
 int RaenAPIdefaultNewsItemsCountPerPage = 10;
@@ -39,7 +41,8 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
 #define kRaenApiGetSliderItems @"http://raenshop.ru/api/news/slider/"
 #define kRaenApiGetSaleOfDay @"http://raenshop.ru/api/news/sale_of_day/"
 #define kRaenApiUpdateCart @"http://raenshop.ru/api/catalog/update_cart/"
-#define kRaenApiAuth @"http://raenshop.ru/api/auth/social"
+#define kRaenAPIAuthViaEmail @"http://raenshop.ru/api/auth/login"
+#define kRaenApiAuthViaSocial @"http://raenshop.ru/api/auth/social"
 #define kRaenAPIUserInfo @"http://raenshop.ru/api/auth/user/token/"
 #define kRaenAPIUserOrders @"http://raenshop.ru/api/auth/user_orders/token/"
 #define kraenAPICheckout @"http://raenshop.ru/api/catalog/checkout/"
@@ -385,7 +388,20 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
     }];
     
 }
-
+#pragma mark - Authorization via email
+-(void)authViaEmail:(NSString*)email andPassword:(NSString*)password{
+    [self restoreCookies];
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    [JSONHTTPClient JSONFromURLWithString:kRaenAPIAuthViaEmail method:@"POST" params:@{@"email":email,@"password":password} orBodyData:nil headers:@{@"Authorization":kRaenAPIAuthValue} completion:^(id json, JSONModelError *err) {
+        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+        
+        if (err) {
+            [self.delegate didFailuerAPIAuthorizationWithResponse:json];
+        }else{
+            [self.delegate didSuccessAPIAuthorizedWithResponse:json];
+        }
+    }];
+}
 #pragma mark - authorization via social networks
 -(void)authAPIVia:(NSString *)socialName withuserIdentifier:(NSString*)userId
       accessToken:(NSString*)token
@@ -405,8 +421,8 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
     }
     
     NSLog(@"authorization with parameters %@",requestParameters);
-    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];;
-    [JSONHTTPClient JSONFromURLWithString:kRaenApiAuth
+    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
+    [JSONHTTPClient JSONFromURLWithString:kRaenApiAuthViaSocial
                                    method:@"POST"
                                    params:requestParameters
                              orBodyString:nil
@@ -488,9 +504,15 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
                                       headers:@{@"Authorization":kRaenAPIAuthValue}
                                    completion:^(id json, JSONModelError *err) {
                                        [self saveCookies];
+                                       NSLog(@"user info json %@",json);
                                        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
                                        if ([json isKindOfClass:[NSDictionary class]]) {
-                                           [self.delegate didReceiveUserInfo:json];
+                                           NSError *jsonInitializationError;
+                                           UserInfoModel *userInfo = [[UserInfoModel alloc] initWithDictionary:json error:&jsonInitializationError];
+                                           if (jsonInitializationError) {
+                                               NSLog(@"jsonInitializationError %@",jsonInitializationError);
+                                           }
+                                           [self.delegate didReceiveUserInfo:userInfo];
                                        }
             
         }];

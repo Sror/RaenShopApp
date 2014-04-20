@@ -35,7 +35,9 @@ extern int RaenAPIdefaultNewsItemsCountPerPage;
 
 - (void)checkoutWithParameters:(NSDictionary*)orderParams;
 
-//authorization via socials
+//authorization methods
+-(void)authViaEmail:(NSString*)email andPassword:(NSString*)password;
+
 - (void)authAPIVia:(NSString*)socialName
 withuserIdentifier:(NSString*)userId
        accessToken:(NSString*)token

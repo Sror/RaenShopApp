@@ -62,13 +62,25 @@
     if ([subcategoryModel isKindOfClass:[SubcategoryModel class]]) {
         SubcategoryModel *subcategory  = subcategoryModel;
         _itemsCount = subcategory.count;
-        if (_itemsCount==0) {
-        }
+        NSLog(@"_itemsCount %i",_itemsCount);
         [_items addObjectsFromArray:subcategory.goods];
+        NSLog(@"_items.count %i",_items.count);
         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
         [self.navigationItem setTitle:@"Товары"];
         [self.collectionView reloadData];
         [self.refreshControl endRefreshing];
+        
+        /*
+        if (_itemsCount/_items.count != 1)
+        {
+            NSInteger rowToScroll= _items.count-_itemsCount;
+            NSLog(@"rowToScroll %i",rowToScroll);
+            NSIndexPath *firstNewIndexPath = [NSIndexPath indexPathForRow:rowToScroll inSection:0];
+            [self.collectionView scrollToItemAtIndexPath:firstNewIndexPath
+                                        atScrollPosition:UICollectionViewScrollPositionCenteredVertically
+                                                animated:YES];
+        }
+         */
     }
     NSLog(@"\n_items.count = %d\n _itemsCount=%d",_items.count,_itemsCount);
 }
@@ -101,7 +113,8 @@
     ItemCell *itemCell = (ItemCell*)[collectionView dequeueReusableCellWithReuseIdentifier:CollectionViewCellIdentifier
                                                                               forIndexPath:indexPath];
     GoodModel *item = _items[indexPath.row];
-    itemCell.titleLabel.text = item.title;
+    itemCell.titleLabel.text =[NSString stringWithFormat:@"%@\n%@",item.brand,item.title];
+    //itemCell.titleLabel.text = item.title;
     [itemCell.activityIndicator startAnimating];
     //PRICE LABELS
     if (item.priceNew.length>2) {

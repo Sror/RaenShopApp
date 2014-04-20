@@ -100,7 +100,7 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 #pragma mark - RAEN API Delegation methods
 -(void)didReceiveCartItems:(NSArray *)items{
     UITabBarController *tabController = (UITabBarController *) self.window.rootViewController;
-    [tabController.tabBar.items[2] setBadgeValue:[NSString stringWithFormat:@"%i",items.count]];
+    [tabController.tabBar.items[3] setBadgeValue:[NSString stringWithFormat:@"%i",items.count]];
 }
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     NSLog(@"error to update cart icon badge");

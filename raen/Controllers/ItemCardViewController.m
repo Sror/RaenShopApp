@@ -92,7 +92,7 @@
     NSString *totalItems=response[@"total_items"];
     
     NSLog(@"setting tabbar badge");
-    [[[[[self tabBarController]tabBar]items]objectAtIndex:2] setBadgeValue:[NSString stringWithFormat:@"%@",totalItems]];
+    [self.tabBarController.tabBar.items[3] setBadgeValue:[NSString stringWithFormat:@"%@",totalItems]];
     [_communicator saveCookies];
     
 }
@@ -102,11 +102,6 @@
 }
 #pragma  mark - ScrollView
 -(void)setImagesInScrollview:(UIScrollView*)scrollview{
-    //remove all subviews
-    //    for (UIView *subview in scrollview.subviews) {
-    //        if([subview isKindOfClass:[UIImageView class]] || [subview isKindOfClass:[UIActivityIndicatorView class]])
-    //            [subview removeFromSuperview];
-    //    }
     //set new images
     for (int i=0;i<_item.images.count;i++) {
         CGRect frame = scrollview.bounds;
@@ -292,7 +287,7 @@
     }
     //should never happen
     NSLog(@"----should never happen----");
-    UITableViewCell *cell =[self.tableView dequeueReusableCellWithIdentifier:@"defaultCell"];
+    UITableViewCell *cell =[tableView dequeueReusableCellWithIdentifier:@"defaultCell"];
     cell.textLabel.text = @"empty cell";
     return cell;
 }

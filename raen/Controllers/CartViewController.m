@@ -50,7 +50,7 @@
 
 -(void)updateTabbarBadge
 {
-    [self.tabBarController.tabBar.items[2] setBadgeValue:[self itemsCount]];
+    [self.tabBarController.tabBar.items[3] setBadgeValue:[self itemsCount]];
 }
 
 -(void)viewWillDisappear:(BOOL)animated{
@@ -190,11 +190,13 @@
 
 - (IBAction)checkOutButtonPressed:(id)sender {
     NSLog(@"checkOutButtonPressed");
-    NSDictionary *fastTmpParameters = @{@"firstname": @"test from ios app",
-                                    @"phone":@"+79050002233",
-                                    @"delivery":@"fast"};
-    
-    [[RaenAPICommunicator sharedManager]checkoutWithParameters:fastTmpParameters];
+    if (_items.count>0) {
+        NSDictionary *fastParameters = @{@"firstname": @"test from ios app",
+                                            @"phone":@"+79050002233",
+                                            @"delivery":@"fast"};
+        
+        [[RaenAPICommunicator sharedManager] checkoutWithParameters:fastParameters];
+    }
 }
 
 

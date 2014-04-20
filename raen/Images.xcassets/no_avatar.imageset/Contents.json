@@ -3,11 +3,12 @@
     {
       "idiom" : "universal",
       "scale" : "1x",
-      "filename" : "lfacebook.png"
+      "filename" : "no_avatar.png"
     },
     {
       "idiom" : "universal",
-      "scale" : "2x"
+      "scale" : "2x",
+      "filename" : "no_avatar@2x.png"
     }
   ],
   "info" : {

@@ -86,6 +86,7 @@
     }
     [self.tableView insertRowsAtIndexPaths:animatedIndexPaths withRowAnimation:UITableViewRowAnimationFade];
     NSIndexPath *firstNewIndexPath = [NSIndexPath indexPathForRow:rowToScroll inSection:1];
+    
     if (_news.count/news.count !=1) {
         [self.tableView scrollToRowAtIndexPath:firstNewIndexPath atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
     }

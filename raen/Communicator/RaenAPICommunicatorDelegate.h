@@ -32,7 +32,7 @@
 - (void)didExistEmail;
 - (void)didFailuerAPIAuthorizationWithResponse:(NSDictionary*)response;
 
-- (void)didReceiveUserInfo:(NSDictionary*)userInfo;
+- (void)didReceiveUserInfo:(id)userInfo;
 - (void)didReceiveUserOrders:(NSDictionary*)userOrders;
 
 @required
