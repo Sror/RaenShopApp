@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface LoginViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface ProfileViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property (nonatomic,strong) IBOutlet UITableView* tableView;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *logOutButton;

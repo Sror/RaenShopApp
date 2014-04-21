@@ -18,7 +18,11 @@
     }
     return self;
 }
-
+-(UIView *)selectedBackgroundView{
+    UIView *backgroundView  = [[UIView alloc] initWithFrame:self.frame];
+    backgroundView.backgroundColor  = [UIColor lightGrayColor];
+    return backgroundView;
+}
 /*
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.

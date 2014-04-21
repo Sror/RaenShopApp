@@ -187,11 +187,6 @@
 }
 
 -(void)setImagesInScrollview:(UIScrollView*)scrollview{
-    //remove all subviews
-//    for (UIView *subview in scrollview.subviews) {
-//        if([subview isKindOfClass:[UIImageView class]] || [subview isKindOfClass:[UIActivityIndicatorView class]])
-//            [subview removeFromSuperview];
-//    }
     //set new images
     for (int i=0;i<[self imagesCountInSliderItems];i++) {
         CGRect frame = scrollview.bounds;
@@ -227,18 +222,19 @@
     
 }
 
--(void)handleSlideTap:(UITapGestureRecognizer*)tapGestureRecognizer{
-    NSLog(@"Taped slide #%d", tapGestureRecognizer.view.tag);
+-(void)handleSlideTap:(UITapGestureRecognizer*)tapGestureRecognizer
+{
     SliderModel *slider = _sliderItems[tapGestureRecognizer.view.tag];
     NSLog(@"slider action %@",slider.action);
     if ([slider.action isEqualToString:@"toBrowser"]) {
         TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:slider.link]];
         webBrowser.hidesBottomBarWhenPushed = YES;
         [self.navigationController pushViewController:webBrowser animated:YES];
+        
     }else if ([slider.action isEqualToString:@"toItemCardView"]){
         [self performSegueWithIdentifier:@"toItemCardView" sender:slider.id];
+        
     }else if ([slider.action isEqualToString:@"toSaleOfDay"]){
-        //TODO sender
         [self performSegueWithIdentifier:@"toSaleOfDay" sender:nil];
     }else if ([slider.action isEqualToString:@"toGridItemsVC"]){
         [self performSegueWithIdentifier:@"toGridItemsVC" sender:slider.id];

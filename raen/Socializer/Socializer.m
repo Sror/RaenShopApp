@@ -19,7 +19,6 @@ NSString *kFacebookIdentifier = @"Facebook";
 #define kGoogleClientID @"231217279677-ebftkbl3ad5jbhdr1ha7dilcm2otvpil.apps.googleusercontent.com"
 #define kGoogleClientSecret @"vGLokxZqDzF5HgIpllGl0Hao"
 #define kShouldSaveInKeychainKey  @"shouldSaveInKeychain"
-#warning TODO change line below
 #define kKeychainItemName  @"OAuth raenshopapp: Google+"
 
 NSString* kVKAppId = @"4237186";
@@ -241,7 +240,6 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
             [self removeAuthDataFromDefaults];
             _authorizedAnySocial = [self socialIdFromDefaults] ? YES : NO;
             [VKSdk forceLogout];
-#warning why do i have to try log in again?
             [self loginVK];
             
         }];
@@ -379,6 +377,9 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
 -(void)vkSdkShouldPresentViewController:(UIViewController *)controller{
     NSLog(@"vkSdkShouldPresentViewController");
 }
+#pragma mark - FaceBook Delegation methods
+
+
 #pragma mark - UserDefaults manager
 - (NSString*)accessTokenFromDefaults{
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];

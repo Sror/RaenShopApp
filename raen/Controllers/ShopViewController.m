@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Aleksey Ivanov. All rights reserved.
 //
 
-#import "TVController.h"
+#import "ShopViewController.h"
 #import "TVCell.h"
 #import "CVCell.h"
 #import "JSONModelLib.h"
@@ -21,14 +21,14 @@
 
 #import "RaenAPICommunicator.h"
 
-@interface TVController ()<RaenAPICommunicatorDelegate> {
+@interface ShopViewController ()<RaenAPICommunicatorDelegate> {
     NSArray *_categories;
     RaenAPICommunicator *_communicator;
 }
 
 @end
 
-@implementation TVController
+@implementation ShopViewController
 
 
 - (void)viewDidLoad
@@ -62,7 +62,7 @@
     [MBProgressHUD hideHUDForView:self.tableView animated:YES];
     [self.tableView reloadData];
     [self.refreshControl endRefreshing];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alert show];
     
 }
@@ -100,6 +100,7 @@
     CategoryModel *category = _categories[indexPath.row];
     tvCell.categoryLabel.text = category.title;
     tvCell.categoryLabel.tag = indexPath.row;
+    
     UITapGestureRecognizer *tapOnLabel = [[UITapGestureRecognizer alloc]
                                           initWithTarget:self action:@selector(handleLabelTap:)];
     tapOnLabel.numberOfTapsRequired = 1;
@@ -157,11 +158,17 @@
 
 #pragma mark - Handle Label Tap
 -(void)handleLabelTap:(UITapGestureRecognizer*)tapGestureRecognizer{
-    NSInteger row = tapGestureRecognizer.view.tag;
-    NSLog(@"tapped on %d label",row);
-    CategoryModel *category = _categories[row];
-    NSLog(@"category.id %@",category.id);
-    [self performSegueWithIdentifier:@"toCategoryItemsGridVC" sender:category.id];
+    
+    [UIView animateWithDuration:0.3 delay:0 options:UIViewAnimationOptionCurveEaseIn animations:^{
+        tapGestureRecognizer.view.alpha = 0.2;
+    } completion:^(BOOL finished) {
+        tapGestureRecognizer.view.alpha = 1;
+        
+        NSInteger row = tapGestureRecognizer.view.tag;
+        CategoryModel *category = _categories[row];
+        [self performSegueWithIdentifier:@"toCategoryItemsGridVC" sender:category.id];
+        
+    }];
     
 }
 

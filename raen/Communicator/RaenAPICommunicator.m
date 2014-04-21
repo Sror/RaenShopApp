@@ -27,7 +27,7 @@ int RaenAPIdefaulSubcategoryItemsCountPerPage = 30;
 int RaenAPIdefaultNewsItemsCountPerPage = 10;
 
 #warning add/remove hash below
-#define kRaenAPIAuthValue @"Basic =="
+#define kRaenAPIAuthValue @"Basic =cmFlbmlvc2FwcDp0ajA1VVJNMnVmbG9ScnlmazA="
 
 #define kRaenApiGetGuard @"http://raenshop.ru/api/catalog/goods_list/cat_id/81/" //get all guard items
 #define kRaenApiGetParamsOfCategory @"http://raenshop.ru/api/catalog/category/id/"
@@ -392,7 +392,12 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
 -(void)authViaEmail:(NSString*)email andPassword:(NSString*)password{
     [self restoreCookies];
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    [JSONHTTPClient JSONFromURLWithString:kRaenAPIAuthViaEmail method:@"POST" params:@{@"email":email,@"password":password} orBodyData:nil headers:@{@"Authorization":kRaenAPIAuthValue} completion:^(id json, JSONModelError *err) {
+    [JSONHTTPClient JSONFromURLWithString:kRaenAPIAuthViaEmail
+                                   method:@"POST"
+                                   params:@{@"email":email,@"password":password}
+                               orBodyData:nil
+                                  headers:@{@"Authorization":kRaenAPIAuthValue}
+                               completion:^(id json, JSONModelError *err) {
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
         
         if (err) {

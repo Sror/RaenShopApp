@@ -9,7 +9,7 @@
 #import <UIKit/UIKit.h>
 
 
-@interface TVController : UIViewController <UICollectionViewDataSource,UICollectionViewDelegate,UITableViewDataSource,UITableViewDelegate>
+@interface ShopViewController : UIViewController <UICollectionViewDataSource,UICollectionViewDelegate,UITableViewDataSource,UITableViewDelegate>
 
 @property (nonatomic,strong) IBOutlet UITableView *tableView;
 @property (strong,nonatomic) UIRefreshControl* refreshControl;

@@ -6,7 +6,7 @@
 //  Copyright (c) 2014 Aleksey Ivanov. All rights reserved.
 //
 
-#import "LoginViewController.h"
+#import "ProfileViewController.h"
 #import "RaenAPICommunicator.h"
 #import "Socializer.h"
 #import "ProfileCell.h"
@@ -22,7 +22,7 @@ typedef enum SocialButtonTags {
     SocialButtonGoogle
 } SocialButtonTags;
 
-@interface LoginViewController ()<RaenAPICommunicatorDelegate,SocializerDelegate,UIAlertViewDelegate,UITextFieldDelegate,UIActionSheetDelegate>
+@interface ProfileViewController ()<RaenAPICommunicatorDelegate,SocializerDelegate,UIAlertViewDelegate,UITextFieldDelegate,UIActionSheetDelegate>
 {
     UIAlertView *_emailAlert;
     NSString * _tmpUserEmail;
@@ -44,11 +44,9 @@ typedef enum SocialButtonTags {
 - (IBAction)socialButtonTapped:(id)sender;
 
 
-
-
 @end
 
-@implementation LoginViewController
+@implementation ProfileViewController
 
 -(void)viewDidAppear:(BOOL)animated{
     [RaenAPICommunicator sharedManager].delegate = self;
@@ -97,6 +95,7 @@ typedef enum SocialButtonTags {
         [self.tableView setHidden:NO];
     }else
     {
+        
         [self.navigationItem setRightBarButtonItem:nil];
         [self.tableView setHidden:YES];
         [self.signInSubview setHidden:NO];
@@ -207,15 +206,20 @@ typedef enum SocialButtonTags {
                                                                    userId:[Socializer sharedManager].socialUserId];
     }else{
         //show alert view with textfield for email
-        [self showEmailAlertWithMessage:@"Пожалуйста введите Ваш email для завершения регистрации."];
+        [self rotateSignInSubviewWithCompletion:^{
+            [self showEmailAlertWithMessage:@"Пожалуйста введите Ваш email для завершения регистрации."];
+        }];
     }
 }
 
 -(void)didExistEmail{
     NSLog(@"current email already exist");
-    [self showEmailAlertWithMessage:[NSString stringWithFormat:@"%@ уже занят, пожалуйста введите другой email",[Socializer sharedManager].socialUserEmail]];
-}
+    [self rotateSignInSubviewWithCompletion:^{
+        [self showEmailAlertWithMessage:[NSString stringWithFormat:@"%@ уже занят, пожалуйста введите другой email",
+                                         [Socializer sharedManager].socialUserEmail]];
 
+    }];
+}
 
 
 #pragma mark - Email Alert view initialization
@@ -226,33 +230,7 @@ typedef enum SocialButtonTags {
     [_emailAlert show];
 }
 
-#pragma mark - UIAlertViewDelegate
--(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    NSLog(@"_emailAlertView button clicked %d",buttonIndex);
-    if (buttonIndex == 0) {
-        if (![self validateEmail:_tmpUserEmail]) {
-            [self showEmailAlertWithMessage:@"Вы ввели неверный email! Попробуйте еще раз"];
-        }else{
-            NSLog(@"finish registration with email %@",[Socializer sharedManager].socialUserEmail);
-            if (_tmpUserEmail) {
-                [[RaenAPICommunicator sharedManager] registrationNewUserWithEmail:_tmpUserEmail
-                                                                        firstName:[Socializer sharedManager].socialUsername
-                                                                         lastName:nil
-                                                                            phone:nil
-                                                                           avatar:nil
-                                                                       socialLink:nil
-                                                                 socialIdentifier:[Socializer sharedManager].socialIdentificator
-                                                                      accessToken:[Socializer sharedManager].socialAccessToken
-                                                                           userId:[Socializer sharedManager].socialUserId];
-            }
-        }
-    }
-    if (buttonIndex == 1)
-    {
-        [MBProgressHUD hideHUDForView:self.view animated:YES];
-        [[Socializer sharedManager] logOutFromCurrentSocial];
-    }
-}
+
 
 #pragma mark - UITableView DataSource
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
@@ -280,16 +258,15 @@ typedef enum SocialButtonTags {
         ProfileCell *cell = [tableView dequeueReusableCellWithIdentifier:@"profileCell"];
         cell.usernameLabel.text = _userInfo.username;
         cell.userEmailLabel.text = _userInfo.email;
+        cell.userPhoneLabel.text = _userInfo.phone;
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
         [cell.avatarImageView setImageWithURL:[NSURL URLWithString:_userInfo.avatar]
+                             placeholderImage:[UIImage imageNamed:@"no_avatar.png"]
                                     completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType)
         {
             [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-            if (!image) {
-                [cell.avatarImageView setImage:[UIImage imageNamed:@"no_avatar.png"]];
-            }
-            
         }];
+ 
        return  cell;
     }
     //ORDER CELL
@@ -338,6 +315,7 @@ typedef enum SocialButtonTags {
     return [emailTest evaluateWithObject:emailStr];
 }
 
+
 #pragma mark - Twitter
 - (void)_refreshTwitterAccounts
 {
@@ -384,26 +362,37 @@ typedef enum SocialButtonTags {
     }
     
 }
-#pragma mark - Keyboard helpers
-/*
--(UIToolbar*)keyboardToolBar{
-    //portrait toolbar only
-    UIToolbar* keyboardToolBar = [[UIToolbar alloc] initWithFrame:CGRectMake(0.0, 0.0, 320.0, 40.0)];
-    [keyboardToolBar setBarStyle:UIBarStyleBlack];
-    [keyboardToolBar setTranslucent:YES];
-    UIBarButtonItem *flexSpace = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace target:nil action:nil];
-    UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone target:self action:@selector(keyboardDonePressed)];
-    keyboardToolBar.items = @[flexSpace,doneButton];
-    [keyboardToolBar.layer setCornerRadius:3.0];
-    return keyboardToolBar;
-    
+#pragma mark - UIAlertViewDelegate
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    NSLog(@"_emailAlertView button clicked %d",buttonIndex);
+    if (buttonIndex == 0) {
+        if (![self validateEmail:_tmpUserEmail]) {
+           [self rotateSignInSubviewWithCompletion:^{
+               [self showEmailAlertWithMessage:@"Вы ввели неверный email! Попробуйте еще раз"];
+           }];
+            
+        }else{
+            NSLog(@"finish registration with email %@",[Socializer sharedManager].socialUserEmail);
+            if (_tmpUserEmail) {
+                [[RaenAPICommunicator sharedManager] registrationNewUserWithEmail:_tmpUserEmail
+                                                                        firstName:[Socializer sharedManager].socialUsername
+                                                                         lastName:nil
+                                                                            phone:nil
+                                                                           avatar:nil
+                                                                       socialLink:nil
+                                                                 socialIdentifier:[Socializer sharedManager].socialIdentificator
+                                                                      accessToken:[Socializer sharedManager].socialAccessToken
+                                                                           userId:[Socializer sharedManager].socialUserId];
+            }
+        }
+    }
+    if (buttonIndex == 1)
+    {
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
+        [[Socializer sharedManager] logOutFromCurrentSocial];
+    }
 }
-- (void)keyboardDonePressed{
-    [self.view resignFirstResponder];
-    [self signInButtonPressed:nil];
-    //[self.view endEditing:YES];
-}
- */
+
 #pragma mark - Sign in view email/pass button pressed
 - (IBAction)signInButtonPressed:(id)sender {
     [self.emailTextField resignFirstResponder];
@@ -412,8 +401,12 @@ typedef enum SocialButtonTags {
         self.emailTextField.text = _tmpUserEmail;
         self.passwordTextField.text = _userPassword;
         if (![self validateEmail:_tmpUserEmail]) {
-            UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Ошибка" message:@"Вы ввели неверный email! Попробуйте еще раз" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-            [alert show];
+            
+            [self rotateSignInSubviewWithCompletion:^{
+                UIAlertView *alert =[[UIAlertView alloc] initWithTitle:@"Ошибка" message:@"Вы ввели неверный email! Попробуйте еще раз" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+                [alert show];
+            }];
+            
         }else{
             [[RaenAPICommunicator sharedManager] authViaEmail:_tmpUserEmail andPassword:_userPassword];
         }
@@ -429,8 +422,6 @@ typedef enum SocialButtonTags {
     }else if (screenHeight>480 && screenHeight<=568){
          newPoint.y  = self.view.center.y - 100;
     }
-    NSLog(@"newPoin x=%f y=%f",newPoint.x,newPoint.y);
-    
     [UIView animateWithDuration:0.5 animations:^{
         self.signInSubview.center = newPoint;
     }];
@@ -440,6 +431,30 @@ typedef enum SocialButtonTags {
     [UIView animateWithDuration:0.5  animations:^{
         self.signInSubview.center = self.view.center;
     }];
+}
+
+#pragma mark - SignInSubView animation
+-(void)rotateSignInSubviewWithCompletion:(void(^)(void))completionBlock{
+    [UIView animateWithDuration:0.1 animations:^{
+        CGFloat rotationAngleDegreesLeft = -10;
+        CGFloat rotationAngleRadiansLeft = rotationAngleDegreesLeft * (M_PI/180);
+        CATransform3D transform = CATransform3DIdentity;
+        transform = CATransform3DRotate(transform, rotationAngleRadiansLeft, 0.0, 0.0, 1.0);
+        self.signInSubview.layer.transform =transform;
+    } completion:^(BOOL finished) {
+        self.signInSubview.layer.transform = CATransform3DIdentity;
+        [UIView animateWithDuration:0.1 animations:^{
+            CGFloat rotationAngleDegreesRight = +10;
+            CGFloat rotationAngleRadiansRight = rotationAngleDegreesRight * (M_PI/180);
+            CATransform3D transform = CATransform3DIdentity;
+            transform = CATransform3DRotate(transform, rotationAngleRadiansRight, 0.0, 0.0, 1.0);
+            self.signInSubview.layer.transform =transform;
+        } completion:^(BOOL finished) {
+            self.signInSubview.layer.transform = CATransform3DIdentity;
+            completionBlock();
+        }];
+    }];
+    
 }
 
 #pragma mark - didReceiveMemoryWarning

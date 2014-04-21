@@ -94,7 +94,6 @@
 
 #pragma mark -FiltersViewControllerDelegate method
 -(void)didSelectFilter:(NSDictionary *)filterParameters{
-    NSLog(@"didSelectFilter %@",filterParameters);
     [MBProgressHUD showHUDAddedTo:self.view animated:YES]; 
     [_items removeAllObjects];
     [_communicator getSubcategoryWithId:self.subcategoryID withParameters:filterParameters];
@@ -137,17 +136,17 @@
 }
 #pragma  mark -UiCollectionViewDelegate
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
+    NSLog(@"didSelectItemAtIndexPath");
     GoodModel *item = _items[indexPath.row];
+    
     [self performSegueWithIdentifier:@"toItemCardView" sender:item.id];
 }
 #pragma mark - UIScrollViewDelegate
 -(void)scrollViewDidEndDecelerating:(UIScrollView *)scrollView{
     float endScrolling = scrollView.contentOffset.y +scrollView.frame.size.height;
     if (endScrolling >= scrollView.contentSize.height) {
-        NSLog(@"Scroll END Called!");
         if (_items.count < _itemsCount) {
             NSInteger page = _items.count/RaenAPIdefaulSubcategoryItemsCountPerPage+1;
-             NSLog(@"currentPage %d",page);
             [_communicator getSubcategoryWithId:self.subcategoryID withParameters:@{@"page":[NSNumber numberWithInteger:page]}];
             [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         }
@@ -171,9 +170,7 @@
         }else{
             NSLog(@"unknow sender's class sent to filters view controller");
         }
-        
     }
-
 }
 - (IBAction)filterButtonPressed:(id)sender {
     

@@ -112,7 +112,7 @@
 		6CBAF2EC18AB401B00426647 /* GridItemsVC.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2E318AB401B00426647 /* GridItemsVC.m */; };
 		6CBAF2ED18AB401B00426647 /* IndexedCV.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2E518AB401B00426647 /* IndexedCV.m */; };
 		6CBAF2EE18AB401B00426647 /* ItemCardViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2E718AB401B00426647 /* ItemCardViewController.m */; };
-		6CBAF2F018AB401B00426647 /* TVController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2EB18AB401B00426647 /* TVController.m */; };
+		6CBAF2F018AB401B00426647 /* ShopViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBAF2EB18AB401B00426647 /* ShopViewController.m */; };
 		6CBB386118C5C7630097AFD0 /* SaleOfDayModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB386018C5C7630097AFD0 /* SaleOfDayModel.m */; };
 		6CBB386418C5C8050097AFD0 /* SaleOfDayDescriptionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB386318C5C8050097AFD0 /* SaleOfDayDescriptionModel.m */; };
 		6CBB386B18C5CB880097AFD0 /* SaleOfDayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB386A18C5CB880097AFD0 /* SaleOfDayViewController.m */; };
@@ -127,7 +127,7 @@
 		6CC7FBA318E03A5100AB0278 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC7FBA218E03A5100AB0278 /* Security.framework */; };
 		6CC7FBA518E03A5900AB0278 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC7FBA418E03A5900AB0278 /* SystemConfiguration.framework */; };
 		6CC92F2618D6E848003E8DA5 /* SubcategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CC92F2518D6E848003E8DA5 /* SubcategoryModel.m */; };
-		6CD3896E18D849C0005D3FD4 /* LoginViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CD3896D18D849C0005D3FD4 /* LoginViewController.m */; };
+		6CD3896E18D849C0005D3FD4 /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CD3896D18D849C0005D3FD4 /* ProfileViewController.m */; };
 		6CD38A0118F5CEAA00A9C087 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD389AA18F5CEAA00A9C087 /* FacebookSDK.framework */; };
 		6CD38A0218F5CEAA00A9C087 /* GoogleOpenSource.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD389AB18F5CEAA00A9C087 /* GoogleOpenSource.framework */; };
 		6CD38A0318F5CEAA00A9C087 /* GooglePlus.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 6CD389AC18F5CEAA00A9C087 /* GooglePlus.bundle */; };
@@ -402,8 +402,8 @@
 		6CBAF2E518AB401B00426647 /* IndexedCV.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IndexedCV.m; sourceTree = "<group>"; };
 		6CBAF2E618AB401B00426647 /* ItemCardViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ItemCardViewController.h; sourceTree = "<group>"; };
 		6CBAF2E718AB401B00426647 /* ItemCardViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ItemCardViewController.m; sourceTree = "<group>"; };
-		6CBAF2EA18AB401B00426647 /* TVController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TVController.h; sourceTree = "<group>"; };
-		6CBAF2EB18AB401B00426647 /* TVController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TVController.m; sourceTree = "<group>"; };
+		6CBAF2EA18AB401B00426647 /* ShopViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ShopViewController.h; sourceTree = "<group>"; };
+		6CBAF2EB18AB401B00426647 /* ShopViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ShopViewController.m; sourceTree = "<group>"; };
 		6CBB385F18C5C7630097AFD0 /* SaleOfDayModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SaleOfDayModel.h; sourceTree = "<group>"; };
 		6CBB386018C5C7630097AFD0 /* SaleOfDayModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SaleOfDayModel.m; sourceTree = "<group>"; };
 		6CBB386218C5C8050097AFD0 /* SaleOfDayDescriptionModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SaleOfDayDescriptionModel.h; sourceTree = "<group>"; };
@@ -423,8 +423,8 @@
 		6CC7FBA418E03A5900AB0278 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		6CC92F2418D6E848003E8DA5 /* SubcategoryModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubcategoryModel.h; sourceTree = "<group>"; };
 		6CC92F2518D6E848003E8DA5 /* SubcategoryModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubcategoryModel.m; sourceTree = "<group>"; };
-		6CD3896C18D849C0005D3FD4 /* LoginViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LoginViewController.h; sourceTree = "<group>"; };
-		6CD3896D18D849C0005D3FD4 /* LoginViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LoginViewController.m; sourceTree = "<group>"; };
+		6CD3896C18D849C0005D3FD4 /* ProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
+		6CD3896D18D849C0005D3FD4 /* ProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
 		6CD389AA18F5CEAA00A9C087 /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FacebookSDK.framework; sourceTree = "<group>"; };
 		6CD389AB18F5CEAA00A9C087 /* GoogleOpenSource.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = GoogleOpenSource.framework; sourceTree = "<group>"; };
 		6CD389AC18F5CEAA00A9C087 /* GooglePlus.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = GooglePlus.bundle; sourceTree = "<group>"; };
@@ -574,6 +574,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		33C460661904EC5600AFDDCE /* ShopViewController */ = {
+			isa = PBXGroup;
+			children = (
+				6CBAF2EA18AB401B00426647 /* ShopViewController.h */,
+				6CBAF2EB18AB401B00426647 /* ShopViewController.m */,
+				6CBAF2E418AB401B00426647 /* IndexedCV.h */,
+				6CBAF2E518AB401B00426647 /* IndexedCV.m */,
+			);
+			name = ShopViewController;
+			sourceTree = "<group>";
+		};
+		33C4606C1904F33C00AFDDCE /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				6CBAF2D118AB3FFE00426647 /* Cells */,
+			);
+			name = Views;
+			path = Controllers;
+			sourceTree = "<group>";
+		};
 		6C340C4918FC25130014B070 /* Twitter */ = {
 			isa = PBXGroup;
 			children = (
@@ -719,7 +739,7 @@
 				6CD6250F18DA2B57004A189B /* thirdparty */,
 				6C4EBFE818D887B800F953D2 /* Socializer */,
 				6CF584DE18AE01B400549A79 /* RaenAPICommunicator */,
-				6CBAF2D118AB3FFE00426647 /* Cells */,
+				33C4606C1904F33C00AFDDCE /* Views */,
 				6CBAF2E118AB401B00426647 /* Controllers */,
 				6CBAF29A18AB3FF100426647 /* Model */,
 				6C5473D7188405130069E62B /* AppDelegate.h */,
@@ -971,33 +991,31 @@
 				6C45CCEB18CB328E006440C2 /* GridCategoryItemCell.h */,
 				6C45CCEC18CB328E006440C2 /* GridCategoryItemCell.m */,
 			);
-			path = Cells;
+			name = Cells;
+			path = ../Cells;
 			sourceTree = "<group>";
 		};
 		6CBAF2E118AB401B00426647 /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
 				6CECDBE618E2FB5F0086967F /* Filters */,
+				33C460661904EC5600AFDDCE /* ShopViewController */,
 				6CBAD8E118FE5578002C72D0 /* CheckoutViewController.h */,
 				6CBAD8E218FE5578002C72D0 /* CheckoutViewController.m */,
-				6CBAF2EA18AB401B00426647 /* TVController.h */,
-				6CBAF2EB18AB401B00426647 /* TVController.m */,
 				6CBAF2E218AB401B00426647 /* GridItemsVC.h */,
 				6CBAF2E318AB401B00426647 /* GridItemsVC.m */,
 				6CBAF2E618AB401B00426647 /* ItemCardViewController.h */,
 				6CBAF2E718AB401B00426647 /* ItemCardViewController.m */,
 				6C6472CA18ABD845001028DE /* CartViewController.h */,
 				6C6472CB18ABD845001028DE /* CartViewController.m */,
-				6CBAF2E418AB401B00426647 /* IndexedCV.h */,
-				6CBAF2E518AB401B00426647 /* IndexedCV.m */,
 				6CBB386918C5CB880097AFD0 /* SaleOfDayViewController.h */,
 				6CBB386A18C5CB880097AFD0 /* SaleOfDayViewController.m */,
 				6CBB386C18C5F7100097AFD0 /* NewsViewController.h */,
 				6CBB386D18C5F7100097AFD0 /* NewsViewController.m */,
 				6C45CCE818CB2B5D006440C2 /* CategoryItemsGridViewController.h */,
 				6C45CCE918CB2B5D006440C2 /* CategoryItemsGridViewController.m */,
-				6CD3896C18D849C0005D3FD4 /* LoginViewController.h */,
-				6CD3896D18D849C0005D3FD4 /* LoginViewController.m */,
+				6CD3896C18D849C0005D3FD4 /* ProfileViewController.h */,
+				6CD3896D18D849C0005D3FD4 /* ProfileViewController.m */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -1373,10 +1391,10 @@
 				6CD38A0E18F5CEAA00A9C087 /* VKApiFriends.m in Sources */,
 				6CD38A0618F5CEAA00A9C087 /* NSData+MD5.m in Sources */,
 				6C340C5918FC25130014B070 /* OAuthCore.m in Sources */,
-				6CBAF2F018AB401B00426647 /* TVController.m in Sources */,
+				6CBAF2F018AB401B00426647 /* ShopViewController.m in Sources */,
 				6C41FB3118FF03E40082ACC5 /* UIImage+WebP.m in Sources */,
 				6CBAD98918FEFE44002C72D0 /* PSTGridLayoutRow.m in Sources */,
-				6CD3896E18D849C0005D3FD4 /* LoginViewController.m in Sources */,
+				6CD3896E18D849C0005D3FD4 /* ProfileViewController.m in Sources */,
 				6CBB386E18C5F7100097AFD0 /* NewsViewController.m in Sources */,
 				6CD38A1B18F5CEAA00A9C087 /* VKHTTPOperation.m in Sources */,
 				6CBAD98218FEFE44002C72D0 /* PSTCollectionViewData.m in Sources */,
