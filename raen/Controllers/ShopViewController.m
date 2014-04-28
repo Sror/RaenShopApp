@@ -39,7 +39,8 @@
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
     [self setupRefreshControl];
-    [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
+    
+    [self updateDataFromModel];
 }
 
 #pragma mark - RefreshControl

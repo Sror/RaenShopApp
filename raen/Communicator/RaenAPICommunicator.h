@@ -21,21 +21,30 @@ extern int RaenAPIdefaultNewsItemsCountPerPage;
 
 + (RaenAPICommunicator*)sharedManager;
 
+#pragma mark - News
 - (void)getNewsByPage:(NSInteger)page;
-- (void)getAllCategories;
-- (void)getParamsOfCategoryWithId:(NSString*)categoryId;
-- (void)getSubcategoryWithId:(NSString*)subcategoryId withParameters:(NSDictionary*)parameters;
-- (void)getItemCardWithId:(NSString*)itemId;
 - (void)getSliderItems;
+#pragma mark - Shop
+- (void)getAllCategories;
+#pragma mark -Filters
+- (void)getParamsOfCategoryWithId:(NSString*)categoryId;
+#pragma mark - Grid items vc
+- (void)getSubcategoryWithId:(NSString*)subcategoryId withParameters:(NSDictionary*)parameters;
+#pragma mark - ItemCard
+- (void)getItemCardWithId:(NSString*)itemId;
+#pragma mark - SaleOfDay
 - (void)getSaleOfDay;
-//cart
+
+#pragma mark - Cart
 - (void)getItemsFromCart;
 - (void)addItemToCart:(ItemModel*)item withSpecItemAtIndex:(NSInteger)index andQty:(NSUInteger)qty;
 - (void)changeCartItemQTY:(NSString*)qty byRowID:(NSString*)rowid;
 
-- (void)checkoutWithParameters:(NSDictionary*)orderParams;
+#pragma  mark -Checkout
+- (void)checkoutFastWithFirstName:(NSString*)firstName andPhone:(NSString*)phone;
 
 //authorization methods
+#pragma mark - RAEN API Authorization
 -(void)authViaEmail:(NSString*)email andPassword:(NSString*)password;
 
 - (void)authAPIVia:(NSString*)socialName
@@ -43,7 +52,7 @@ withuserIdentifier:(NSString*)userId
        accessToken:(NSString*)token
 optionalParameters:(NSDictionary*)optionalParametersDictionary;
 
-- (void)registrationNewUserWithEmail:(NSString*)email
+- (void)signInNewUserWithEmail:(NSString*)email
                            firstName:(NSString*)firstName
                             lastName:(NSString*)lastName
                                phone:(NSString*)phone

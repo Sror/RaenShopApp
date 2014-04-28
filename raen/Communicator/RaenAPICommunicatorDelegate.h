@@ -8,7 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "JSONModelError.h"
-
+#import "UserInfoModel.h"
 
 @protocol RaenAPICommunicatorDelegate <NSObject>
 @optional
@@ -32,8 +32,8 @@
 - (void)didExistEmail;
 - (void)didFailuerAPIAuthorizationWithResponse:(NSDictionary*)response;
 
-- (void)didReceiveUserInfo:(id)userInfo;
-- (void)didReceiveUserOrders:(NSDictionary*)userOrders;
+- (void)didReceiveUserInfo:(UserInfoModel*)userInfo;
+- (void)didReceiveUserOrders:(NSArray*)userOrders;
 
 @required
 - (void)fetchingFailedWithError:(JSONModelError *)error;

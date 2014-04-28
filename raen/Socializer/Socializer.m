@@ -25,12 +25,13 @@ NSString* kVKAppId = @"4237186";
 NSString* kFacebookAppID = @"220082361532667";
 
 NSString* kSocializerAuthDict = @"SOCIALIZER_SOCIAL_AUTH_DICT";
+NSString* kSocializerRaenAPIToken = @"SOCIALIZER_RAEN_API_TOKEN";
 NSString* kSocializerSocialIdentifier = @"SOCIALIZER_SOCIAL_IDENTIFIER";
 NSString* kSocializerSocialAccessToken =@"SOCIALIZER_SOCIAL_ACCESS_TOKEN";
 NSString* kSocializerSocialUserID = @"SOCIALIZER_SOCIAL_USER_ID";
 NSString* kSocializerSocialUserFullName = @"SOCIALIZER_SOCIAL_USER_FULL_NAME";
 NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
-
+NSString* kUserPhone = @"RAEN_USER_PHONE";
 
 @interface Socializer ()<VKSdkDelegate, GPPSignInDelegate>{
     int mNetworkActivityCounter;
@@ -48,16 +49,12 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
     return __sharedManager;
 }
 
--(id)init
+- (instancetype)init
 {
-    self.accountStore = [[ACAccountStore alloc]init];
-    self.twitterAPIManager = [[TWAPIManager alloc] init];
-    
-    return [self initFromUserDefaults];
-}
-//Convenience Initializer
--(id)initFromUserDefaults{
-    if (self = [super init]) {
+    self = [super init];
+    if (self) {
+        self.accountStore = [[ACAccountStore alloc]init];
+        self.twitterAPIManager = [[TWAPIManager alloc] init];
         [self setPropertiesFromUserDefaults];
     }
     return self;
@@ -66,9 +63,11 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
 -(void)setPropertiesFromUserDefaults{
     if ([[NSUserDefaults standardUserDefaults] objectForKey:kSocializerAuthDict]) {
         self.socialIdentificator = [self socialIdFromDefaults];
+        self.raenAPIToken = [self raenAPITokenFromDefaults];
         self.socialUsername = [self socialUserNameFromDefaults];
         self.socialAccessToken = [self socialTokenFromDefaults];
         self.socialUserEmail = [self socialUserEmailFromDefaults];
+        self.userPhone = [self userPhoneFromDefaults];
         _authorizedAnySocial = self.socialIdentificator ? YES:NO;
     }
 }
@@ -80,6 +79,8 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
                                                               @"email",
                                                               @"user_likes"
                                                               ]];
+    }else if (_fbSession.state == FBSessionStateClosed || _fbSession.state == FBSessionStateClosedLoginFailed){
+        [self handleFacebookSessionError];
     }
     return _fbSession;
 }
@@ -124,12 +125,14 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
                 [self fbUserInfo];
                 //[self.delegate authorizedViaFaceBook];
             }else{
-                NSLog(@"---error to open face booksession--- %@",error);
+                NSLog(@"---error to open facebook session--- %@",error);
+                
             }
         }
     }];
     
 }
+
 -(void)loginGoogle{
     [self.googleSignIn authenticate];
 }
@@ -200,6 +203,8 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
     _socialAccessToken = nil;
     _socialUserEmail = nil;
     _socialUsername = nil;
+    _raenAPIToken = nil;
+    _userPhone = nil;
     [self removeAuthDataFromDefaults];
 }
 #pragma mark - Twitter
@@ -326,13 +331,16 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
             [self saveAuthUserDataToDefaults];
             [self.delegate successfullyAuthorizedToSocialNetwork];
         }
+    }else{
+        NSLog(@"--Google Authorization error %@--",error);
+        [self.delegate failureAuthorization];
     }
 }
 
 
 #pragma mark - VKDelegate methods
 -(void)vkSdkAcceptedUserToken:(VKAccessToken *)token{
-
+    NSLog(@"vkSdkAcceptedUserToken %@",token);
     _socialAccessToken = token.accessToken;
     _socialUserId = token.userId;
     _socialIdentificator = kVkontakteIdentifier;
@@ -348,7 +356,7 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
    
 }
 -(void)vkSdkReceivedNewToken:(VKAccessToken *)newToken{
-
+ NSLog(@"vkSdkReceivedNewToken %@",newToken);
     _socialAccessToken = newToken.accessToken;
     _socialUserId = newToken.userId;
     _socialIdentificator = kVkontakteIdentifier;
@@ -358,6 +366,7 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
     
 }
 -(void)vkSdkRenewedToken:(VKAccessToken *)newToken{
+    NSLog(@"vkSdkRenewedToken %@",newToken);
     _socialAccessToken = newToken.accessToken;
     _socialUserId = newToken.userId;
     _socialIdentificator = kVkontakteIdentifier;
@@ -367,6 +376,7 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
 }
 
 -(void)vkSdkTokenHasExpired:(VKAccessToken *)expiredToken{
+    NSLog(@"-------vkSdkTokenHasExpired! %@",expiredToken);
     NSArray *scope = @[VK_PER_FRIENDS,VK_PER_WALL,VK_PER_PHOTOS,VK_PER_NOHTTPS];
     [VKSdk authorize:scope revokeAccess:YES];
 }
@@ -378,7 +388,9 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
     NSLog(@"vkSdkShouldPresentViewController");
 }
 #pragma mark - FaceBook Delegation methods
-
+-(void)handleFacebookSessionError{
+    [self.delegate failureAuthorization];
+}
 
 #pragma mark - UserDefaults manager
 - (NSString*)accessTokenFromDefaults{
@@ -391,6 +403,10 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
 }
 - (NSString*)socialIdFromDefaults{
     return [[NSUserDefaults standardUserDefaults] objectForKey:kSocializerAuthDict][kSocializerSocialIdentifier];
+}
+
+- (NSString*)raenAPITokenFromDefaults{
+    return [[NSUserDefaults standardUserDefaults]objectForKey:kSocializerAuthDict][kSocializerRaenAPIToken];
 }
 - (NSString*)socialUserEmailFromDefaults{
     return  [[NSUserDefaults standardUserDefaults]objectForKey:kSocializerAuthDict][kSocializerSocialUserEmail];
@@ -405,14 +421,19 @@ NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
 -(NSString *)socialTokenFromDefaults{
     return [[NSUserDefaults standardUserDefaults] objectForKey:kSocializerAuthDict][kSocializerSocialAccessToken];
 }
+-(NSString* )userPhoneFromDefaults{
+    return [[NSUserDefaults standardUserDefaults]objectForKey:kSocializerAuthDict][kUserPhone];
+}
 - (void)saveAuthUserDataToDefaults{
-    NSLog(@"saving auth User data to defaults");
-    //NSMutableDictionary *authDict = [NSMutableDictionary dictionary];
+    NSLog(@"saving auth User data to user defaults");
+   
     NSDictionary *authDict = @{kSocializerSocialIdentifier :_socialIdentificator ? _socialIdentificator : @"",
                                kSocializerSocialAccessToken : _socialAccessToken ? _socialAccessToken :@"",
+                               kSocializerRaenAPIToken :_raenAPIToken ? _raenAPIToken :@"",
                                kSocializerSocialUserEmail: _socialUserEmail ? _socialUserEmail: @"",
                                kSocializerSocialUserFullName:_socialUsername ? _socialUsername:@"",
-                               kSocializerSocialUserID : _socialUserId ?_socialUserId :@""
+                               kSocializerSocialUserID : _socialUserId ?_socialUserId :@"",
+                               kUserPhone :_userPhone ?_userPhone:@""
                                };
     
 	NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];

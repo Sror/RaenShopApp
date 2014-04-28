@@ -16,9 +16,10 @@
 #import "MBProgressHUD.h"
 
 
-@interface CartViewController () <RaenAPICommunicatorDelegate,UITextFieldDelegate>
+@interface CartViewController () <RaenAPICommunicatorDelegate,UITextFieldDelegate,UIAlertViewDelegate>
 {
-  
+    UIAlertView *_checkOutAlertView;
+    BOOL _checkOutAlertViewShown;
     NSArray *_items;
     UITextField *_activeTextField;
 }
@@ -42,7 +43,7 @@
 }
 
 -(void)updateDataFromAPI{
-    [self.tableView setHidden:YES];
+    //[self.tableView setHidden:YES];
     [self.subView setHidden:YES];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [[RaenAPICommunicator sharedManager] getItemsFromCart];
@@ -111,9 +112,23 @@
 }
 
 -(void)didCheckoutWithResponse:(NSDictionary *)response{
-    UIAlertView *alert = [[ UIAlertView alloc] initWithTitle:nil message:response[@"text"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
-    [alert show];
-    [self viewWillAppear:YES];
+    NSLog(@"didCheckoutWithResponse %@",response);
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    if (response[@"error"]) {
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:response[@"error"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [alertView show];
+    }else{
+      
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Success"
+                                                        message:response[@"text"]
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles: nil];
+        [alert show];
+        //we have to reload view
+        //[self viewWillAppear:YES];
+    }
+    [self updateDataFromAPI];
 }
 
 #pragma mark - UITableViewDataSource
@@ -191,11 +206,9 @@
 - (IBAction)checkOutButtonPressed:(id)sender {
     NSLog(@"checkOutButtonPressed");
     if (_items.count>0) {
-        NSDictionary *fastParameters = @{@"firstname": @"test from ios app",
-                                            @"phone":@"+79050002233",
-                                            @"delivery":@"fast"};
-        
-        [[RaenAPICommunicator sharedManager] checkoutWithParameters:fastParameters];
+        NSString* firstName = [Socializer sharedManager].socialUsername;
+        NSString* phone = [Socializer sharedManager].userPhone;
+        [self showCheckOutAlertViewWithFirstName:firstName andPhone:phone message:@"Введите Ваше имя и телефон для оформления заказа."];
     }
 }
 
@@ -212,6 +225,52 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark - Checkout AlertView
+
+-(void)showCheckOutAlertViewWithFirstName:(NSString*)firstName andPhone:(NSString*)phone message:(NSString*)message{
+    _checkOutAlertView = [[UIAlertView alloc] initWithTitle:@"Оформление заказа" message:message delegate:self cancelButtonTitle:@"OK" otherButtonTitles:@"Отмена", nil];
+    _checkOutAlertView.alertViewStyle = UIAlertViewStyleLoginAndPasswordInput;
+    [_checkOutAlertView textFieldAtIndex:0].text = firstName;
+    [_checkOutAlertView textFieldAtIndex:0].placeholder = @"Введите Ваше имя";
+    
+    [_checkOutAlertView textFieldAtIndex:1].secureTextEntry = NO;
+    [_checkOutAlertView textFieldAtIndex:1].keyboardType = UIKeyboardTypeDecimalPad;
+    [_checkOutAlertView textFieldAtIndex:1].placeholder = @"Введите номер телефона";
+    [_checkOutAlertView textFieldAtIndex:1].text = phone;
+    [_checkOutAlertView show];
+    _checkOutAlertViewShown = YES;
+}
+#pragma mark - UIAlertView Delegation methods
+-(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
+    NSLog(@"alertView clicked button %i",buttonIndex);
+    _checkOutAlertView = NO;
+    if (buttonIndex == 0) {
+        NSString *firstName  = [alertView textFieldAtIndex:0].text;
+        NSString* phone =[alertView textFieldAtIndex:1].text;
+        if (firstName.length>1 && firstName.length<20 && phone.length>7 && phone.length<20)
+        {
+            [[RaenAPICommunicator sharedManager]checkoutFastWithFirstName:firstName andPhone:phone];
+            [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+
+        }else{
+#warning check!
+            if (firstName.length<=1 && !_checkOutAlertView) {
+                [self showCheckOutAlertViewWithFirstName:nil andPhone:nil message:@"Имя слишком короткое! Попробуйте еще раз"];
+            }
+            if (firstName.length>20 && !_checkOutAlertView) {
+                [self showCheckOutAlertViewWithFirstName:nil andPhone:nil message:@"Имя должно быть меньше 20 символов! Попробуйте еще раз"];
+            }
+            if (phone.length<=1 && !_checkOutAlertView) {
+                 [self showCheckOutAlertViewWithFirstName:nil andPhone:nil message:@"Слишком короткий номер телефона! Попробуйте еще раз"];
+            }
+            if (phone.length>20 && !_checkOutAlertView) {
+                [self showCheckOutAlertViewWithFirstName:nil andPhone:nil message:@"Слишком длинный номер телефона! Попробуйте еще раз"];
+            }
+            
+        }
+        
+    }
+}
 #pragma mark - UITextField Delegate methods
 -(BOOL)textField:(UITextField *)textField shouldChangeCharactersInRange:(NSRange)range replacementString:(NSString *)string{
     NSString* resultString = [textField.text stringByReplacingCharactersInRange:range withString:string];

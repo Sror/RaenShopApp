@@ -146,8 +146,9 @@
     NewsModel *news = _news[indexPath.row];
     
     TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:news.link]];
-    webBrowser.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:webBrowser animated:YES];
+    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
+
+    //[self.navigationController pushViewController:webBrowser animated:YES];
    
 }
 #pragma mark - UIScrollViewDelegate
@@ -164,11 +165,6 @@
 #pragma mark - Navigation
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);
-    if ([segue.identifier isEqualToString:@"toBrowser"]) {
-        TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:sender]];
-        webBrowser.hidesBottomBarWhenPushed = YES;
-        
-    }
 }
 
 #pragma mark - Slider Helpers
@@ -228,8 +224,10 @@
     NSLog(@"slider action %@",slider.action);
     if ([slider.action isEqualToString:@"toBrowser"]) {
         TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:slider.link]];
-        webBrowser.hidesBottomBarWhenPushed = YES;
-        [self.navigationController pushViewController:webBrowser animated:YES];
+        [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
+
+//        webBrowser.hidesBottomBarWhenPushed = YES;
+//        [self.navigationController pushViewController:webBrowser animated:YES];
         
     }else if ([slider.action isEqualToString:@"toItemCardView"]){
         [self performSegueWithIdentifier:@"toItemCardView" sender:slider.id];
@@ -240,6 +238,7 @@
         [self performSegueWithIdentifier:@"toGridItemsVC" sender:slider.id];
     }
 }
+
 #pragma mark - Memory Warning 
 - (void)didReceiveMemoryWarning
 {

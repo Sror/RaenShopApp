@@ -17,6 +17,7 @@
 @property (nonatomic,getter = isSale) BOOL sale;
 @property (nonatomic,strong) NSString *price;
 @property (nonatomic,strong) NSString *priceNew;
+
 @property (nonatomic,strong) NSString <Optional>*weight;
 @property (nonatomic,strong) NSString <Optional>*desc;
 @property (nonatomic,strong) NSString <Optional>*video;
@@ -28,5 +29,6 @@
 @property (nonatomic,strong) NSString <Optional>*param4;
 @property (nonatomic,strong) NSString <Optional>*param5;
 @property (nonatomic,strong) NSString <Optional>*brand;
+
 
 @end

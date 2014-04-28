@@ -40,7 +40,7 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+    [self.tableView setHidden:YES];
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
     [self setupRefreshControl];
@@ -82,7 +82,9 @@
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     self.navigationItem.title = _item.title;
     [self addReviewAndVideo];
+    
     [self.tableView reloadData];
+    [self.tableView setHidden:NO];
     [self.refreshControl endRefreshing];
 }
 #pragma mark - add item to cart
@@ -151,8 +153,8 @@
     MWPhotoBrowser *photoBrowser = [[MWPhotoBrowser alloc] initWithDelegate:self];
     
     [self setupPhotoBrowser:photoBrowser withCurrentPhotoIndex:imageTag];
-    
-    [self.navigationController pushViewController:photoBrowser animated:YES];
+    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:photoBrowser] animated:YES completion:nil];
+    //[self.navigationController pushViewController:photoBrowser animated:YES];
 }
 
 -(void)setScrollViewSize:(UIScrollView*)scrollview withPages:(NSInteger)pages {
@@ -205,7 +207,7 @@
         if (boundingSize.height<75) {
             return 80;
         }else{
-            NSLog(@"cell size %f",10+boundingSize.height);
+           
             return (10+boundingSize.height);
         }
     }
@@ -322,9 +324,9 @@
             url = [NSURL URLWithString:rawstring];
             webBrowser.url = url;
         }
-        
-        [webBrowser setHidesBottomBarWhenPushed:YES];
-        [self.navigationController pushViewController:webBrowser animated:YES];
+        [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
+//        [webBrowser setHidesBottomBarWhenPushed:YES];
+//        [self.navigationController pushViewController:webBrowser animated:YES];
     }
 }
 #pragma mark - prepare for segue
@@ -336,7 +338,6 @@
 #pragma mark - buy button pressed
 -(void)buyButtonPressed:(id)sender{
     NSInteger row = [sender tag];
-    NSLog(@"buyButtonPressed row %ld",(long)row);
     //to do animation
     [self animateCellWithRow:row];
     [_communicator addItemToCart:_item withSpecItemAtIndex:row andQty:1];
@@ -461,7 +462,8 @@
     NSLog(@"tapped on thumbnail %i",tag);
     MWPhotoBrowser *photoBrowser = [[MWPhotoBrowser alloc] initWithDelegate:self];
     [self setupPhotoBrowser:photoBrowser withCurrentPhotoIndex:0];
-    [self.navigationController pushViewController:photoBrowser animated:YES];
+    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:photoBrowser] animated:YES completion:nil];
+    //[self.navigationController pushViewController:photoBrowser animated:YES];
 }
 
 - (NSUInteger)numberOfPhotosInPhotoBrowser:(MWPhotoBrowser *)photoBrowser {

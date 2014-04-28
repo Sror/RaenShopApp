@@ -52,7 +52,6 @@
 		6C5473D5188405130069E62B /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C5473D4188405130069E62B /* main.m */; };
 		6C5473D9188405130069E62B /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C5473D8188405130069E62B /* AppDelegate.m */; };
 		6C5473DC188405130069E62B /* Main_iPhone.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6C5473DA188405130069E62B /* Main_iPhone.storyboard */; };
-		6C5473DF188405130069E62B /* Main_iPad.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6C5473DD188405130069E62B /* Main_iPad.storyboard */; };
 		6C5473E7188405130069E62B /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 6C5473E6188405130069E62B /* Images.xcassets */; };
 		6C5473EE188405130069E62B /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473ED188405130069E62B /* XCTest.framework */; };
 		6C5473EF188405140069E62B /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6C5473C8188405130069E62B /* Foundation.framework */; };
@@ -127,6 +126,9 @@
 		6CC7FBA318E03A5100AB0278 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC7FBA218E03A5100AB0278 /* Security.framework */; };
 		6CC7FBA518E03A5900AB0278 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC7FBA418E03A5900AB0278 /* SystemConfiguration.framework */; };
 		6CC92F2618D6E848003E8DA5 /* SubcategoryModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CC92F2518D6E848003E8DA5 /* SubcategoryModel.m */; };
+		6CD1909E1905334000399F31 /* OrderModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CD1909D1905334000399F31 /* OrderModel.m */; };
+		6CD190A11905343200399F31 /* GoodsInOrderModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CD190A01905343200399F31 /* GoodsInOrderModel.m */; };
+		6CD190A4190541B100399F31 /* OrderViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CD190A3190541B100399F31 /* OrderViewController.m */; };
 		6CD3896E18D849C0005D3FD4 /* ProfileViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CD3896D18D849C0005D3FD4 /* ProfileViewController.m */; };
 		6CD38A0118F5CEAA00A9C087 /* FacebookSDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD389AA18F5CEAA00A9C087 /* FacebookSDK.framework */; };
 		6CD38A0218F5CEAA00A9C087 /* GoogleOpenSource.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CD389AB18F5CEAA00A9C087 /* GoogleOpenSource.framework */; };
@@ -283,7 +285,6 @@
 		6C5473D7188405130069E62B /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		6C5473D8188405130069E62B /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
 		6C5473DB188405130069E62B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPhone.storyboard; sourceTree = "<group>"; };
-		6C5473DE188405130069E62B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main_iPad.storyboard; sourceTree = "<group>"; };
 		6C5473E6188405130069E62B /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		6C5473EC188405130069E62B /* raenappTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = raenappTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6C5473ED188405130069E62B /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
@@ -423,6 +424,12 @@
 		6CC7FBA418E03A5900AB0278 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		6CC92F2418D6E848003E8DA5 /* SubcategoryModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SubcategoryModel.h; sourceTree = "<group>"; };
 		6CC92F2518D6E848003E8DA5 /* SubcategoryModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SubcategoryModel.m; sourceTree = "<group>"; };
+		6CD1909C1905334000399F31 /* OrderModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderModel.h; sourceTree = "<group>"; };
+		6CD1909D1905334000399F31 /* OrderModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderModel.m; sourceTree = "<group>"; };
+		6CD1909F1905343200399F31 /* GoodsInOrderModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GoodsInOrderModel.h; sourceTree = "<group>"; };
+		6CD190A01905343200399F31 /* GoodsInOrderModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GoodsInOrderModel.m; sourceTree = "<group>"; };
+		6CD190A2190541B100399F31 /* OrderViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderViewController.h; sourceTree = "<group>"; };
+		6CD190A3190541B100399F31 /* OrderViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderViewController.m; sourceTree = "<group>"; };
 		6CD3896C18D849C0005D3FD4 /* ProfileViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileViewController.h; sourceTree = "<group>"; };
 		6CD3896D18D849C0005D3FD4 /* ProfileViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ProfileViewController.m; sourceTree = "<group>"; };
 		6CD389AA18F5CEAA00A9C087 /* FacebookSDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = FacebookSDK.framework; sourceTree = "<group>"; };
@@ -747,7 +754,6 @@
 				6C5473E6188405130069E62B /* Images.xcassets */,
 				6C5473CF188405130069E62B /* Supporting Files */,
 				6C5473DA188405130069E62B /* Main_iPhone.storyboard */,
-				6C5473DD188405130069E62B /* Main_iPad.storyboard */,
 			);
 			path = raen;
 			sourceTree = "<group>";
@@ -887,6 +893,10 @@
 		6CBAF29A18AB3FF100426647 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				6CD1909C1905334000399F31 /* OrderModel.h */,
+				6CD1909D1905334000399F31 /* OrderModel.m */,
+				6CD1909F1905343200399F31 /* GoodsInOrderModel.h */,
+				6CD190A01905343200399F31 /* GoodsInOrderModel.m */,
 				6CB89CDF18B67CCE0048407B /* News */,
 				6CBB386718C5C8310097AFD0 /* Slider */,
 				6CBB386618C5C8290097AFD0 /* Cart */,
@@ -1016,6 +1026,8 @@
 				6C45CCE918CB2B5D006440C2 /* CategoryItemsGridViewController.m */,
 				6CD3896C18D849C0005D3FD4 /* ProfileViewController.h */,
 				6CD3896D18D849C0005D3FD4 /* ProfileViewController.m */,
+				6CD190A2190541B100399F31 /* OrderViewController.h */,
+				6CD190A3190541B100399F31 /* OrderViewController.m */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -1302,7 +1314,6 @@
 			files = (
 				6C41FB3C18FFB63B0082ACC5 /* LICENCE.txt in Resources */,
 				6C41FB6D18FFB8890082ACC5 /* TOWebViewControllerLocalizable.strings in Resources */,
-				6C5473DF188405130069E62B /* Main_iPad.storyboard in Resources */,
 				6CD38A2618F5CEAA00A9C087 /* VKSdkResources.bundle in Resources */,
 				6CD38A0318F5CEAA00A9C087 /* GooglePlus.bundle in Resources */,
 				6C41FB3E18FFB6AF0082ACC5 /* LICENSE in Resources */,
@@ -1422,6 +1433,7 @@
 				6CECDBDC18E2B9F10086967F /* ColorModel.m in Sources */,
 				6CBAD97818FEFE44002C72D0 /* MWTapDetectingImageView.m in Sources */,
 				6CD38A1118F5CEAA00A9C087 /* VKApiPhotos.m in Sources */,
+				6CD190A11905343200399F31 /* GoodsInOrderModel.m in Sources */,
 				6CB8D5471901A8360003E3CC /* OrderCell.m in Sources */,
 				6CECDBDF18E2BDCB0086967F /* BrandModel.m in Sources */,
 				6C340C5C18FC25130014B070 /* TWSignedRequest.m in Sources */,
@@ -1458,12 +1470,14 @@
 				6CD38A2818F5CEAA00A9C087 /* VKUploadPhotoRequest.m in Sources */,
 				6CBAD97618FEFE44002C72D0 /* MWPhoto.m in Sources */,
 				6CD38A1818F5CEAA00A9C087 /* VKCaptchaViewController.m in Sources */,
+				6CD190A4190541B100399F31 /* OrderViewController.m in Sources */,
 				6C41FB3218FF03E40082ACC5 /* UIImageView+WebCache.m in Sources */,
 				6C41FB2F18FF03E40082ACC5 /* UIImage+GIF.m in Sources */,
 				6C41FB7118FFB8890082ACC5 /* UIImage+TOWebViewControllerIcons.m in Sources */,
 				6C41FB2B18FF03E40082ACC5 /* SDWebImageDownloaderOperation.m in Sources */,
 				6CD38A2018F5CEAA00A9C087 /* VKPermissions.m in Sources */,
 				6CF0820418B4DFE900AB3533 /* AvailableItemCell.m in Sources */,
+				6CD1909E1905334000399F31 /* OrderModel.m in Sources */,
 				6CBB386118C5C7630097AFD0 /* SaleOfDayModel.m in Sources */,
 				6CD38A2918F5CEAA00A9C087 /* VKUploadWallPhotoRequest.m in Sources */,
 				6CBAD98618FEFE44002C72D0 /* PSTCollectionViewUpdateItem.m in Sources */,
@@ -1529,14 +1543,6 @@
 				6C5473DB188405130069E62B /* Base */,
 			);
 			name = Main_iPhone.storyboard;
-			sourceTree = "<group>";
-		};
-		6C5473DD188405130069E62B /* Main_iPad.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				6C5473DE188405130069E62B /* Base */,
-			);
-			name = Main_iPad.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -1628,6 +1634,7 @@
 				INFOPLIST_FILE = "raen/raenapp-Info.plist";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = raenapp;
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -1646,6 +1653,7 @@
 				INFOPLIST_FILE = "raen/raenapp-Info.plist";
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = raenapp;
+				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;

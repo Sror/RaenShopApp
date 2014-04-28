@@ -15,23 +15,18 @@
 
 NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 
-@implementation AppDelegate
+@implementation AppDelegate 
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
     NSLog(@"didFinishLaunchingWithOptions %@",launchOptions);
-    //check which social signed
-    //[[Socializer sharedManager] removeAuthDataFromDefaults];
+    // Create a tab bar and set it as root view for the application
+    UITabBarController *tabController = (UITabBarController *) self.window.rootViewController;
+    tabController.delegate = self;
+   
+
     
-    NSLog(@"currentSocial id %@",[[Socializer sharedManager] socialIdFromDefaults]);
-    //check items count in cart and update tab bar badge
-    /*
-    NSArray *cartItems=[[NSUserDefaults standardUserDefaults] objectForKey:RAENSHOP_CART_ITEMS];
-    NSLog(@"cartItems count %@",cartItems.count);
-    UITabBarController *tabController = (UITabBarController *)self.window.rootViewController;
-    [tabController.tabBar.items[2] setBadgeValue:[NSString stringWithFormat:@"%d",cartItems.count]];
-    */
     [self updateCartBadge];
     return YES;
 }
@@ -78,7 +73,6 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
     NSLog(@"applicationDidBecomeActive");
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [FBAppCall handleDidBecomeActive];
-
     [FBAppCall handleDidBecomeActiveWithSession:[Socializer sharedManager].fbSession];
     
 }
@@ -104,5 +98,13 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 }
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     NSLog(@"error to update cart icon badge");
+}
+
+#pragma mark - 
+-(NSUInteger)tabBarControllerSupportedInterfaceOrientations:(UITabBarController *)tabBarController{
+    return  UIInterfaceOrientationMaskPortrait;
+}
+-(UIInterfaceOrientation)tabBarControllerPreferredInterfaceOrientationForPresentation:(UITabBarController *)tabBarController{
+    return UIInterfaceOrientationPortrait;
 }
 @end

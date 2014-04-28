@@ -13,6 +13,6 @@
 
 @property (nonatomic,strong) IBOutlet UITableView* tableView;
 @property (weak, nonatomic) IBOutlet UIBarButtonItem *logOutButton;
-
+@property NSArray* orders;
 
 @end

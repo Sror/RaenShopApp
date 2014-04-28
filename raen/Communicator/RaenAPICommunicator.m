@@ -21,13 +21,14 @@
 #import "SliderModel.h"
 #import "SaleOfDayModel.h"
 #import "UserInfoModel.h"
+#import "OrderModel.h"
 
 
 int RaenAPIdefaulSubcategoryItemsCountPerPage = 30;
 int RaenAPIdefaultNewsItemsCountPerPage = 10;
 
 #warning add/remove hash below
-#define kRaenAPIAuthValue @"Basic =cmFlbmlvc2FwcDp0ajA1VVJNMnVmbG9ScnlmazA="
+#define kRaenAPIAuthValue @"Basic ="
 
 #define kRaenApiGetGuard @"http://raenshop.ru/api/catalog/goods_list/cat_id/81/" //get all guard items
 #define kRaenApiGetParamsOfCategory @"http://raenshop.ru/api/catalog/category/id/"
@@ -58,7 +59,6 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
 }
 #pragma mark - get News
 -(void)getNewsByPage:(NSInteger)page{
-    NSLog(@"getting news by page %d",page);
     [self restoreCookies];
     NSString *fullUrlString = [kRaenApiGetNewsByPage stringByAppendingString:[NSString stringWithFormat:@"%ld",(long)page]];
     NSLog(@"fullURLString %@",fullUrlString);
@@ -276,7 +276,7 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
     
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     NSString *urlStr= kRaenApiGetCart;
-    NSString* token = [[Socializer sharedManager] socialAccessToken];
+    NSString* token = [[Socializer sharedManager] raenAPIToken];
     if (token) {
         urlStr =   [urlStr stringByAppendingString:[NSString stringWithFormat:@"token/%@",token]];
     }
@@ -308,7 +308,7 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
     SpecItem *specItem = item.specItems[index];
     //NSLog(@"adding item in cart  %@",item);
     NSString *price =item.priceNew.length >2 ? item.priceNew : item.price;
-    NSString *bodyParams =[NSString stringWithFormat:@"name=%@ %@,%@&id=%@&price=%@&qty=1&token=%@",item.brand,item.title,specItem.color,specItem.db1cId,price,[[Socializer sharedManager] socialAccessToken]];
+    NSString *bodyParams =[NSString stringWithFormat:@"name=%@ %@,%@&id=%@&price=%@&qty=1&token=%@",item.brand,item.title,specItem.color,specItem.db1cId,price,[[Socializer sharedManager] raenAPIToken]];
     NSLog(@"parameters %@",bodyParams);
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [JSONHTTPClient JSONFromURLWithString:kRaenApiSendToCartItem
@@ -334,7 +334,7 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
 -(void)changeCartItemQTY:(NSString*)qty byRowID:(NSString*)rowid{
     [self restoreCookies];
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-    NSString* token = [[Socializer sharedManager] socialAccessToken];
+    NSString* token = [[Socializer sharedManager] raenAPIToken];
     //token  = token ? token : @"0";
     NSDictionary *params = @{@"rowid":rowid,
                              @"qty":qty,
@@ -359,14 +359,18 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                }];
 }
 #pragma mark - Checkout
-- (void)checkoutWithParameters:(NSDictionary*)orderParams{
-    NSLog(@"checkoutWithParameters %@",orderParams);
+- (void)checkoutFastWithFirstName:(NSString*)firstName andPhone:(NSString*)phone{
     [self restoreCookies];
-    NSString *token = [[Socializer sharedManager] socialAccessToken];
-    NSMutableDictionary *tmpDict = orderParams.mutableCopy;
+    NSString *token = [[Socializer sharedManager] raenAPIToken];
+    NSMutableDictionary *tmpDict = [[NSMutableDictionary alloc]
+                                    initWithDictionary:@{@"firstname": firstName,
+                                                         @"phone":phone,
+                                                         @"delivery":@"fast"}];
+   //add token if exist
     if (token) {
         [tmpDict addEntriesFromDictionary:@{@"token":token}];
     }
+    NSLog(@"checking out fast with parameters %@",tmpDict);
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     
     [JSONHTTPClient JSONFromURLWithString:kraenAPICheckout
@@ -399,12 +403,18 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                   headers:@{@"Authorization":kRaenAPIAuthValue}
                                completion:^(id json, JSONModelError *err) {
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-        
-        if (err) {
-            [self.delegate didFailuerAPIAuthorizationWithResponse:json];
-        }else{
-            [self.delegate didSuccessAPIAuthorizedWithResponse:json];
-        }
+                                   [self saveCookies];
+                                   if ([json isKindOfClass:[NSDictionary class]]) {
+                                       if (err || json[@"error"]) {
+                                           [self.delegate didFailuerAPIAuthorizationWithResponse:json];
+                                       }
+                                       if (json[@"success"]) {
+                                           [Socializer sharedManager].raenAPIToken = json[@"token"];
+                                           [[Socializer sharedManager] saveAuthUserDataToDefaults];
+                                           
+                                           [self.delegate didSuccessAPIAuthorizedWithResponse:json];
+                                       }
+                                   }
     }];
 }
 #pragma mark - authorization via social networks
@@ -438,7 +448,7 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
        if ([json isKindOfClass:[NSDictionary class]]) {
            NSDictionary *jsonDict = json;
-           NSLog(@"json RAEN API authorization %@",jsonDict);
+
            NSString *errorMsg = jsonDict[@"error"];
            //if email required
            if ([errorMsg isEqualToString:@"Email is required"]) {
@@ -453,8 +463,9 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
                [self.delegate didFailuerAPIAuthorizationWithResponse:jsonDict];
            }
            if (jsonDict[@"success"]) {
-               _raenAPIAccessToken = jsonDict[@"token"];
+               [Socializer sharedManager].raenAPIToken = jsonDict[@"token"];
                [[Socializer sharedManager] saveAuthUserDataToDefaults];
+               
                [self.delegate didSuccessAPIAuthorizedWithResponse:jsonDict];
            }
            
@@ -466,7 +477,7 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
                                   
     
 }
-- (void)registrationNewUserWithEmail:(NSString*)email
+- (void)signInNewUserWithEmail:(NSString*)email
                       firstName:(NSString*)firstName
                        lastName:(NSString*)lastName
                           phone:(NSString*)phone
@@ -485,19 +496,18 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
                                      @"link"        : socialLink ?  socialLink : @""
                                      };
 
-    NSLog(@"registrationNewUserWith %@",optionalValues);
+    NSLog(@"sign in new user with options %@",optionalValues);
     if (![socialId isEqualToString:@""] && ![accessToken isEqualToString:@""] && ![socialId isEqualToString:@""]) {
         [self authAPIVia:socialId withuserIdentifier:userId accessToken:accessToken optionalParameters:optionalValues];
     }else{
         NSLog(@"----NO socialID/AccessToken/SocialID! Can't sign in new user!-----");
-    }
-    
+    }    
 }
 
 #pragma mark - User Info 
 -(void)userInfo{
     [self restoreCookies];
-    NSString *token =[Socializer sharedManager].socialTokenFromDefaults;
+    NSString *token =[Socializer sharedManager].raenAPIToken;
     if (token) {
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
         NSString *fullUrl = [kRaenAPIUserInfo stringByAppendingString:token];
@@ -508,18 +518,24 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
                                    orBodyData:nil
                                       headers:@{@"Authorization":kRaenAPIAuthValue}
                                    completion:^(id json, JSONModelError *err) {
-                                       [self saveCookies];
-                                       NSLog(@"user info json %@",json);
                                        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-                                       if ([json isKindOfClass:[NSDictionary class]]) {
-                                           NSError *jsonInitializationError;
-                                           UserInfoModel *userInfo = [[UserInfoModel alloc] initWithDictionary:json error:&jsonInitializationError];
-                                           if (jsonInitializationError) {
-                                               NSLog(@"jsonInitializationError %@",jsonInitializationError);
+                                       [self saveCookies];
+                                       
+                                       if (json[@"error"]) {
+                                           NSLog(@"---ERROR: %@---",json[@"error"]);
+                                           [[Socializer sharedManager]logOutFromCurrentSocial];
+                                       }else{
+                                           if ([json isKindOfClass:[NSDictionary class]]) {
+                                               NSError *jsonInitializationError;
+                                               UserInfoModel *userInfo = [[UserInfoModel alloc] initWithDictionary:json error:&jsonInitializationError];
+                                               if (jsonInitializationError) {
+                                                   NSLog(@"jsonInitializationError %@",jsonInitializationError);
+                                               }else{
+                                                   [self.delegate didReceiveUserInfo:userInfo];
+                                               }
+                                               
                                            }
-                                           [self.delegate didReceiveUserInfo:userInfo];
                                        }
-            
         }];
     }else{
         NSLog(@"---Can't get userInfo cause user NOT authorized! (token = nil) ----");
@@ -528,7 +544,7 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
 #pragma mark - User Orders
 -(void)userOrders{
     [self restoreCookies];
-    NSString *token =[Socializer sharedManager].socialTokenFromDefaults;
+    NSString *token =[Socializer sharedManager].raenAPIToken;
     if (token) {
         [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
         NSString* fullUrl = [kRaenAPIUserOrders stringByAppendingString:token];
@@ -539,13 +555,18 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
                                    orBodyData:nil
                                       headers:@{@"Authorization":kRaenAPIAuthValue}
                                    completion:^(id json, JSONModelError *err) {
-                                       NSLog(@"user orders json %@",json);
                                        [self saveCookies];
                                        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
                                        if ([json isKindOfClass:[NSDictionary class]]) {
-                                           [self.delegate didReceiveUserOrders:json];
+                                           if (json[@"error"]) {
+                                               NSLog(@"---ERORR: %@-----",json[@"error"]);
+                                           }
+                                       }else{
+                                           if ([json isKindOfClass:[NSArray class]]) {
+                                               NSArray *orders = [OrderModel arrayOfModelsFromDictionaries:json error:&err];
+                                               [self.delegate didReceiveUserOrders:orders];
+                                           }
                                        }
-        
     }];
     }else{
         NSLog(@"---Can't get user orders cause user NOT authorized! (token = nil) ----");

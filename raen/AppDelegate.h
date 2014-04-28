@@ -15,7 +15,7 @@
 
 extern NSString* RAENSHOP_CART_ITEMS;
 
-@interface AppDelegate : UIResponder <UIApplicationDelegate,RaenAPICommunicatorDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate,RaenAPICommunicatorDelegate,UITabBarControllerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 

@@ -20,11 +20,13 @@ extern NSString* kFacebookAppID;
 
 //NSUserDefault keys
 extern NSString* kSocializerAuthDict;
+extern NSString* kSocializerRaenAPIToken;
 extern NSString* kSocializerSocialAccessToken;
 extern NSString* kSocializerSocialIdentifier;
 extern NSString* kSocializerSocialUserID;
 extern NSString* kSocializerSocialUserFullName;
 extern NSString* kSocializerSocialUserEmail;
+extern NSString* kUserPhone;
 
 //Social Identifiers
 extern NSString *kVkontakteIdentifier;
@@ -53,6 +55,8 @@ extern NSString *kFacebookIdentifier;
 @property (nonatomic,strong) NSString *socialUsername;
 @property (nonatomic,strong) NSString *socialUserEmail;
 @property (nonatomic,strong) NSString *socialIdentificator;
+@property (nonatomic,strong) NSString *raenAPIToken;
+@property (nonatomic,strong) NSString *userPhone;
 
 @property (nonatomic,strong)  FBSession *fbSession;
 @property (nonatomic,strong)  GPPSignIn *googleSignIn;
@@ -80,6 +84,7 @@ extern NSString *kFacebookIdentifier;
 
 //Local storage manager
 - (NSString*)socialTokenFromDefaults;
+- (NSString*)raenAPITokenFromDefaults;
 - (NSString*)socialIdFromDefaults;
 - (NSString*)socialUserEmailFromDefaults;
 - (NSString*)socialUserNameFromDefaults;

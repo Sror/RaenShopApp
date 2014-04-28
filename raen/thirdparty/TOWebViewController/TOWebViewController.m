@@ -270,6 +270,7 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     //Create the all-encompassing container view
     UIView *view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] applicationFrame]];
     view.backgroundColor = (self.hideWebViewBoundaries ? [UIColor whiteColor] : BACKGROUND_COLOR);
+  
     view.opaque = YES;
     view.clipsToBounds = YES;
     self.view = view;
@@ -518,6 +519,7 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     
     return YES;
 }
+
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
 {
@@ -957,7 +959,7 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     MFMailComposeViewController *mailViewController = [[MFMailComposeViewController alloc] init];
     mailViewController.mailComposeDelegate = self;
     [mailViewController setMessageBody:[self.url absoluteString] isHTML:NO];
-    [self presentModalViewController:mailViewController animated:YES];
+    [self presentViewController:mailViewController animated:YES completion:nil];
 }
 
 - (void)mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error
@@ -970,7 +972,8 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     MFMessageComposeViewController *messageViewController = [[MFMessageComposeViewController alloc] init];
     messageViewController.messageComposeDelegate = self;
     [messageViewController setBody:[self.url absoluteString]];
-    [self presentModalViewController:messageViewController animated:YES];
+    [self presentViewController:messageViewController animated:YES completion:nil];
+    //[self presentModalViewController:messageViewController animated:YES];
 }
 
 - (void)messageComposeViewController:(MFMessageComposeViewController *)controller didFinishWithResult:(MessageComposeResult)result
@@ -982,7 +985,9 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
 {
     TWTweetComposeViewController *tweetComposer = [[TWTweetComposeViewController alloc] init];
     [tweetComposer addURL:self.url];
-    [self presentModalViewController:tweetComposer animated:YES];
+    
+    [self presentViewController:tweetComposer animated:YES completion:nil];
+    //[self presentModalViewController:tweetComposer animated:YES];
 }
 
 
@@ -1467,6 +1472,7 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     //hide the webview while the snapshot is animating
     self.webView.hidden = YES;
 }
+
 
 /* Called within the animation block. All views will be set to their 'destination' state. */
 - (void)animateWebViewRotationToOrientation:(UIInterfaceOrientation)toOrientation withDuration:(NSTimeInterval)duration

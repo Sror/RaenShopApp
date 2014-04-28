@@ -14,6 +14,9 @@
 #import "UserInfoModel.h"
 #import "UIImageView+WebCache.h"
 #import "OrderCell.h"
+#import "OrderModel.h"
+#import "OrderViewController.h"
+
 
 typedef enum SocialButtonTags {
     SocialButtonTwitter,
@@ -51,6 +54,7 @@ typedef enum SocialButtonTags {
 -(void)viewDidAppear:(BOOL)animated{
     [RaenAPICommunicator sharedManager].delegate = self;
     [Socializer sharedManager].delegate = self;
+    
     //add observer for twitter accounts store
     if ([[Socializer sharedManager].socialIdFromDefaults isEqualToString:@"Twitter"]) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_refreshTwitterAccounts) name:ACAccountStoreDidChangeNotification object:nil];
@@ -64,12 +68,10 @@ typedef enum SocialButtonTags {
     self.tableView.hidden = YES;
     [self updateUI];
 }
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
-
-   // [self updateUI];
 
 }
 -(void)viewWillDisappear:(BOOL)animated{
@@ -81,8 +83,10 @@ typedef enum SocialButtonTags {
 {
     if ([Socializer sharedManager].isAuthorizedAnySocial)
     {
+        [MBProgressHUD showHUDAddedTo:self.tableView animated:YES];
         [[RaenAPICommunicator sharedManager]  userInfo];
         [[RaenAPICommunicator sharedManager] userOrders];
+        
         UIBarButtonItem *logoutButton = [[UIBarButtonItem alloc]
                                          initWithTitle:@"Выход"
                                          style:UIBarButtonItemStylePlain
@@ -91,19 +95,21 @@ typedef enum SocialButtonTags {
         
         [self.navigationItem setRightBarButtonItem:logoutButton animated:YES];
         [self.signInSubview setHidden:YES];
-       // [self.tableView reloadData];
         [self.tableView setHidden:NO];
+        [self.tableView reloadData];
     }else
     {
-        
         [self.navigationItem setRightBarButtonItem:nil];
         [self.tableView setHidden:YES];
         [self.signInSubview setHidden:NO];
+        self.emailTextField.text = nil;
+        self.passwordTextField.text = nil;
     }
 }
 
 #pragma mark - RaenAPICommunocatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error {
+    [MBProgressHUD hideHUDForView:self.tableView animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription
                                                    delegate:self
                                           cancelButtonTitle:@"OK"
@@ -111,14 +117,20 @@ typedef enum SocialButtonTags {
     [alert show];
 }
 
--(void)didReceiveUserInfo:(id)userInfo{
-    NSLog(@"didReceiveUserInfo %@",(UserInfoModel*)userInfo);
-    _userInfo = (UserInfoModel*)userInfo;
+-(void)didReceiveUserInfo:(UserInfoModel*)userInfo{
+   [MBProgressHUD hideHUDForView:self.tableView animated:YES];
+    _userInfo = userInfo;
+    if (userInfo.phone.length>1) {
+        [Socializer sharedManager].userPhone = userInfo.phone;
+        [[Socializer sharedManager] saveAuthUserDataToDefaults];
+    }
     [self.tableView reloadData];
     
 }
--(void)didReceiveUserOrders:(NSDictionary *)userOrders{
-    NSLog(@"didReceiveUserOrders %@",userOrders);
+-(void)didReceiveUserOrders:(NSArray*)userOrders{
+    [MBProgressHUD hideHUDForView:self.tableView animated:YES];
+    self.orders = userOrders;
+    [self.tableView reloadData];
 }
 
 #pragma mark - socialButtonTapped
@@ -148,6 +160,7 @@ typedef enum SocialButtonTags {
     [[Socializer sharedManager] logOutFromCurrentSocial];
     [[RaenAPICommunicator sharedManager]deleteCookies];
     [[RaenAPICommunicator sharedManager]deleteCookieFromLocalStorage];
+     [[RaenAPICommunicator sharedManager] getItemsFromCart];
 }
 
 
@@ -179,7 +192,9 @@ typedef enum SocialButtonTags {
 #pragma mark - STEP2 RESPONSES
 #pragma mark - RaenAPICommunicator delegation methods
 -(void)didSuccessAPIAuthorizedWithResponse:(NSDictionary *)response{
-    NSLog(@"didSuccessAPIAuthorizedWithResponse %@",response);
+    //UPDATE CART BADGE
+    [[RaenAPICommunicator sharedManager] getItemsFromCart];
+    //
     [self updateUI];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
 }
@@ -191,11 +206,13 @@ typedef enum SocialButtonTags {
     [alertView show];
     
 }
-
+-(void)didReceiveCartItems:(NSArray *)items{
+   [self.tabBarController.tabBar.items[3] setBadgeValue:[NSString stringWithFormat:@"%i",items.count]];
+}
 -(void)didEmailRequest{
     
     if ([Socializer sharedManager].socialUserEmail.length>0) {
-        [[RaenAPICommunicator sharedManager] registrationNewUserWithEmail:[Socializer sharedManager].socialUserEmail
+        [[RaenAPICommunicator sharedManager]       signInNewUserWithEmail:[Socializer sharedManager].socialUserEmail
                                                                 firstName:[Socializer sharedManager].socialUsername
                                                                  lastName:nil
                                                                     phone:nil
@@ -248,7 +265,7 @@ typedef enum SocialButtonTags {
     if (section ==0) {
         return 1;
     }
-    return 5;
+    return _orders.count;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
    //UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"defaultCell"];
@@ -272,8 +289,10 @@ typedef enum SocialButtonTags {
     //ORDER CELL
     if (indexPath.section == 1) {
         OrderCell *cell = [tableView dequeueReusableCellWithIdentifier:@"orderCell"];
-        cell.numberAndDateLabel.text = @"order #1234 22.12.12";
-        cell.statusLabel.text = @"orderStatus";
+        OrderModel *order = self.orders[indexPath.row];
+        cell.numberAndDateLabel.text = [NSString stringWithFormat:@"№%@",order.id];
+        cell.statusLabel.text = [order.status isEqualToString:@"0"] ? nil:order.status;
+        
         return  cell;
     }
     
@@ -287,6 +306,20 @@ typedef enum SocialButtonTags {
     }
     return nil;
 }
+
+#pragma mark - UITableView delegation methods
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    if (indexPath.section !=0) {
+        [tableView deselectRowAtIndexPath:indexPath animated:YES];
+        OrderModel *order = self.orders[indexPath.row];
+        NSLog(@"order %@",order);
+        NSArray *goodsInOrder = order.goodsInOrder;
+        NSLog(@"goodsInOrder %@",goodsInOrder);
+        [self performSegueWithIdentifier:@"toOrderVC" sender:goodsInOrder];
+    }
+}
+
+
 #pragma mark - UITextField delegation methods
 -(void)textFieldDidBeginEditing:(UITextField *)textField{
     NSLog(@"textFieldDidBeginEditing");
@@ -294,12 +327,10 @@ typedef enum SocialButtonTags {
 
 -(void)textFieldDidEndEditing:(UITextField *)textField{
     if (textField.tag!=1) {
-        NSLog(@"_tmpUserEmail = %@",textField.text);
         _tmpUserEmail = textField.text;
     }
     if (textField.tag ==1) {
         _userPassword = textField.text;
-        NSLog(@"user password %@",_userPassword);
     }
 }
 
@@ -328,7 +359,6 @@ typedef enum SocialButtonTags {
         [[Socializer sharedManager] obtainAccessToAccountsWithBlock:^(BOOL granted) {
             dispatch_async(dispatch_get_main_queue(), ^{
                 if (granted) {
-                    NSLog(@"GRANTED!");
                     UIActionSheet *sheet = [[UIActionSheet alloc] initWithTitle:@"Выберите Twitter аккаунт"
                                                                        delegate:self
                                                               cancelButtonTitle:nil
@@ -345,7 +375,6 @@ typedef enum SocialButtonTags {
                     [alert show];
                     [[Socializer sharedManager] logOutFromCurrentSocial];
                     [MBProgressHUD hideHUDForView:self.view animated:YES];
-                    NSLog(@"You were not granted access to the Twitter accounts.");
                 }
             });
         }];
@@ -364,7 +393,6 @@ typedef enum SocialButtonTags {
 }
 #pragma mark - UIAlertViewDelegate
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    NSLog(@"_emailAlertView button clicked %d",buttonIndex);
     if (buttonIndex == 0) {
         if (![self validateEmail:_tmpUserEmail]) {
            [self rotateSignInSubviewWithCompletion:^{
@@ -372,9 +400,8 @@ typedef enum SocialButtonTags {
            }];
             
         }else{
-            NSLog(@"finish registration with email %@",[Socializer sharedManager].socialUserEmail);
             if (_tmpUserEmail) {
-                [[RaenAPICommunicator sharedManager] registrationNewUserWithEmail:_tmpUserEmail
+                [[RaenAPICommunicator sharedManager]       signInNewUserWithEmail:_tmpUserEmail
                                                                         firstName:[Socializer sharedManager].socialUsername
                                                                          lastName:nil
                                                                             phone:nil
@@ -390,6 +417,14 @@ typedef enum SocialButtonTags {
     {
         [MBProgressHUD hideHUDForView:self.view animated:YES];
         [[Socializer sharedManager] logOutFromCurrentSocial];
+    }
+}
+
+#pragma mark - Navigation methods
+-(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
+    if ([segue.identifier isEqualToString:@"toOrderVC"]) {
+        OrderViewController *orderVC = segue.destinationViewController;
+        orderVC.goodies = sender;
     }
 }
 
@@ -435,26 +470,35 @@ typedef enum SocialButtonTags {
 
 #pragma mark - SignInSubView animation
 -(void)rotateSignInSubviewWithCompletion:(void(^)(void))completionBlock{
-    [UIView animateWithDuration:0.1 animations:^{
+  
+    [UIView animateWithDuration:0.2 animations:^{
         CGFloat rotationAngleDegreesLeft = -10;
         CGFloat rotationAngleRadiansLeft = rotationAngleDegreesLeft * (M_PI/180);
         CATransform3D transform = CATransform3DIdentity;
         transform = CATransform3DRotate(transform, rotationAngleRadiansLeft, 0.0, 0.0, 1.0);
         self.signInSubview.layer.transform =transform;
+       
     } completion:^(BOOL finished) {
-        self.signInSubview.layer.transform = CATransform3DIdentity;
+        
         [UIView animateWithDuration:0.1 animations:^{
-            CGFloat rotationAngleDegreesRight = +10;
+            CGFloat rotationAngleDegreesRight = +20;
             CGFloat rotationAngleRadiansRight = rotationAngleDegreesRight * (M_PI/180);
             CATransform3D transform = CATransform3DIdentity;
             transform = CATransform3DRotate(transform, rotationAngleRadiansRight, 0.0, 0.0, 1.0);
             self.signInSubview.layer.transform =transform;
+            
         } completion:^(BOOL finished) {
-            self.signInSubview.layer.transform = CATransform3DIdentity;
-            completionBlock();
+            [UIView animateWithDuration:0.1 animations:^{
+                CATransform3D transform = CATransform3DIdentity;
+                transform = CATransform3DRotate(transform, 0, 0.0, 0.0, 1.0);
+                self.signInSubview.layer.transform =transform;
+            } completion:^(BOOL finished) {
+                completionBlock();
+            }];
+            
         }];
     }];
-    
+  
 }
 
 #pragma mark - didReceiveMemoryWarning
