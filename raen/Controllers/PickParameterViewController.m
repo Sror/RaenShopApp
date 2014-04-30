@@ -12,6 +12,11 @@
 #import "ColorModel.h"
 #import "FiltersViewController.h"
 
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
+
+
 static NSString * RAENAPP_CURRENT_FILTER_DEFAULTS_KEY = @"RAENAPP_CURRENT_FILTER_DEFAULTS_KEY";
 
 @interface PickParameterViewController (){
@@ -22,6 +27,15 @@ static NSString * RAENAPP_CURRENT_FILTER_DEFAULTS_KEY = @"RAENAPP_CURRENT_FILTER
 @end
 
 @implementation PickParameterViewController
+
+-(void)viewDidAppear:(BOOL)animated{
+    id tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName
+           value:@"Pick parameter Screen"];
+    [tracker send:[[GAIDictionaryBuilder createAppView] build]];
+}
+
+
 
 - (void)viewDidLoad
 {

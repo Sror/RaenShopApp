@@ -14,7 +14,13 @@
 #import "PickParameterViewController.h"
 #import "MBProgressHUD.h"
 
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
+
+
 @interface FiltersViewController ()<RaenAPICommunicatorDelegate>{
+    RaenAPICommunicator* _communicator;
     FilterModel *_filter;
     NSMutableDictionary *_filterDictionary;
 }
@@ -25,19 +31,29 @@
 @implementation FiltersViewController
 
 
+-(void)viewDidAppear:(BOOL)animated
+{
+    id tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName
+           value:@"Filters Screen"];
+    [tracker send:[[GAIDictionaryBuilder createAppView] build]];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [RaenAPICommunicator sharedManager].delegate = self;
+    _communicator = [[RaenAPICommunicator alloc] init];
+    _communicator.delegate = self;
     
     _filterDictionary = [NSMutableDictionary dictionary];
-    if (self.subcategoryID) {
-        // [RaenAPICommunicator sharedManager] get params of category
-        [[RaenAPICommunicator sharedManager] getParamsOfCategoryWithId:self.subcategoryID];
+    if (self.subcategoryID)
+    {
+        [_communicator getParamsOfCategoryWithId:self.subcategoryID];
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     }else{
         NSLog(@"there is NOT subcategory ID!");
     }
+    
 
 }
 

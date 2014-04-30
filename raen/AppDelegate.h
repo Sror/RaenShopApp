@@ -10,12 +10,7 @@
 #import "RaenAPICommunicator.h"
 #import "Socializer.h"
 
-#import "RaenAPICommunicator.h"
-#import "RaenAPICommunicatorDelegate.h"
-
-extern NSString* RAENSHOP_CART_ITEMS;
-
-@interface AppDelegate : UIResponder <UIApplicationDelegate,RaenAPICommunicatorDelegate,UITabBarControllerDelegate>
+@interface AppDelegate : UIResponder <UIApplicationDelegate,UITabBarControllerDelegate>
 
 @property (strong, nonatomic) UIWindow *window;
 

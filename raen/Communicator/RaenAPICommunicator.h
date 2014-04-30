@@ -19,7 +19,7 @@ extern int RaenAPIdefaultNewsItemsCountPerPage;
 @property (weak, nonatomic) id<RaenAPICommunicatorDelegate> delegate;
 @property (nonatomic,strong) NSString *raenAPIAccessToken;
 
-+ (RaenAPICommunicator*)sharedManager;
+//+ (RaenAPICommunicator*)sharedManager;
 
 #pragma mark - News
 - (void)getNewsByPage:(NSInteger)page;

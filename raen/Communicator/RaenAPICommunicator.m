@@ -23,6 +23,10 @@
 #import "UserInfoModel.h"
 #import "OrderModel.h"
 
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
+
 
 int RaenAPIdefaulSubcategoryItemsCountPerPage = 30;
 int RaenAPIdefaultNewsItemsCountPerPage = 10;
@@ -49,6 +53,8 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
 #define kraenAPICheckout @"http://raenshop.ru/api/catalog/checkout/"
 
 @implementation RaenAPICommunicator
+
+/*
 + (RaenAPICommunicator*)sharedManager {
     static RaenAPICommunicator * __sharedManager;
     static dispatch_once_t onceToken;
@@ -57,6 +63,8 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
     });
     return __sharedManager;
 }
+*/
+
 #pragma mark - get News
 -(void)getNewsByPage:(NSInteger)page{
     [self restoreCookies];
@@ -318,6 +326,7 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                   headers:@{@"Authorization":kRaenAPIAuthValue}
                                completion:^(id json, JSONModelError *err) {
                                    [self saveCookies];
+                                   NSLog(@"did add item to cart json response :%@",json);
                                    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
                                    if(!err )
                                    {
@@ -330,6 +339,15 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                    }
 
                                }];
+    
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    NSLog(@"tracker send event");
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"API communication"
+                                                          action:@"add item to cart"
+                                                           label:bodyParams
+                                                           value:nil] build]];
+    
+
 }
 -(void)changeCartItemQTY:(NSString*)qty byRowID:(NSString*)rowid{
     [self restoreCookies];
@@ -353,7 +371,7 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                        [self.delegate didChangeCartItemQTYWithResponse:json];
                                    }
                                    if (err!=nil) {
-                                       //[self.delegate didFailureChangeCartItemQTYWithError:err];
+                                       
                                        NSLog(@"error to change qty item from cart %@",err.localizedDescription);
                                    }
                                }];
@@ -381,7 +399,7 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                completion:^(id json, JSONModelError *err) {
                                    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
                                    [self saveCookies];
-                                   NSLog(@"json response %@",json);
+                                   
                                    if ([json isKindOfClass:[NSDictionary class]]) {
                                        [self.delegate didCheckoutWithResponse:json];
                                    }
@@ -390,6 +408,12 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                    }
      
     }];
+    
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"API communication"
+                                                          action:@"Checkout"
+                                                           label:[NSString stringWithFormat:@"%@",tmpDict]
+                                                           value:nil] build]];
     
 }
 #pragma mark - Authorization via email
@@ -416,7 +440,13 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                        }
                                    }
     }];
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"API communication"
+                                                          action:@"Email/pass authorization"
+                                                           label:email
+                                                           value:nil] build]];
 }
+
 #pragma mark - authorization via social networks
 -(void)authAPIVia:(NSString *)socialName withuserIdentifier:(NSString*)userId
       accessToken:(NSString*)token
@@ -448,7 +478,7 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
        if ([json isKindOfClass:[NSDictionary class]]) {
            NSDictionary *jsonDict = json;
-
+          
            NSString *errorMsg = jsonDict[@"error"];
            //if email required
            if ([errorMsg isEqualToString:@"Email is required"]) {
@@ -497,6 +527,7 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
                                      };
 
     NSLog(@"sign in new user with options %@",optionalValues);
+    
     if (![socialId isEqualToString:@""] && ![accessToken isEqualToString:@""] && ![socialId isEqualToString:@""]) {
         [self authAPIVia:socialId withuserIdentifier:userId accessToken:accessToken optionalParameters:optionalValues];
     }else{

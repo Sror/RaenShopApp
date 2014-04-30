@@ -17,6 +17,10 @@
 #import "OrderModel.h"
 #import "OrderViewController.h"
 
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
+
 
 typedef enum SocialButtonTags {
     SocialButtonTwitter,
@@ -27,10 +31,12 @@ typedef enum SocialButtonTags {
 
 @interface ProfileViewController ()<RaenAPICommunicatorDelegate,SocializerDelegate,UIAlertViewDelegate,UITextFieldDelegate,UIActionSheetDelegate>
 {
+    RaenAPICommunicator * _communicator;
     UIAlertView *_emailAlert;
     NSString * _tmpUserEmail;
     NSString* _userPassword;
     UserInfoModel* _userInfo;
+    UIRefreshControl* _refreshControl;
 }
 
 @property (weak, nonatomic) IBOutlet UIView *signInSubview;
@@ -52,9 +58,6 @@ typedef enum SocialButtonTags {
 @implementation ProfileViewController
 
 -(void)viewDidAppear:(BOOL)animated{
-    [RaenAPICommunicator sharedManager].delegate = self;
-    [Socializer sharedManager].delegate = self;
-    
     //add observer for twitter accounts store
     if ([[Socializer sharedManager].socialIdFromDefaults isEqualToString:@"Twitter"]) {
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(_refreshTwitterAccounts) name:ACAccountStoreDidChangeNotification object:nil];
@@ -62,30 +65,41 @@ typedef enum SocialButtonTags {
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
     
-    [self.signInSubview.layer setCornerRadius:5.0];
-    [self.signInButton.layer setCornerRadius:5.0];
-    
-    self.tableView.hidden = YES;
-    [self updateUI];
+    id tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName
+           value:@"Profile Screen"];
+    [tracker send:[[GAIDictionaryBuilder createAppView] build]];
 }
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    [Socializer sharedManager].delegate = self;
+    _communicator = [[RaenAPICommunicator alloc] init];
+    _communicator.delegate = self;
+    
+    [self.signInSubview.layer setCornerRadius:5.0];
+    [self.signInButton.layer setCornerRadius:5.0];
+    [self setupRefreshControl];
+    [self performSelectorOnMainThread:@selector(updateUI) withObject:nil waitUntilDone:YES];
+}
 
+#pragma mark - UIRefreshControl
+-(void)setupRefreshControl{
+    _refreshControl = [[UIRefreshControl alloc] init];
+    [_refreshControl addTarget:self action:@selector(updateUI) forControlEvents:UIControlEventValueChanged];
+    [self.tableView addSubview:_refreshControl];
 }
--(void)viewWillDisappear:(BOOL)animated{
-    [[NSNotificationCenter defaultCenter]removeObserver:self];
-}
+
 
 #pragma mark - setupUI
 -(void)updateUI
 {
     if ([Socializer sharedManager].isAuthorizedAnySocial)
     {
-        [MBProgressHUD showHUDAddedTo:self.tableView animated:YES];
-        [[RaenAPICommunicator sharedManager]  userInfo];
-        [[RaenAPICommunicator sharedManager] userOrders];
+        [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        [_communicator  userInfo];
+        [_communicator userOrders];
         
         UIBarButtonItem *logoutButton = [[UIBarButtonItem alloc]
                                          initWithTitle:@"Выход"
@@ -104,12 +118,14 @@ typedef enum SocialButtonTags {
         [self.signInSubview setHidden:NO];
         self.emailTextField.text = nil;
         self.passwordTextField.text = nil;
+        [_refreshControl endRefreshing];
     }
 }
 
 #pragma mark - RaenAPICommunocatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error {
-    [MBProgressHUD hideHUDForView:self.tableView animated:YES];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    [_refreshControl endRefreshing];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription
                                                    delegate:self
                                           cancelButtonTitle:@"OK"
@@ -117,10 +133,13 @@ typedef enum SocialButtonTags {
     [alert show];
 }
 
--(void)didReceiveUserInfo:(UserInfoModel*)userInfo{
-   [MBProgressHUD hideHUDForView:self.tableView animated:YES];
+-(void)didReceiveUserInfo:(UserInfoModel*)userInfo
+{
+   [MBProgressHUD hideHUDForView:self.view animated:YES];
+    [_refreshControl endRefreshing];
     _userInfo = userInfo;
-    if (userInfo.phone.length>1) {
+    if (userInfo.phone.length>1)
+    {
         [Socializer sharedManager].userPhone = userInfo.phone;
         [[Socializer sharedManager] saveAuthUserDataToDefaults];
     }
@@ -128,7 +147,8 @@ typedef enum SocialButtonTags {
     
 }
 -(void)didReceiveUserOrders:(NSArray*)userOrders{
-    [MBProgressHUD hideHUDForView:self.tableView animated:YES];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    [_refreshControl endRefreshing];
     self.orders = userOrders;
     [self.tableView reloadData];
 }
@@ -136,11 +156,15 @@ typedef enum SocialButtonTags {
 #pragma mark - socialButtonTapped
 
 - (IBAction)socialButtonTapped:(id)sender {
+    //hide keyboard
+    [_emailTextField resignFirstResponder];
+    [_passwordTextField resignFirstResponder];
+    
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+  
     switch (((UIButton*)sender).tag) {
         case SocialButtonTwitter:
             [self _refreshTwitterAccounts];
-            //[[Socializer sharedManager] loginTwitter];
             break;
             case SocialButtonFacebook:
             [[Socializer sharedManager] loginFacebook];
@@ -153,14 +177,13 @@ typedef enum SocialButtonTags {
         default:
             break;
     }
-    
 }
 
 -(void)logoutButtonPressed{
     [[Socializer sharedManager] logOutFromCurrentSocial];
-    [[RaenAPICommunicator sharedManager]deleteCookies];
-    [[RaenAPICommunicator sharedManager]deleteCookieFromLocalStorage];
-     [[RaenAPICommunicator sharedManager] getItemsFromCart];
+    [_communicator deleteCookies];
+    [_communicator deleteCookieFromLocalStorage];
+    [_communicator getItemsFromCart];
 }
 
 
@@ -170,22 +193,38 @@ typedef enum SocialButtonTags {
     [viewController presentIn:self];
 }
 -(void)successfullyAuthorizedToSocialNetwork{
-    //[self updateUI];
     //Step 2 - send request to RAEN API
-    [[RaenAPICommunicator sharedManager] authAPIVia:[Socializer sharedManager].socialIdentificator
+    [_communicator authAPIVia:[Socializer sharedManager].socialIdentificator
                                  withuserIdentifier:[Socializer sharedManager].socialUserId
                                         accessToken:[Socializer sharedManager].socialAccessToken
                                  optionalParameters:nil];
+    
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Social auth"
+                                                          action:@"successfullyAuthorizedToSocialNetwork"
+                                                           label:[Socializer sharedManager].socialIdentificator
+                                                           value:nil] build]];
 }
 -(void)failureAuthorization{
     [self updateUI];
-    [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Social auth"
+                                                          action:@"failureAuthorization"
+                                                           label:[Socializer sharedManager].socialIdentificator
+                                                           value:nil] build]];
 }
 
 -(void)successLogout{
-    NSLog(@"got successLogout");
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     [self updateUI];
+    
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Social auth"
+                                                          action:@"successLogout"
+                                                           label:[Socializer sharedManager].socialIdentificator
+                                                           value:nil] build]];
     
 }
 
@@ -193,10 +232,17 @@ typedef enum SocialButtonTags {
 #pragma mark - RaenAPICommunicator delegation methods
 -(void)didSuccessAPIAuthorizedWithResponse:(NSDictionary *)response{
     //UPDATE CART BADGE
-    [[RaenAPICommunicator sharedManager] getItemsFromCart];
+    [_communicator getItemsFromCart];
     //
     [self updateUI];
-    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    [MBProgressHUD hideHUDForView:self.view
+                         animated:YES];
+    
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"API auth"
+                                                          action:@"didSuccessAPIAuthorized"
+                                                           label:[Socializer sharedManager].socialIdentificator
+                                                           value:nil] build]];
 }
 -(void)didFailuerAPIAuthorizationWithResponse:(NSDictionary *)response{
     NSLog(@"didFailuerAPIAuthorizationWithResponse %@",response);
@@ -205,14 +251,22 @@ typedef enum SocialButtonTags {
     UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:response[@"login_error"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alertView show];
     
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"API auth"
+                                                          action:@"Failure API auth"
+                                                           label:[NSString stringWithFormat:@"Response %@",response]
+                                                           value:nil] build]];
+    
 }
+
 -(void)didReceiveCartItems:(NSArray *)items{
    [self.tabBarController.tabBar.items[3] setBadgeValue:[NSString stringWithFormat:@"%i",items.count]];
 }
+
 -(void)didEmailRequest{
     
     if ([Socializer sharedManager].socialUserEmail.length>0) {
-        [[RaenAPICommunicator sharedManager]       signInNewUserWithEmail:[Socializer sharedManager].socialUserEmail
+        [_communicator       signInNewUserWithEmail:[Socializer sharedManager].socialUserEmail
                                                                 firstName:[Socializer sharedManager].socialUsername
                                                                  lastName:nil
                                                                     phone:nil
@@ -401,7 +455,7 @@ typedef enum SocialButtonTags {
             
         }else{
             if (_tmpUserEmail) {
-                [[RaenAPICommunicator sharedManager]       signInNewUserWithEmail:_tmpUserEmail
+                [_communicator       signInNewUserWithEmail:_tmpUserEmail
                                                                         firstName:[Socializer sharedManager].socialUsername
                                                                          lastName:nil
                                                                             phone:nil
@@ -443,7 +497,7 @@ typedef enum SocialButtonTags {
             }];
             
         }else{
-            [[RaenAPICommunicator sharedManager] authViaEmail:_tmpUserEmail andPassword:_userPassword];
+            [_communicator authViaEmail:_tmpUserEmail andPassword:_userPassword];
         }
     }
 }
@@ -498,7 +552,6 @@ typedef enum SocialButtonTags {
             
         }];
     }];
-  
 }
 
 #pragma mark - didReceiveMemoryWarning

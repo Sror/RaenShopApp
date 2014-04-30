@@ -14,12 +14,15 @@
 #import "CategoryModel.h"
 #import "ChildrenModel.h"
 #import "ItemCardViewController.h"
-#import "GridItemsVC.h"
+#import "SubcategoryItemsVC.h"
 #import "MBProgressHUD.h"
-#import "CategoryItemsGridViewController.h"
+#import "CategoryItemsVC.h"
 #import "UIImageView+WebCache.h"
-
 #import "RaenAPICommunicator.h"
+
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
 
 @interface ShopViewController ()<RaenAPICommunicatorDelegate> {
     NSArray *_categories;
@@ -30,17 +33,24 @@
 
 @implementation ShopViewController
 
+-(void)viewDidAppear:(BOOL)animated
+{
+    id tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName
+           value:@"Shop Screen"];
+    [tracker send:[[GAIDictionaryBuilder createAppView] build]];
+}
+
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self.tableView setDelegate:self];
-    [self.tableView setDataSource:self];
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
-    [self setupRefreshControl];
     
+    [self setupRefreshControl];
     [self updateDataFromModel];
+    
 }
 
 #pragma mark - RefreshControl
@@ -152,7 +162,7 @@
     NSLog(@"indexedCV #%d, did selectItem at row %d",collectionView.index,indexPath.row);
     CategoryModel *category=_categories[collectionView.index];
     ChildrenModel *subCategory = category.childrens[indexPath.row];
-    [self performSegueWithIdentifier:@"toGridItemsVC" sender:subCategory.id];
+    [self performSegueWithIdentifier:@"toSubcategoryItemsVC" sender:subCategory.id];
 }
 
 
@@ -167,7 +177,7 @@
         
         NSInteger row = tapGestureRecognizer.view.tag;
         CategoryModel *category = _categories[row];
-        [self performSegueWithIdentifier:@"toCategoryItemsGridVC" sender:category.id];
+        [self performSegueWithIdentifier:@"toCategoryItemsVC" sender:category.id];
         
     }];
     
@@ -180,17 +190,13 @@
         ItemCardViewController *itemCardVC=segue.destinationViewController;
         itemCardVC.itemID = sender;
     }
-    if ([segue.identifier isEqualToString:@"toGridItemsVC"]) {
-        GridItemsVC *gridItemsVC = segue.destinationViewController;
-        gridItemsVC.subcategoryID = sender;
+    if ([segue.identifier isEqualToString:@"toSubcategoryItemsVC"]) {
+        SubcategoryItemsVC *subcategoryItemsVC = segue.destinationViewController;
+        subcategoryItemsVC.subcategoryID = sender;
     }
-    
-//    if ([segue.identifier isEqualToString:@"toBrowser"]) {
-//        BrowserViewController *browserVC = segue.destinationViewController;
-//        browserVC.link = sender;
-//    }
-    if ([segue.identifier isEqualToString:@"toCategoryItemsGridVC"]) {
-        CategoryItemsGridViewController *categoryItemsGridVC = segue.destinationViewController;
+
+    if ([segue.identifier isEqualToString:@"toCategoryItemsVC"]) {
+        CategoryItemsVC *categoryItemsGridVC = segue.destinationViewController;
         categoryItemsGridVC.currentCategoryId = sender;
     }
 }

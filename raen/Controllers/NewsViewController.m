@@ -16,30 +16,42 @@
 //slider
 #import "MainSliderCell.h"
 #import "SliderModel.h"
-
+#import "GAI.h"
+#import "GAIDictionaryBuilder.h"
+#import "GAIFields.h"
 
 @interface NewsViewController ()<RaenAPICommunicatorDelegate>{
+    RaenAPICommunicator* _communicator;
     NSMutableArray *_news;
     NSArray *_sliderItems;
     BOOL _gotNews;
     BOOL _gotSlider;
-    RaenAPICommunicator *_communicator;
 }
 
 @end
 
 @implementation NewsViewController
 
+-(void)viewDidAppear:(BOOL)animated{
+    id tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName
+           value:@"News Screen"];
+    [tracker send:[[GAIDictionaryBuilder createAppView] build]];
+}
+
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     _communicator = [[RaenAPICommunicator alloc] init];
-    [_communicator setDelegate:self];
+    _communicator.delegate = self;
+    [_communicator getItemsFromCart];
+    
     [self setupRefreshControl];
     _news = [NSMutableArray array];
     [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
 }
+
 
 #pragma mark - UIRefreshControl
 -(void)setupRefreshControl{
@@ -57,6 +69,7 @@
     [_communicator getSliderItems];
 }
 
+
 #pragma mark - RaenAPICommunicatorDelegate Methods
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
@@ -70,11 +83,10 @@
 }
 
 -(void)didReceiveNews:(NSArray *)news{
-    NSLog(@"didReceive %d news",news.count);
     _gotNews = YES;
-    if (_gotSlider) {
-        [MBProgressHUD hideHUDForView:self.view animated:YES];
-    }
+    
+    if (_gotSlider) [MBProgressHUD hideHUDForView:self.view animated:YES];
+    
     [self.refreshControl endRefreshing];
 
     NSInteger rowToScroll= _news.count;
@@ -97,12 +109,17 @@
     if (_gotNews) {
          [MBProgressHUD hideHUDForView:self.view animated:YES];
     }
-
     _sliderItems = array;
     [self.tableView reloadData];
     [self.refreshControl endRefreshing];
     
 }
+//Update cart tabbar icon
+-(void)didReceiveCartItems:(NSArray *)items
+{
+    [self.tabBarController.tabBar.items[3] setBadgeValue:[NSString stringWithFormat:@"%i",items.count]];
+}
+
 #pragma mark - UITableViewDataSource Methods
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
     
@@ -225,17 +242,14 @@
     if ([slider.action isEqualToString:@"toBrowser"]) {
         TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:slider.link]];
         [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
-
-//        webBrowser.hidesBottomBarWhenPushed = YES;
-//        [self.navigationController pushViewController:webBrowser animated:YES];
         
     }else if ([slider.action isEqualToString:@"toItemCardView"]){
         [self performSegueWithIdentifier:@"toItemCardView" sender:slider.id];
         
     }else if ([slider.action isEqualToString:@"toSaleOfDay"]){
         [self performSegueWithIdentifier:@"toSaleOfDay" sender:nil];
-    }else if ([slider.action isEqualToString:@"toGridItemsVC"]){
-        [self performSegueWithIdentifier:@"toGridItemsVC" sender:slider.id];
+    }else if ([slider.action isEqualToString:@"toSubcategoryItemsVC"]){
+        [self performSegueWithIdentifier:@"toSubcategoryItemsVC" sender:slider.id];
     }
 }
 

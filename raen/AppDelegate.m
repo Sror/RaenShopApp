@@ -11,7 +11,11 @@
 #import "VKSdk.h"
 #import <GooglePlus/GooglePlus.h>
 
+#import "GAI.h"
+#import "GAIDictionaryBuilder.h"
 
+
+#define kGoogleAnalyticsTrackingId @"UA-50455989-1"
 
 NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 
@@ -25,9 +29,22 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
     UITabBarController *tabController = (UITabBarController *) self.window.rootViewController;
     tabController.delegate = self;
    
-
+    //google analytics
     
-    [self updateCartBadge];
+    // Optional: automatically send uncaught exceptions to Google Analytics.
+    [GAI sharedInstance].trackUncaughtExceptions = YES;
+    // Optional: set Google Analytics dispatch interval to e.g. 20 seconds.
+    [GAI sharedInstance].dispatchInterval = 20;
+    // Optional: set debug to YES for extra debugging information.
+   // [GAI sharedInstance].debug = YES;
+    // Create tracker instance.
+    id<GAITracker> tracker = [[GAI sharedInstance] trackerWithTrackingId:kGoogleAnalyticsTrackingId];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"App"
+                                                         action:@"Запустил приложение"
+                                                           label:nil
+                                                           value:nil] build]];
+    
+   // [self updateCartBadge];
     return YES;
 }
 
@@ -74,37 +91,25 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [FBAppCall handleDidBecomeActive];
     [FBAppCall handleDidBecomeActiveWithSession:[Socializer sharedManager].fbSession];
-    
+    NSLog(@"_fbSession %@",[Socializer sharedManager].fbSession);
+                            
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     NSLog(@"applicationWillTerminate");
-    [[RaenAPICommunicator sharedManager] saveCookies];
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     NSLog(@"closing facebook session");
     [[Socializer sharedManager].fbSession close];
 }
 
-#pragma mark - RAEN API cummunitator methods
--(void)updateCartBadge{
-    [RaenAPICommunicator sharedManager].delegate = self;
-    [[RaenAPICommunicator sharedManager] getItemsFromCart];
-}
-#pragma mark - RAEN API Delegation methods
--(void)didReceiveCartItems:(NSArray *)items{
-    UITabBarController *tabController = (UITabBarController *) self.window.rootViewController;
-    [tabController.tabBar.items[3] setBadgeValue:[NSString stringWithFormat:@"%i",items.count]];
-}
--(void)fetchingFailedWithError:(JSONModelError *)error{
-    NSLog(@"error to update cart icon badge");
-}
+#pragma mark -UITabBarController Delegate
 
-#pragma mark - 
 -(NSUInteger)tabBarControllerSupportedInterfaceOrientations:(UITabBarController *)tabBarController{
     return  UIInterfaceOrientationMaskPortrait;
 }
 -(UIInterfaceOrientation)tabBarControllerPreferredInterfaceOrientationForPresentation:(UITabBarController *)tabBarController{
     return UIInterfaceOrientationPortrait;
 }
+
 @end

@@ -15,9 +15,14 @@
 #import "UIImageView+WebCache.h"
 #import "MBProgressHUD.h"
 
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
+
 
 @interface CartViewController () <RaenAPICommunicatorDelegate,UITextFieldDelegate,UIAlertViewDelegate>
 {
+    RaenAPICommunicator* _communicator;
     UIAlertView *_checkOutAlertView;
     BOOL _checkOutAlertViewShown;
     NSArray *_items;
@@ -31,22 +36,31 @@
 @synthesize tabBarItem;
 
 
+
 -(void)viewDidAppear:(BOOL)animated{
     [super viewDidAppear:animated];
     
-    //User Interface
+    _communicator = [[RaenAPICommunicator alloc] init];
+    _communicator.delegate = self;
+    
+    //Keyboard observers
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillShow:) name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(keyboardWillHide:) name:UIKeyboardWillHideNotification object:nil];
-    [RaenAPICommunicator sharedManager].delegate = self;
+    
     [self updateDataFromAPI];
-
+    
+    id tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName
+           value:@"Cart Screen"];
+    [tracker send:[[GAIDictionaryBuilder createAppView] build]];
 }
+
 
 -(void)updateDataFromAPI{
     //[self.tableView setHidden:YES];
     [self.subView setHidden:YES];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    [[RaenAPICommunicator sharedManager] getItemsFromCart];
+    [_communicator getItemsFromCart];
 }
 
 -(void)updateTabbarBadge
@@ -56,7 +70,6 @@
 
 -(void)viewWillDisappear:(BOOL)animated{
     [super viewWillDisappear:animated];
-    
     [[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillShowNotification object:nil];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
@@ -64,7 +77,6 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
     [self.subView.layer setCornerRadius:10.0];
 }
 
@@ -87,6 +99,12 @@
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     
     [self updateTabbarBadge];
+    
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Cart"
+                                                          action:@"didReceiveCartItems"
+                                                           label:@"Items.count"
+                                                           value:@(items.count)] build]];
 }
 
 -(void)fetchingFailedWithError:(JSONModelError *)error
@@ -103,7 +121,7 @@
         UIAlertView *alert  =[[UIAlertView alloc] initWithTitle:@"Ошибка" message:response[@"error"] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }
-    [[RaenAPICommunicator sharedManager] getItemsFromCart];
+    [_communicator getItemsFromCart];
     
 }
 -(void)didFailureChangeCartItemQTYWithError:(JSONModelError *)error{
@@ -176,7 +194,7 @@
 
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         CartItemModel *cartItem = _items[indexPath.row];
-        [[RaenAPICommunicator sharedManager] changeCartItemQTY:@"0" byRowID:cartItem.rowid];
+        [_communicator changeCartItemQTY:@"0" byRowID:cartItem.rowid];
     }
 }
 
@@ -249,7 +267,7 @@
         NSString* phone =[alertView textFieldAtIndex:1].text;
         if (firstName.length>1 && firstName.length<20 && phone.length>7 && phone.length<20)
         {
-            [[RaenAPICommunicator sharedManager]checkoutFastWithFirstName:firstName andPhone:phone];
+            [_communicator checkoutFastWithFirstName:firstName andPhone:phone];
             [MBProgressHUD showHUDAddedTo:self.view animated:YES];
 
         }else{
@@ -300,7 +318,7 @@
     }
     if (![cartItem.qty isEqualToString:textField.text]) {
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-        [[RaenAPICommunicator sharedManager] changeCartItemQTY:textField.text byRowID:cartItem.rowid];
+        [_communicator changeCartItemQTY:textField.text byRowID:cartItem.rowid];
     }
     _activeTextField = nil;
 }

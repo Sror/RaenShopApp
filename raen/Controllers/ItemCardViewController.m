@@ -23,31 +23,42 @@
 #import "UIImageView+WebCache.h"
 #import "MBProgressHUD.h"
 
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
+
 #define IS_IPHONE_5 ( fabs( ( double )[ [ UIScreen mainScreen ] bounds ].size.height - ( double )568 ) < DBL_EPSILON )
 
 @interface ItemCardViewController ()<RaenAPICommunicatorDelegate,MWPhotoBrowserDelegate> {
-    
+    RaenAPICommunicator *_communicator;
     ItemModel *_item;
     NSMutableArray *_properties;
-    RaenAPICommunicator *_communicator;
 }
 @property (nonatomic,strong) NSMutableArray *properties;
 @end
 
 @implementation ItemCardViewController
 
+-(void)viewDidAppear:(BOOL)animated
+{
+    id tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName
+           value:@"Item card Screen"];
+    [tracker send:[[GAIDictionaryBuilder createAppView] build]];
+   
+}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    [self.tableView setHidden:YES];
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
+    
+    [self.tableView setHidden:YES];
     [self setupRefreshControl];
     if (self.itemID) {
         [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
     }
-    
 
 }
 - (void)didReceiveMemoryWarning
@@ -177,6 +188,7 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSLog(@"heightForRowAtIndexPath section %i , row %i",indexPath.section,indexPath.row);
     //set height for first tableview cell
     if (indexPath.section==0) {
         UIFont *font = [UIFont fontWithName:@"HelveticaNeue" size:14];
@@ -215,6 +227,7 @@
     return 44;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+    NSLog(@"cellForRowAtIndexPath section %i row %i",indexPath.section, indexPath.row);
     //Photo slider
     if (indexPath.section == 0) {
         //item card cell
@@ -260,6 +273,7 @@
         paramStr = [paramStr stringByAppendingString:[NSString stringWithFormat:@"\nЦвет: %@",specItem.color]];
         cell.textView.text = paramStr;
         [cell.addToCartButton setTag:indexPath.row];
+       
         [cell.addToCartButton addTarget:self action:@selector(buyButtonPressed:)
                        forControlEvents:UIControlEventTouchUpInside];
         
@@ -359,6 +373,7 @@
     
     [self.view addSubview:starView];
     // begin ---- apply position animation
+    
 	CAKeyframeAnimation *pathAnimation = [CAKeyframeAnimation animationWithKeyPath:@"position"];
     pathAnimation.calculationMode = kCAAnimationPaced;
     pathAnimation.fillMode = kCAFillModeForwards;
@@ -370,9 +385,9 @@
 	CGPoint endPoint = CGPointZero;
     if (IS_IPHONE_5)
     {
-        endPoint = CGPointMake(265, 550);
+        endPoint = CGPointMake(275, 550);
     }else{
-        endPoint = CGPointMake(265, 440);
+        endPoint = CGPointMake(275, 440);
     }
 	CGMutablePathRef curvedPath = CGPathCreateMutable();
     CGPathMoveToPoint(curvedPath, NULL, starView.frame.origin.x, starView.frame.origin.y);
@@ -390,7 +405,7 @@
 	[starView.layer addAnimation:pathAnimation forKey:@"curveAnimation"];
 	[starView.layer addAnimation:basic forKey:@"transform"];
 	
-	[starView performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:0.8];
+	[starView performSelector:@selector(removeFromSuperview) withObject:nil afterDelay:0.75];
     
 }
 #pragma mark - Helpers

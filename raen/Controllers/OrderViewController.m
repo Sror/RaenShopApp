@@ -10,20 +10,24 @@
 
 #import "UIImageView+WebCache.h"
 #import "CartCell.h"
+
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
+
 @interface OrderViewController ()
 
 @end
 
 @implementation OrderViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-    }
-    return self;
+-(void)viewDidAppear:(BOOL)animated{
+    id tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName
+           value:@"Order Screen"];
+    [tracker send:[[GAIDictionaryBuilder createAppView] build]];
 }
+
 
 - (void)viewDidLoad
 {
@@ -31,7 +35,6 @@
     [self.tableView setHidden:self.goodies ? NO:YES];
     GoodsInOrderModel *firstItem=self.goodies[0];
     [self.navigationItem setTitle:[NSString stringWithFormat:@"Заказ №%@",firstItem.orderId]];
-    // Do any additional setup after loading the view.
 }
 
 - (void)didReceiveMemoryWarning
@@ -45,16 +48,6 @@
 }
 
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-//    OrderItemCell *cell = [tableView dequeueReusableCellWithIdentifier:@"orderItemCell"];
-//    GoodsInOrderModel *currentItem = self.goodies[indexPath.row];
-//    cell.priceLabel.text = [NSString stringWithFormat:@"%@ руб.",currentItem.price];
-//    cell.titleLabel.text = currentItem.title;
-//    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
-//    [cell.imageview setImageWithURL:[NSURL URLWithString:currentItem.image]
-//                          completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
-//        [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
-//    }];
-//
     CartCell *cell = [tableView dequeueReusableCellWithIdentifier:@"CartCell"];
     GoodsInOrderModel* currentItem =self.goodies[indexPath.row];
     cell.titleLabel.text = currentItem.title;

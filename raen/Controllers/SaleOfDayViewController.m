@@ -14,19 +14,33 @@
 #import "SaleOfDayDescriptionModel.h"
 #import "MBProgressHUD.h"
 
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
+
 @interface SaleOfDayViewController  () <RaenAPICommunicatorDelegate,UITextViewDelegate>{
-    RaenAPICommunicator *_communicator;
+    RaenAPICommunicator* _communicator;
 }
 
 @end
 
 @implementation SaleOfDayViewController
 
+
+-(void)viewDidAppear:(BOOL)animated{
+    
+    id tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName
+           value:@"Sale of day Screen"];
+    [tracker send:[[GAIDictionaryBuilder createAppView] build]];
+}
+
 - (void)viewDidLoad
 {
     [super viewDidLoad];
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
+    
     [_communicator getSaleOfDay];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [self.textView setDataDetectorTypes:UIDataDetectorTypeLink];
@@ -38,6 +52,7 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+
 #pragma mark - RaenAPICommunicatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [MBProgressHUD hideHUDForView:self.view animated:YES];
@@ -47,7 +62,7 @@
 -(void)didReceiveSaleOfDay:(id)saleOfDayModel{
     NSLog(@"didReceiveSaleOfDay");
     SaleOfDayModel *saleOfDay = (SaleOfDayModel*)saleOfDayModel;
-    NSLog(@"saleOfDay %@",saleOfDay);
+    
     //set image in imageView
     if (saleOfDay.image) {
         [self.spinner startAnimating];
@@ -61,9 +76,7 @@
     }else{
         NSLog(@"--- NO IMAGE For Sale of day");
     }
-    //set text in textView
-    //[self.textView setText:[self attributedStringFromDescriptions:saleOfDay.descriptions]];
-    //self.textView.text = [self attributedStringFromDescriptions:saleOfDay.descriptions];
+    
     [self.textView setAttributedText:[self attributedStringFromDescriptions:saleOfDay.descriptions]];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     
