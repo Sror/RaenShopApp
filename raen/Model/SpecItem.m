@@ -12,7 +12,8 @@
 +(JSONKeyMapper *)keyMapper{
     return [[JSONKeyMapper alloc] initWithDictionary:@{
                                                        @"db1c_id":@"db1cId",
-                                                       @"new_price":@"priceNew"
+                                                       @"new_price":@"priceNew",
+                                                       @"all_kol":@"allCount"
                                                        }];
 }
 @end

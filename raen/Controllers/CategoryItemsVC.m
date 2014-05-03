@@ -65,6 +65,7 @@
 }
 
 - (void)refreshView:(UIRefreshControl *)sender {
+    
     [_communicator getAllCategories];
 }
 

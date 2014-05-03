@@ -295,7 +295,13 @@
                             <outlet property="delegate" destination="CZ4-MO-1fc" id="2Lw-YC-2bq"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Магазин" id="gMB-ew-6za"/>
+                    <navigationItem key="navigationItem" title="Магазин" id="gMB-ew-6za">
+                        <barButtonItem key="rightBarButtonItem" title="Контакты" id="SD0-sC-lKg">
+                            <connections>
+                                <action selector="contactsButtonPressed:" destination="CZ4-MO-1fc" id="ndS-vD-Azb"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
                     <simulatedOrientationMetrics key="simulatedOrientationMetrics"/>
                     <connections>
                         <outlet property="tableView" destination="KBU-I5-PFd" id="tgx-3J-tP3"/>

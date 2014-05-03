@@ -126,7 +126,7 @@ typedef enum SocialButtonTags {
 -(void)fetchingFailedWithError:(JSONModelError *)error {
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     [_refreshControl endRefreshing];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Проверьте подключение к интернету"
                                                    delegate:self
                                           cancelButtonTitle:@"OK"
                                           otherButtonTitles: nil];

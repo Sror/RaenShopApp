@@ -13,7 +13,6 @@
 @interface ItemModel : JSONModel
 @property (nonatomic, strong) NSString *id;
 @property (nonatomic, strong) NSString <Optional>*catId;
-@property (nonatomic, getter = isAvailable) BOOL available;
 @property (nonatomic, strong) NSString <Optional>*review;
 @property (nonatomic, strong) NSString *title;
 @property (nonatomic, strong) NSString *price;

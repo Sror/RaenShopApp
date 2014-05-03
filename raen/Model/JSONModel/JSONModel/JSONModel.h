@@ -1,7 +1,7 @@
 //
 //  JSONModel.h
 //
-//  @version 0.11.0
+//  @version 0.13.0
 //  @author Marin Todorov, http://www.touch-code-magazine.com
 //
 
@@ -86,7 +86,7 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
  * A protocol describing an abstract JSONModel class
  * JSONModel conforms to this protocol, so it can use itself abstractly
  */
-@protocol AbstractJSONModelProtocol <NSObject>
+@protocol AbstractJSONModelProtocol <NSObject, NSCopying, NSCoding>
 
 @required
   /**
@@ -100,6 +100,17 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
    */
   -(instancetype)initWithDictionary:(NSDictionary*)dict error:(NSError**)err;
 
+
+/**
+ * All JSONModel classes should implement initWithData:error:
+ *
+ * For most classes the default initWithData: inherited from JSONModel itself
+ * should suffice, but developers have the option ot also overwrite it if needed.
+ *
+ * @param data representing a JSON response (usually fetched from web), to be imported in the model.
+ * @param err an error or NULL
+ */
+-(instancetype)initWithData:(NSData*)data error:(NSError**)error;
 
 /**
  * All JSONModel classes should be able to export themselves as a dictionary of
@@ -159,6 +170,8 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
 
   -(instancetype)initWithDictionary:(NSDictionary*)dict error:(NSError **)err;
 
+  -(instancetype)initWithData:(NSData *)data error:(NSError **)error;
+
 /** @name Exporting model contents */
 
   /**
@@ -204,6 +217,8 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
   +(NSMutableArray*)arrayOfModelsFromDictionaries:(NSArray*)array;
 
   +(NSMutableArray*)arrayOfModelsFromDictionaries:(NSArray*)array error:(NSError**)err;
+
+  +(NSMutableArray*)arrayOfModelsFromData:(NSData*)data error:(NSError**)err;
 
   /**
    * If you have an NSArray of data model objects, this method takes it in and outputs a list of the 
@@ -294,5 +309,13 @@ lastPathComponent], __LINE__, [NSString stringWithFormat:(s), ##__VA_ARGS__] )
  * @return a BOOL result indicating whether the property is ignored
  */
 +(BOOL)propertyIsIgnored:(NSString*)propertyName;
+
+/**
+ * Merges values from the given dictionary into the model instance.
+ * @param dict dictionary with values
+ * @param useKeyMapping if YES the method will use the model's key mapper and the global key mapper, if NO 
+ * it'll just try to match the dictionary keys to the model's properties
+ */
+-(void)mergeFromDictionary:(NSDictionary*)dict useKeyMapping:(BOOL)useKeyMapping;
 
 @end

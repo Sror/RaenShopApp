@@ -64,55 +64,57 @@
     [_news removeAllObjects];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     _gotNews = NO;
-    _gotSlider = NO;
     [_communicator getNewsByPage:1];
+    _gotSlider = NO;
     [_communicator getSliderItems];
 }
 
 
 #pragma mark - RaenAPICommunicatorDelegate Methods
 -(void)fetchingFailedWithError:(JSONModelError *)error{
+#warning TODO: show alert view only ONCE!
     [self.refreshControl endRefreshing];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
+   
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка"
-                                                    message:error.localizedDescription
+                                                    message:@"Нет доступа к интернету. Повторите попытку позже"
                                                    delegate:self
-                                          cancelButtonTitle:@"Ok"
+                                          cancelButtonTitle:@"OK"
                                           otherButtonTitles: nil];
-    [alert show];
+    if (!alert.isVisible) {
+        [alert show];
+    }
+    
+    [self.tableView reloadData];
 }
 
+-(void)updateTableView{
+    [MBProgressHUD hideHUDForView:self.view animated:YES];
+    [self.refreshControl endRefreshing];
+    [self.tableView reloadData];
+    NSInteger rowToScroll = _news.count-10;
+    NSIndexPath *firstNewIndexPath = [NSIndexPath indexPathForRow:rowToScroll inSection:1];
+    if (rowToScroll != 0) {
+        [self.tableView scrollToRowAtIndexPath:firstNewIndexPath atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+    }
+    
+}
 -(void)didReceiveNews:(NSArray *)news{
     _gotNews = YES;
-    
-    if (_gotSlider) [MBProgressHUD hideHUDForView:self.view animated:YES];
-    
-    [self.refreshControl endRefreshing];
-
-    NSInteger rowToScroll= _news.count;
-    [_news  addObjectsFromArray:news];
-    NSMutableArray *animatedIndexPaths = [NSMutableArray arrayWithCapacity:news.count];
-    for (int i=0; i<news.count; i++) {
-        NSIndexPath *tmpIndexPath = [NSIndexPath indexPathForRow:i+rowToScroll inSection:1];
-        [animatedIndexPaths addObject:tmpIndexPath];
-    }
-    [self.tableView insertRowsAtIndexPaths:animatedIndexPaths withRowAnimation:UITableViewRowAnimationFade];
-    NSIndexPath *firstNewIndexPath = [NSIndexPath indexPathForRow:rowToScroll inSection:1];
-    
-    if (_news.count/news.count !=1) {
-        [self.tableView scrollToRowAtIndexPath:firstNewIndexPath atScrollPosition:UITableViewScrollPositionMiddle animated:YES];
+    [_news addObjectsFromArray:news];
+    NSLog(@"added %d news in _news array",news.count);
+    if (_gotSlider){
+        [self updateTableView];
     }
 }
 
 -(void)didReceiveSliderItems:(NSArray *)array{
+    NSLog(@"didReceiveSliderItems count %d",array.count);
     _gotSlider= YES;
-    if (_gotNews) {
-         [MBProgressHUD hideHUDForView:self.view animated:YES];
-    }
     _sliderItems = array;
-    [self.tableView reloadData];
-    [self.refreshControl endRefreshing];
-    
+    if (_gotNews) {
+        [self updateTableView];
+    }
 }
 //Update cart tabbar icon
 -(void)didReceiveCartItems:(NSArray *)items
@@ -122,7 +124,6 @@
 
 #pragma mark - UITableViewDataSource Methods
 -(NSInteger)numberOfSectionsInTableView:(UITableView *)tableView{
-    
     return 2;
 }
 -(NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
@@ -132,6 +133,7 @@
     return _news.count;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
+  //  NSLog(@"cell for row at index path %@",indexPath);
     if (indexPath.section ==0) {
         MainSliderCell *sliderCell = [tableView dequeueReusableCellWithIdentifier:@"sliderCell"];
         NSInteger imagesCount =[self imagesCountInSliderItems];
@@ -163,9 +165,9 @@
     NewsModel *news = _news[indexPath.row];
     
     TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:news.link]];
-    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
-
-    //[self.navigationController pushViewController:webBrowser animated:YES];
+    //[self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
+    //webBrowser.hidesBottomBarWhenPushed = YES;
+    [self.navigationController pushViewController:webBrowser animated:YES];
    
 }
 #pragma mark - UIScrollViewDelegate
@@ -179,6 +181,9 @@
     }
 }
 
+-(BOOL)scrollViewShouldScrollToTop:(UIScrollView *)scrollView{
+    return YES;
+}
 #pragma mark - Navigation
 -(void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender{
     NSLog(@"prepareForSegue %@",segue.identifier);

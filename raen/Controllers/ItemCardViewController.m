@@ -54,7 +54,7 @@
     _communicator = [[RaenAPICommunicator alloc] init];
     _communicator.delegate = self;
     
-    [self.tableView setHidden:YES];
+    //[self.tableView setHidden:YES];
     [self setupRefreshControl];
     if (self.itemID) {
         [self performSelectorOnMainThread:@selector(refreshView:) withObject:nil waitUntilDone:YES];
@@ -75,27 +75,32 @@
 }
 
 - (void)refreshView:(UIRefreshControl *)sender {
+    NSLog(@"refreshView");
     _item = nil;
+    [self.tableView reloadData];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [_communicator getItemCardWithId:self.itemID];
+    //[self.tableView setHidden:YES];
 }
 
 #pragma mark - RaenAPICommunicatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Проверьте подключение к интернету" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alert show];
 }
 
 -(void)didReceiveItemCard:(id)itemCard{
+    NSLog(@"didReceiveItemCard");
     _item = (ItemModel*) itemCard;
+    NSLog(@"_item.specItems.count %d",_item.specItems.count);
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     self.navigationItem.title = _item.title;
     [self addReviewAndVideo];
     
     [self.tableView reloadData];
-    [self.tableView setHidden:NO];
+    //[self.tableView setHidden:NO];
     [self.refreshControl endRefreshing];
 }
 #pragma mark - add item to cart
@@ -110,7 +115,7 @@
     
 }
 -(void)didFailureAddingItemToCartWithError:(JSONModelError *)error{
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:error.description delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:@"Проверьте подключение к интернету" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alert show];
 }
 #pragma  mark - ScrollView
@@ -227,7 +232,6 @@
     return 44;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-    NSLog(@"cellForRowAtIndexPath section %i row %i",indexPath.section, indexPath.row);
     //Photo slider
     if (indexPath.section == 0) {
         //item card cell
@@ -447,9 +451,12 @@
 -(NSArray*)availabledSpecItems{
     NSMutableArray *availabledSpecItems = [NSMutableArray array];
     for (SpecItem *specItem in _item.specItems) {
-        if (specItem.sklad.integerValue>0 || specItem.piter.integerValue>0 || specItem.shop.integerValue>0) {
+        if (specItem.allCount.intValue>0) {
             [availabledSpecItems addObject:specItem];
         }
+//        if (specItem.sklad.integerValue>0 || specItem.piter.integerValue>0 || specItem.shop.integerValue>0) {
+//            [availabledSpecItems addObject:specItem];
+//        }
     }
     return availabledSpecItems;
 }

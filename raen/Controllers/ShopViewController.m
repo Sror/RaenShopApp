@@ -19,10 +19,13 @@
 #import "CategoryItemsVC.h"
 #import "UIImageView+WebCache.h"
 #import "RaenAPICommunicator.h"
+#import "TOWebViewController.h"
 
 #import "GAI.h"
 #import "GAIFields.h"
 #import "GAIDictionaryBuilder.h"
+
+#define kRaenContactsLink @"http://raenshop.ru/contacts/from_ios"
 
 @interface ShopViewController ()<RaenAPICommunicatorDelegate> {
     NSArray *_categories;
@@ -73,7 +76,7 @@
     [MBProgressHUD hideHUDForView:self.tableView animated:YES];
     [self.tableView reloadData];
     [self.refreshControl endRefreshing];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:error.localizedDescription delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Проверьте подключение к интернету" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alert show];
     
 }
@@ -199,6 +202,11 @@
         CategoryItemsVC *categoryItemsGridVC = segue.destinationViewController;
         categoryItemsGridVC.currentCategoryId = sender;
     }
+}
+- (IBAction)contactsButtonPressed:(id)sender {
+    TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:kRaenContactsLink]];
+    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
+
 }
 
 

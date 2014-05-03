@@ -110,7 +110,8 @@
 -(void)fetchingFailedWithError:(JSONModelError *)error
 {
     [MBProgressHUD hideHUDForView:self.view animated:YES];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:error.localizedDescription delegate:self cancelButtonTitle:@"ОК" otherButtonTitles: nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:@"Проверьте подключение к интернету"
+                                                   delegate:nil cancelButtonTitle:@"ОК" otherButtonTitles: nil];
     [alert show];
 }
 
@@ -118,7 +119,7 @@
 {
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     if (![response objectForKey:@"success"]) {
-        UIAlertView *alert  =[[UIAlertView alloc] initWithTitle:@"Ошибка" message:response[@"error"] delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        UIAlertView *alert  =[[UIAlertView alloc] initWithTitle:@"Ошибка" message:response[@"error"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [alert show];
     }
     [_communicator getItemsFromCart];

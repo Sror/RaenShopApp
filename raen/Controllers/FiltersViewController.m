@@ -72,7 +72,7 @@
 -(void)fetchingFailedWithError:(JSONModelError *)error{
 
     [MBProgressHUD hideHUDForView:self.view animated:YES];
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:error.localizedDescription delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:nil message:@"Проверьте подключение к интернету" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alertView show];
     
 }

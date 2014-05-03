@@ -983,11 +983,48 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
 
 - (void)openTwitterDialog
 {
+    NSLog(@"openTwitterDialog");
+    /*
+    if([SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter]) {
+        
+        SLComposeViewController *controller = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
+        
+        SLComposeViewControllerCompletionHandler myBlock = ^(SLComposeViewControllerResult result){
+            if (result == SLComposeViewControllerResultCancelled) {
+                
+                NSLog(@"Cancelled");
+                
+            } else
+                
+            {
+                NSLog(@"Done");
+            }
+            
+            [controller dismissViewControllerAnimated:YES completion:Nil];
+        };
+        controller.completionHandler =myBlock;
+        
+        //Adding the Text to the facebook post value from iOS
+        [controller setInitialText:@"Test Post from РАЕН"];
+        
+        //Adding the URL to the facebook post value from iOS
+        
+        [controller addURL:self.url];
+        
+        [self presentViewController:controller animated:YES completion:Nil];
+        
+    }
+    else{
+        NSLog(@"UnAvailable");
+    }
+     */
+    /*
     TWTweetComposeViewController *tweetComposer = [[TWTweetComposeViewController alloc] init];
     [tweetComposer addURL:self.url];
     
     [self presentViewController:tweetComposer animated:YES completion:nil];
     //[self presentModalViewController:tweetComposer animated:YES];
+     */
 }
 
 
