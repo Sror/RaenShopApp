@@ -165,9 +165,9 @@
     NewsModel *news = _news[indexPath.row];
     
     TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:news.link]];
-    //[self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
+    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
     //webBrowser.hidesBottomBarWhenPushed = YES;
-    [self.navigationController pushViewController:webBrowser animated:YES];
+    //[self.navigationController pushViewController:webBrowser animated:YES];
    
 }
 #pragma mark - UIScrollViewDelegate

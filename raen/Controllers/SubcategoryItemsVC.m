@@ -35,7 +35,7 @@
 -(void)viewDidAppear:(BOOL)animated{
     id tracker = [[GAI sharedInstance] defaultTracker];
     [tracker set:kGAIScreenName
-           value:@"Subcategory items Screen"];
+           value:@"Категория товаров"];
     [tracker send:[[GAIDictionaryBuilder createAppView] build]];
 }
 
@@ -67,7 +67,7 @@
 - (void)refreshView:(UIRefreshControl *)sender {
     [_items removeAllObjects];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    [_communicator getSubcategoryWithId:self.subcategoryID withParameters:nil];
+    [_communicator getSubcategoryWithId:self.subcategoryID withParameters:@{@"sort":@"new"}];
     
 }
 #pragma mark - RaenAPICOmmunicationDelegate 
@@ -98,13 +98,15 @@
         }
          */
     }
+    
+    
     NSLog(@"\n_items.count = %d\n _itemsCount=%d",_items.count,_itemsCount);
 }
 
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Проверьте подключение к интернету" delegate:self cancelButtonTitle:@"ok" otherButtonTitles: nil];
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:@"Проверьте подключение к интернету" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alert show];
 }
 
@@ -112,7 +114,11 @@
 -(void)didSelectFilter:(NSDictionary *)filterParameters{
     [MBProgressHUD showHUDAddedTo:self.view animated:YES]; 
     [_items removeAllObjects];
-    [_communicator getSubcategoryWithId:self.subcategoryID withParameters:filterParameters];
+#warning added default sorting as NEW items
+    NSMutableDictionary* newFilterParams = filterParameters.mutableCopy;
+    [newFilterParams addEntriesFromDictionary:@{@"sort":@"new"}];
+    
+    [_communicator getSubcategoryWithId:self.subcategoryID withParameters:newFilterParams];
 }
 
 #pragma mark - UICollectionViewDataSource Methods
@@ -163,8 +169,9 @@
     if (endScrolling >= scrollView.contentSize.height) {
         if (_items.count < _itemsCount) {
             NSInteger page = _items.count/RaenAPIdefaulSubcategoryItemsCountPerPage+1;
-            [_communicator getSubcategoryWithId:self.subcategoryID withParameters:@{@"page":[NSNumber numberWithInteger:page]}];
-#warning TODO: check HUD 
+            [_communicator getSubcategoryWithId:self.subcategoryID withParameters:@{@"page":[NSNumber numberWithInteger:page],
+                                                                                    @"sort":@"new"
+                                                                                    }];
             [MBProgressHUD showHUDAddedTo:self.view animated:YES];
         }
     }

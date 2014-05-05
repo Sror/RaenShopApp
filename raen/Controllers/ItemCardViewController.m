@@ -43,7 +43,7 @@
 {
     id tracker = [[GAI sharedInstance] defaultTracker];
     [tracker set:kGAIScreenName
-           value:@"Item card Screen"];
+           value:[NSString stringWithFormat:@"Карта товара"]];
     [tracker send:[[GAIDictionaryBuilder createAppView] build]];
    
 }
@@ -80,21 +80,21 @@
     [self.tableView reloadData];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     [_communicator getItemCardWithId:self.itemID];
-    //[self.tableView setHidden:YES];
+    [self.tableView setHidden:YES];
 }
 
 #pragma mark - RaenAPICommunicatorDelegate
 -(void)fetchingFailedWithError:(JSONModelError *)error{
     [self.refreshControl endRefreshing];
+    [self.tableView setHidden:NO];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Проверьте подключение к интернету" delegate:self cancelButtonTitle:@"OK" otherButtonTitles: nil];
     [alert show];
 }
 
 -(void)didReceiveItemCard:(id)itemCard{
-    NSLog(@"didReceiveItemCard");
     _item = (ItemModel*) itemCard;
-    NSLog(@"_item.specItems.count %d",_item.specItems.count);
+    [self.tableView setHidden:NO];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     self.navigationItem.title = _item.title;
     [self addReviewAndVideo];
@@ -102,6 +102,12 @@
     [self.tableView reloadData];
     //[self.tableView setHidden:NO];
     [self.refreshControl endRefreshing];
+    
+     id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Карточка товара"
+                                                          action:@"Получил карточку товара"
+                                                           label:[NSString stringWithFormat:@"%@ %@",_item.brand, _item.title]
+                                                           value:nil] build]];
 }
 #pragma mark - add item to cart
 -(void)didAddItemToCartWithResponse:(NSDictionary *)response{
@@ -193,7 +199,6 @@
 }
 
 -(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-    NSLog(@"heightForRowAtIndexPath section %i , row %i",indexPath.section,indexPath.row);
     //set height for first tableview cell
     if (indexPath.section==0) {
         UIFont *font = [UIFont fontWithName:@"HelveticaNeue" size:14];
@@ -245,7 +250,7 @@
         [self setImagesInScrollview:cell.scrollView];
 
         //TITLE
-        cell.nameLabel.text = _item.title;
+        cell.nameLabel.text = [NSString stringWithFormat:@"%@ %@",_item.brand, _item.title];
         //PRICE LABELS
         if (_item.priceNew.length>2) {
             cell.priceLabel.text =  [NSString stringWithFormat:@"%@ Руб.",_item.priceNew];
@@ -317,7 +322,7 @@
         return @"Подробнее:";
     }
     if (section==2 &&_item.specItems.count) {
-        return @"Модели в наличие:";
+        return @"Модели в наличии:";
     }
     return nil;
 }

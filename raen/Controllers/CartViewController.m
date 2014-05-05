@@ -101,10 +101,10 @@
     [self updateTabbarBadge];
     
     id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
-    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Cart"
-                                                          action:@"didReceiveCartItems"
-                                                           label:@"Items.count"
-                                                           value:@(items.count)] build]];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Корзина"
+                                                          action:@"Товары в корзине"
+                                                           label:[NSString stringWithFormat:@"%d товаров в корзине",_items.count]
+                                                           value:nil] build]];
 }
 
 -(void)fetchingFailedWithError:(JSONModelError *)error
@@ -144,6 +144,12 @@
                                               cancelButtonTitle:@"OK"
                                               otherButtonTitles: nil];
         [alert show];
+        
+        id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+        [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Оформление заказа"
+                                                              action:@"Успешно оформил заказ"
+                                                               label:response[@"text"]
+                                                               value:nil] build]];
         //we have to reload view
         //[self viewWillAppear:YES];
     }

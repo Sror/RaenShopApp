@@ -54,17 +54,6 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
 
 @implementation RaenAPICommunicator
 
-/*
-+ (RaenAPICommunicator*)sharedManager {
-    static RaenAPICommunicator * __sharedManager;
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        __sharedManager = [[RaenAPICommunicator alloc] init];
-    });
-    return __sharedManager;
-}
-*/
-
 #pragma mark - get News
 -(void)getNewsByPage:(NSInteger)page{
     [self restoreCookies];
@@ -134,8 +123,13 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
         if (parameters[@"brand"]!=nil) {
             urlStr = [urlStr stringByAppendingString:[NSString stringWithFormat:@"/brand/%@",parameters[@"brand"]]];
         }
+        if (parameters[@"sort"]!=nil) {
+            urlStr = [urlStr stringByAppendingString:[NSString stringWithFormat:@"/sort/%@", parameters[@"sort"]]];
+        }
+        
         NSArray *paramNames = @[@"param1",@"param2",@"param3",@"param4",@"param5"];
-        for (NSString *paramName in paramNames) {
+        for (NSString *paramName in paramNames)
+        {
             if ([parameters objectForKey:paramName]!=nil) {
                 urlStr = [urlStr stringByAppendingString:[NSString stringWithFormat:@"/%@/%@",paramName,parameters[paramName]]];
             }
@@ -162,8 +156,19 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                       if (subcategoryModel) {
                                           //[self.delegate didReceiveSubcategoryItems:subcategoryItems];
                                           [self.delegate didReceiveSubcategory:subcategoryModel];
+                                          id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                          [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Подкатегория товара"
+                                                                                                action:@"Получил список товаров в подкатегории"
+                                                                                                 label:[NSString stringWithFormat:@"%@",parameters]
+                                                                                                 value:nil] build]];
                                       }else{
                                           NSLog(@"----something went wrong with init JSONModel----");
+                                          
+                                          id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                          [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Подкатегория товара"
+                                                                                                action:@"Ошибка при получении списока товаров в подкатегории"
+                                                                                                 label:[NSString stringWithFormat:@"%@",err]
+                                                                                                 value:nil] build]];
                                       }
                                   }];
 
@@ -191,6 +196,11 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                       [self.delegate didReceiveItemCard:item];
                                   }else{
                                       NSLog(@"----something went wrong with init JSONModel----");
+                                      id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                      [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Карточка товара"
+                                                                                            action:@"Ошибка при Получении карточки товара"
+                                                                                             label:[NSString stringWithFormat:@"%@",err]
+                                                                                             value:nil] build]];
                                   }
                               }];
 }
@@ -243,6 +253,7 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                    if (sliderItems) {
                                        [self.delegate didReceiveSliderItems:sliderItems];
                                    }else{
+                                    
                                        NSLog(@"----something went wrong with init JSONModel----");
                                    }
    }];
@@ -301,11 +312,21 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                           NSLog(@"err! %@",err.localizedDescription);
                                           [self.delegate fetchingFailedWithError:err];
                                       }
-                                      //NSLog(@"get items from cart json %@",json);
+                                   
                                       NSArray *cartItems =[CartItemModel arrayOfModelsFromDictionaries:json];
                                       if (cartItems) {
                                           [self.delegate didReceiveCartItems:cartItems];
+                                          id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                          [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Корзина"
+                                                                                                action:@"Получил список товаров в корзине"
+                                                                                                 label:[NSString stringWithFormat:@"В корзине %i товаров",cartItems.count]
+                                                                                                 value:nil] build]];
                                       }else{
+                                          id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                          [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Корзина"
+                                                                                                action:@"Ошибка получении списка товаров"
+                                                                                                 label:[NSString stringWithFormat:@"%@",err]
+                                                                                                 value:nil] build]];
                                           NSLog(@"----something went wrong with init JSONModel----");
                                       }
                                   }];
@@ -332,20 +353,25 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                    {
                                        if ([json isKindOfClass:[NSDictionary class]]) {
                                        [self.delegate didAddItemToCartWithResponse:json];
+                                       id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                       [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Корзина"
+                                                                                             action:@"Добавил в корзину"
+                                                                                              label:bodyParams
+                                                                                              value:nil] build]];
                                        }
                                    }else{
-                                      //[self.delegate didFailureAddingItemToCartWithError:err];
+                                       id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                       [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Корзина"
+                                                                                             action:@"Ошибка при добавлении в корзину"
+                                                                                              label:[NSString stringWithFormat:@"%@",err]
+                                                                                              value:nil] build]];
                                        NSLog(@"---error to add item to cart------");
                                    }
 
                                }];
     
-    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
-    NSLog(@"tracker send event");
-    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"API communication"
-                                                          action:@"add item to cart"
-                                                           label:bodyParams
-                                                           value:nil] build]];
+   
+   
     
 
 }
@@ -369,12 +395,20 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                    [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
                                    if ([json isKindOfClass:[NSDictionary class]]) {
                                        [self.delegate didChangeCartItemQTYWithResponse:json];
+                                       
+                                       id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                       [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Корзина"
+                                                                                             action:@"Изменил кол. товаров в корзине"
+                                                                                              label:[NSString stringWithFormat:@"%@",params]
+                                                                                              value:nil] build]];
                                    }
                                    if (err!=nil) {
                                        
                                        NSLog(@"error to change qty item from cart %@",err.localizedDescription);
                                    }
                                }];
+    
+    
 }
 #pragma mark - Checkout
 - (void)checkoutFastWithFirstName:(NSString*)firstName andPhone:(NSString*)phone{
@@ -404,16 +438,23 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                        [self.delegate didCheckoutWithResponse:json];
                                    }
                                    if (err) {
-                                       NSLog(@"---EROR to check out : %@ ---",err);
+                                       
+                                       id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                       [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Оформление заказа"
+                                                                                             action:@"Ошибка при оформлении заказа"
+                                                                                              label:[NSString stringWithFormat:@"%@",err]
+                                                                                              value:nil] build]];
+                                       NSLog(@"---ERROR to check out : %@ ---",err);
                                    }
      
     }];
     
     id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
-    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"API communication"
-                                                          action:@"Checkout"
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Оформление заказа"
+                                                          action:@"Отправил запрос на оформление заказа"
                                                            label:[NSString stringWithFormat:@"%@",tmpDict]
                                                            value:nil] build]];
+   
     
 }
 #pragma mark - Authorization via email
@@ -431,20 +472,28 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
                                    if ([json isKindOfClass:[NSDictionary class]]) {
                                        if (err || json[@"error"]) {
                                            [self.delegate didFailuerAPIAuthorizationWithResponse:json];
+                                           
+                                           id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                           [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Авторизация"
+                                                                                                 action:@"Ошибка входа ч/з email/pass"
+                                                                                                  label:json[@"error"]
+                                                                                                  value:nil] build]];
                                        }
                                        if (json[@"success"]) {
                                            [Socializer sharedManager].raenAPIToken = json[@"token"];
                                            [[Socializer sharedManager] saveAuthUserDataToDefaults];
                                            
                                            [self.delegate didSuccessAPIAuthorizedWithResponse:json];
+                                           
+                                           id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+                                           [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Авторизация"
+                                                                                                 action:@"Успешный Вход ч/з email/pass"
+                                                                                                  label:email
+                                                                                                  value:nil] build]];
                                        }
                                    }
     }];
-    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
-    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"API communication"
-                                                          action:@"Email/pass authorization"
-                                                           label:email
-                                                           value:nil] build]];
+
 }
 
 #pragma mark - authorization via social networks
@@ -480,6 +529,13 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
            NSDictionary *jsonDict = json;
           
            NSString *errorMsg = jsonDict[@"error"];
+           if (errorMsg) {
+               id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+               [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Авторизация"
+                                                                     action:@"Ошибка входа"
+                                                                      label:[NSString stringWithFormat:@"%@ через %@ c ошибкой %@",[Socializer sharedManager].socialUsername,[Socializer sharedManager].socialIdentificator,jsonDict]
+                                                                      value:nil] build]];
+           }
            //if email required
            if ([errorMsg isEqualToString:@"Email is required"]) {
                
@@ -497,10 +553,18 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
                [[Socializer sharedManager] saveAuthUserDataToDefaults];
                
                [self.delegate didSuccessAPIAuthorizedWithResponse:jsonDict];
+               
+               id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+               [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Авторизация"
+                                                                     action:@"Успешный вход"
+                                                                      label:[NSString stringWithFormat:@"%@ через %@",[Socializer sharedManager].socialUsername,[Socializer sharedManager].socialIdentificator]
+                                                                      value:nil] build]];
+
            }
            
        }else {
 #warning TODO bad response from API server!
+          
            
        }
     }];
@@ -530,6 +594,12 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
     
     if (![socialId isEqualToString:@""] && ![accessToken isEqualToString:@""] && ![socialId isEqualToString:@""]) {
         [self authAPIVia:socialId withuserIdentifier:userId accessToken:accessToken optionalParameters:optionalValues];
+        
+        id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+        [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Авторизация"
+                                                              action:@"Регистрация нового пользователя"
+                                                               label:[NSString stringWithFormat:@"%@ через %@ c параметрами %@",[Socializer sharedManager].socialUsername,[Socializer sharedManager].socialIdentificator,optionalValues]
+                                                               value:nil] build]];
     }else{
         NSLog(@"----NO socialID/AccessToken/SocialID! Can't sign in new user!-----");
     }    
@@ -603,6 +673,9 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
         NSLog(@"---Can't get user orders cause user NOT authorized! (token = nil) ----");
     }
 }
+
+
+
 #pragma mark - Cookie manager methods
 -(void)deleteCookieFromLocalStorage{
     NSLog(@"deleting cookies from local storage");

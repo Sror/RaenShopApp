@@ -35,6 +35,10 @@
 #import <MessageUI/MFMessageComposeViewController.h>
 #import <Twitter/Twitter.h>
 
+#import "GAI.h"
+#import "GAIFields.h"
+#import "GAIDictionaryBuilder.h"
+
 /* Detect if we're running iOS 7.0 or higher */
 #ifndef NSFoundationVersionNumber_iOS_6_1
 #define NSFoundationVersionNumber_iOS_6_1  993.00
@@ -265,6 +269,8 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     self.modalPresentationStyle = UIModalPresentationFullScreen;
 }
 
+
+
 - (void)loadView
 {
     //Create the all-encompassing container view
@@ -455,6 +461,8 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     [self.forwardButton     addTarget:self action:@selector(forwardButtonTapped:)       forControlEvents:UIControlEventTouchUpInside];
     [self.reloadStopButton  addTarget:self action:@selector(reloadStopButtonTapped:)    forControlEvents:UIControlEventTouchUpInside];
     [self.actionButton      addTarget:self action:@selector(actionButtonTapped:)        forControlEvents:UIControlEventTouchUpInside];
+    
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated
@@ -488,12 +496,30 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     if (self.url && self.webView.request == nil){
         NSLog(@"loading URL %@",self.url);
         [self.webView loadRequest:[NSURLRequest requestWithURL:self.url]];
+        //
+        id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+        [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Браузер"
+                                                              action:@"Загружает страницу"
+                                                               label:self.url.absoluteString
+                                                               value:nil] build]];
     }
     
     if (self.HTMLString && self.webView.request == nil) {
         NSLog(@"loading HTML %@",self.HTMLString);
         [self.webView loadHTMLString:self.HTMLString baseURL:nil];
+        //
+        id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+        [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Браузер"
+                                                              action:@"Загружает iframe"
+                                                               label:self.HTMLString
+                                                               value:nil] build]];
+        
     }
+    
+    id tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker set:kGAIScreenName
+           value:@"Браузер"];
+    [tracker send:[[GAIDictionaryBuilder createAppView] build]];
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -749,6 +775,9 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
 
     //see if we can set the proper page title at this point
     self.title = [self.webView stringByEvaluatingJavaScriptFromString:@"document.title"];
+    
+    //
+    
 }
 
 - (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error

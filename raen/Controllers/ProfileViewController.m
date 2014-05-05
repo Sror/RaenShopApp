@@ -198,34 +198,16 @@ typedef enum SocialButtonTags {
                                  withuserIdentifier:[Socializer sharedManager].socialUserId
                                         accessToken:[Socializer sharedManager].socialAccessToken
                                  optionalParameters:nil];
-    
-    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
-    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Social auth"
-                                                          action:@"successfullyAuthorizedToSocialNetwork"
-                                                           label:[Socializer sharedManager].socialIdentificator
-                                                           value:nil] build]];
 }
 -(void)failureAuthorization{
     [self updateUI];
     [MBProgressHUD hideHUDForView:self.view animated:YES];
-    
-    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
-    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Social auth"
-                                                          action:@"failureAuthorization"
-                                                           label:[Socializer sharedManager].socialIdentificator
-                                                           value:nil] build]];
+
 }
 
 -(void)successLogout{
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     [self updateUI];
-    
-    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
-    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Social auth"
-                                                          action:@"successLogout"
-                                                           label:[Socializer sharedManager].socialIdentificator
-                                                           value:nil] build]];
-    
 }
 
 #pragma mark - STEP2 RESPONSES
@@ -238,11 +220,7 @@ typedef enum SocialButtonTags {
     [MBProgressHUD hideHUDForView:self.view
                          animated:YES];
     
-    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
-    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"API auth"
-                                                          action:@"didSuccessAPIAuthorized"
-                                                           label:[Socializer sharedManager].socialIdentificator
-                                                           value:nil] build]];
+   
 }
 -(void)didFailuerAPIAuthorizationWithResponse:(NSDictionary *)response{
     NSLog(@"didFailuerAPIAuthorizationWithResponse %@",response);
@@ -251,11 +229,7 @@ typedef enum SocialButtonTags {
     UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:response[@"login_error"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alertView show];
     
-    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
-    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"API auth"
-                                                          action:@"Failure API auth"
-                                                           label:[NSString stringWithFormat:@"Response %@",response]
-                                                           value:nil] build]];
+    
     
 }
 
