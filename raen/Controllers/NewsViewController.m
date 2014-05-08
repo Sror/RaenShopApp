@@ -102,14 +102,12 @@
 -(void)didReceiveNews:(NSArray *)news{
     _gotNews = YES;
     [_news addObjectsFromArray:news];
-    NSLog(@"added %d news in _news array",news.count);
     if (_gotSlider){
         [self updateTableView];
     }
 }
 
 -(void)didReceiveSliderItems:(NSArray *)array{
-    NSLog(@"didReceiveSliderItems count %d",array.count);
     _gotSlider= YES;
     _sliderItems = array;
     if (_gotNews) {
@@ -133,7 +131,7 @@
     return _news.count;
 }
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
-  //  NSLog(@"cell for row at index path %@",indexPath);
+
     if (indexPath.section ==0) {
         MainSliderCell *sliderCell = [tableView dequeueReusableCellWithIdentifier:@"sliderCell"];
         NSInteger imagesCount =[self imagesCountInSliderItems];
@@ -243,7 +241,6 @@
 -(void)handleSlideTap:(UITapGestureRecognizer*)tapGestureRecognizer
 {
     SliderModel *slider = _sliderItems[tapGestureRecognizer.view.tag];
-    NSLog(@"slider action %@",slider.action);
     if ([slider.action isEqualToString:@"toBrowser"]) {
         TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:slider.link]];
         [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];

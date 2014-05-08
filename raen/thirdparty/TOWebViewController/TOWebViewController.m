@@ -494,7 +494,6 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     
     //start loading the initial page
     if (self.url && self.webView.request == nil){
-        NSLog(@"loading URL %@",self.url);
         [self.webView loadRequest:[NSURLRequest requestWithURL:self.url]];
         //
         id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
@@ -505,7 +504,6 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     }
     
     if (self.HTMLString && self.webView.request == nil) {
-        NSLog(@"loading HTML %@",self.HTMLString);
         [self.webView loadHTMLString:self.HTMLString baseURL:nil];
         //
         id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
@@ -1012,7 +1010,7 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
 
 - (void)openTwitterDialog
 {
-    NSLog(@"openTwitterDialog");
+
     /*
     if([SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter]) {
         

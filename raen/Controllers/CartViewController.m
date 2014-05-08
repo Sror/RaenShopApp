@@ -131,7 +131,6 @@
 }
 
 -(void)didCheckoutWithResponse:(NSDictionary *)response{
-    NSLog(@"didCheckoutWithResponse %@",response);
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     if (response[@"error"]) {
         UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:response[@"error"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -229,12 +228,19 @@
 }
 
 - (IBAction)checkOutButtonPressed:(id)sender {
-    NSLog(@"checkOutButtonPressed");
+
     if (_items.count>0) {
         NSString* firstName = [Socializer sharedManager].socialUsername;
         NSString* phone = [Socializer sharedManager].userPhone;
         [self showCheckOutAlertViewWithFirstName:firstName andPhone:phone message:@"Введите Ваше имя и телефон для оформления заказа."];
     }
+    id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+    [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Оформление заказа"
+                                                          action:@"Нажал кнопку оформить заказ"
+                                                           label:[NSString stringWithFormat:@"заказ на сумму %@",[self subtotal]]
+                                                           value:nil] build]];
+
+    
 }
 
 
@@ -267,7 +273,7 @@
 }
 #pragma mark - UIAlertView Delegation methods
 -(void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex{
-    NSLog(@"alertView clicked button %i",buttonIndex);
+
     _checkOutAlertView = NO;
     if (buttonIndex == 0) {
         NSString *firstName  = [alertView textFieldAtIndex:0].text;
@@ -278,7 +284,6 @@
             [MBProgressHUD showHUDAddedTo:self.view animated:YES];
 
         }else{
-#warning check!
             if (firstName.length<=1 && !_checkOutAlertView) {
                 [self showCheckOutAlertViewWithFirstName:nil andPhone:nil message:@"Имя слишком короткое! Попробуйте еще раз"];
             }

@@ -258,7 +258,6 @@ typedef enum SocialButtonTags {
 }
 
 -(void)didExistEmail{
-    NSLog(@"current email already exist");
     [self rotateSignInSubviewWithCompletion:^{
         [self showEmailAlertWithMessage:[NSString stringWithFormat:@"%@ уже занят, пожалуйста введите другой email",
                                          [Socializer sharedManager].socialUserEmail]];
@@ -340,9 +339,7 @@ typedef enum SocialButtonTags {
     if (indexPath.section !=0) {
         [tableView deselectRowAtIndexPath:indexPath animated:YES];
         OrderModel *order = self.orders[indexPath.row];
-        NSLog(@"order %@",order);
         NSArray *goodsInOrder = order.goodsInOrder;
-        NSLog(@"goodsInOrder %@",goodsInOrder);
         [self performSegueWithIdentifier:@"toOrderVC" sender:goodsInOrder];
     }
 }
@@ -350,7 +347,7 @@ typedef enum SocialButtonTags {
 
 #pragma mark - UITextField delegation methods
 -(void)textFieldDidBeginEditing:(UITextField *)textField{
-    NSLog(@"textFieldDidBeginEditing");
+
 }
 
 -(void)textFieldDidEndEditing:(UITextField *)textField{
@@ -363,7 +360,7 @@ typedef enum SocialButtonTags {
 }
 
 -(BOOL)textFieldShouldReturn:(UITextField *)textField{
-    NSLog(@"textFieldShouldReturn");
+
     [textField resignFirstResponder];
     return YES;
 }

@@ -77,7 +77,7 @@
     
 }
 -(void)didReceiveAllCategories:(NSArray *)array{
-    NSLog(@"didReceiveAllCategories");
+
     for (CategoryModel *category in array) {
         if ([category.id isEqualToString:_currentCategoryId]) {
             _items = category.childrens;

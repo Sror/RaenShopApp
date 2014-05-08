@@ -64,6 +64,10 @@
 		6C6472CC18ABD845001028DE /* CartViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6C6472CB18ABD845001028DE /* CartViewController.m */; };
 		6CA770DC18C7442C00C195E5 /* CartCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA770DB18C7442C00C195E5 /* CartCell.m */; };
 		6CA770DF18C7681900C195E5 /* CartItemParamsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CA770DE18C7681900C195E5 /* CartItemParamsModel.m */; };
+		6CB47DF91918DB910000FB05 /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CB47DF81918DB910000FB05 /* MobileCoreServices.framework */; };
+		6CB47DFB1918DBA40000FB05 /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CB47DFA1918DBA40000FB05 /* CFNetwork.framework */; };
+		6CB47DFD1918DBB80000FB05 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CB47DFC1918DBB80000FB05 /* AudioToolbox.framework */; };
+		6CB47DFF1918DC240000FB05 /* Parse.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CB47DFE1918DC240000FB05 /* Parse.framework */; };
 		6CB89CDE18B67CB60048407B /* NewsModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CB89CDD18B67CB60048407B /* NewsModel.m */; };
 		6CB8D5411901411F0003E3CC /* ProfileCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CB8D5401901411F0003E3CC /* ProfileCell.m */; };
 		6CB8D54419014E870003E3CC /* UserInfoModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CB8D54319014E870003E3CC /* UserInfoModel.m */; };
@@ -309,6 +313,10 @@
 		6CA770DB18C7442C00C195E5 /* CartCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CartCell.m; sourceTree = "<group>"; };
 		6CA770DD18C7681900C195E5 /* CartItemParamsModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CartItemParamsModel.h; sourceTree = "<group>"; };
 		6CA770DE18C7681900C195E5 /* CartItemParamsModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CartItemParamsModel.m; sourceTree = "<group>"; };
+		6CB47DF81918DB910000FB05 /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
+		6CB47DFA1918DBA40000FB05 /* CFNetwork.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
+		6CB47DFC1918DBB80000FB05 /* AudioToolbox.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AudioToolbox.framework; path = System/Library/Frameworks/AudioToolbox.framework; sourceTree = SDKROOT; };
+		6CB47DFE1918DC240000FB05 /* Parse.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = Parse.framework; sourceTree = "<group>"; };
 		6CB89CDC18B67CB60048407B /* NewsModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsModel.h; sourceTree = "<group>"; };
 		6CB89CDD18B67CB60048407B /* NewsModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsModel.m; sourceTree = "<group>"; };
 		6CB8D53F1901411F0003E3CC /* ProfileCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProfileCell.h; sourceTree = "<group>"; };
@@ -559,24 +567,28 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6CB47DF91918DB910000FB05 /* MobileCoreServices.framework in Frameworks */,
+				6CB47DFD1918DBB80000FB05 /* AudioToolbox.framework in Frameworks */,
+				6CC7FB9B18E03A1F00AB0278 /* CoreLocation.framework in Frameworks */,
+				6CB47DFB1918DBA40000FB05 /* CFNetwork.framework in Frameworks */,
+				6C5473CB188405130069E62B /* CoreGraphics.framework in Frameworks */,
+				6C41FB3418FF0B5C0082ACC5 /* QuartzCore.framework in Frameworks */,
 				33F9D506190EF56000D96386 /* libsqlite3.dylib in Frameworks */,
 				33F9D500190EF18800D96386 /* CoreData.framework in Frameworks */,
 				33F9D504190EF1A900D96386 /* libz.dylib in Frameworks */,
 				33F9D502190EF19E00D96386 /* AdSupport.framework in Frameworks */,
+				6CB47DFF1918DC240000FB05 /* Parse.framework in Frameworks */,
 				6CBF68A718913097003ED717 /* ImageIO.framework in Frameworks */,
 				6C41FB3618FF0B720082ACC5 /* MessageUI.framework in Frameworks */,
-				6C41FB3418FF0B5C0082ACC5 /* QuartzCore.framework in Frameworks */,
 				33F9D4FE190EF16000D96386 /* libGoogleAnalyticsServices.a in Frameworks */,
 				6CD38A0418F5CEAA00A9C087 /* GooglePlus.framework in Frameworks */,
 				6CC7FBA518E03A5900AB0278 /* SystemConfiguration.framework in Frameworks */,
 				6CC7FBA318E03A5100AB0278 /* Security.framework in Frameworks */,
 				6CC7FBA118E03A4500AB0278 /* MediaPlayer.framework in Frameworks */,
-				6C5473CB188405130069E62B /* CoreGraphics.framework in Frameworks */,
 				6CC7FB9F18E03A3000AB0278 /* CoreText.framework in Frameworks */,
 				6CC7FB9D18E03A2500AB0278 /* CoreMotion.framework in Frameworks */,
 				6CD38A0218F5CEAA00A9C087 /* GoogleOpenSource.framework in Frameworks */,
 				6CC7FB9918E03A1600AB0278 /* AssetsLibrary.framework in Frameworks */,
-				6CC7FB9B18E03A1F00AB0278 /* CoreLocation.framework in Frameworks */,
 				6CC7FB9718E03A0E00AB0278 /* AddressBook.framework in Frameworks */,
 				6C4EBFE618D86BEB00F953D2 /* Social.framework in Frameworks */,
 				6C4EBFE418D86BE500F953D2 /* Accounts.framework in Frameworks */,
@@ -759,6 +771,9 @@
 		6C5473C7188405130069E62B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6CB47DFC1918DBB80000FB05 /* AudioToolbox.framework */,
+				6CB47DFA1918DBA40000FB05 /* CFNetwork.framework */,
+				6CB47DF81918DB910000FB05 /* MobileCoreServices.framework */,
 				33F9D505190EF56000D96386 /* libsqlite3.dylib */,
 				33F9D503190EF1A900D96386 /* libz.dylib */,
 				33F9D501190EF19E00D96386 /* AdSupport.framework */,
@@ -1223,6 +1238,7 @@
 		6CD6250F18DA2B57004A189B /* thirdparty */ = {
 			isa = PBXGroup;
 			children = (
+				6CB47DFE1918DC240000FB05 /* Parse.framework */,
 				33F9D4F5190EF16000D96386 /* GoogleAnalytics */,
 				6C41FB5A18FFB8890082ACC5 /* TOWebViewController */,
 				6C41FB0718FF03E40082ACC5 /* SDWebImage */,
@@ -1318,6 +1334,9 @@
 				LastUpgradeCheck = 0510;
 				ORGANIZATIONNAME = "Aleksey Ivanov";
 				TargetAttributes = {
+					6C5473C4188405130069E62B = {
+						DevelopmentTeam = 657GC2CXLB;
+					};
 					6C5473EB188405130069E62B = {
 						TestTargetID = 6C5473C4188405130069E62B;
 					};
@@ -1606,13 +1625,13 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
+					"DEBUG=0",
 					"$(inherited)",
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
@@ -1624,6 +1643,7 @@
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				ONLY_ACTIVE_ARCH = YES;
+				PROVISIONING_PROFILE = "72CE39A9-D5A2-46E3-8D67-6B875673CEEF";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -1645,7 +1665,7 @@
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
@@ -1656,6 +1676,7 @@
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
+				PROVISIONING_PROFILE = "72CE39A9-D5A2-46E3-8D67-6B875673CEEF";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -1667,9 +1688,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/raen/Socializer/frameworks",
+					"$(PROJECT_DIR)/raen/thirdparty",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "raen/raenapp-Prefix.pch";
@@ -1680,6 +1704,7 @@
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = raenapp;
+				PROVISIONING_PROFILE = "72CE39A9-D5A2-46E3-8D67-6B875673CEEF";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1690,9 +1715,12 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Alexey Ivanov (657GC2CXLB)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Alexey Ivanov (657GC2CXLB)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/raen/Socializer/frameworks",
+					"$(PROJECT_DIR)/raen/thirdparty",
 				);
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "raen/raenapp-Prefix.pch";
@@ -1703,6 +1731,7 @@
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = raenapp;
+				PROVISIONING_PROFILE = "72CE39A9-D5A2-46E3-8D67-6B875673CEEF";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};

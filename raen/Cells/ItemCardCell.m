@@ -27,7 +27,6 @@
 }
 
 - (IBAction)pageChanged:(id)sender {
-    NSLog(@"changePage");
     // update the scroll view to the appropriate page
     CGRect frame;
     frame.origin.x = self.scrollView.frame.size.width * self.pageControl.currentPage;

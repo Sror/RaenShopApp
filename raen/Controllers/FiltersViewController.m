@@ -52,6 +52,12 @@
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     }else{
         NSLog(@"there is NOT subcategory ID!");
+        id<GAITracker> tracker = [[GAI sharedInstance] defaultTracker];
+        [tracker send:[[GAIDictionaryBuilder createEventWithCategory:@"Ошибка"
+                                                              action:@"Фильтры"
+                                                               label:@"there is NOT subcategory ID!"
+                                                               value:nil] build]];
+
     }
     
 
@@ -86,17 +92,17 @@
 
 #pragma mark - PickParameterViewControllerDelegate methods 
 -(void)didSelectBrand:(BrandModel *)brand{
-    NSLog(@"didSelectBrand %@",brand);
+  
     [_filterDictionary setObject:brand forKey:@"brand"];
     [self.tableView reloadData];
 }
 -(void)didSelectColor:(ColorModel *)color{
-    NSLog(@"didSelectColor %@",color);
+   
     [_filterDictionary setObject:color forKey:@"color"];
     [self.tableView reloadData];
 }
 -(void)didSelectValues:(NSString *)values ofParameter:(ParametersModel *)parameter{
-    NSLog(@"didSelectValues %@ ofParameter name %@",values,parameter.name);
+  
     [_filterDictionary setObject:values forKey:parameter.name];
     [self.tableView reloadData];
     
@@ -172,7 +178,7 @@
     }
     if (indexPath.section ==1) {
         ParametersModel *parameter =_filter.parameters[indexPath.row];
-        NSLog(@"sender.class %@",parameter.class);
+ 
         sender = parameter;
     }
     [self performSegueWithIdentifier:@"toPickParameterVC" sender:sender];
@@ -213,9 +219,7 @@
     for (NSString*paramName in paramNames) {
         if ([_filterDictionary objectForKey:paramName]) {
             NSString *value = [_filterDictionary objectForKey:paramName];
-            NSLog(@"currentValue %@",value);
             NSString *newValue = [value stringByReplacingOccurrencesOfString:@"," withString:@"_"];
-            NSLog(@"newValue %@",newValue);
             [newDict setObject:newValue forKey:paramName];
         }
     }

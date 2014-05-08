@@ -75,7 +75,7 @@
 }
 
 - (void)refreshView:(UIRefreshControl *)sender {
-    NSLog(@"refreshView");
+
     _item = nil;
     [self.tableView reloadData];
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
@@ -115,7 +115,6 @@
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     NSString *totalItems=response[@"total_items"];
     
-    NSLog(@"setting tabbar badge");
     [self.tabBarController.tabBar.items[3] setBadgeValue:[NSString stringWithFormat:@"%@",totalItems]];
     [_communicator saveCookies];
     
@@ -127,6 +126,10 @@
 #pragma  mark - ScrollView
 -(void)setImagesInScrollview:(UIScrollView*)scrollview{
     //set new images
+    for (UIView*subview in scrollview.subviews) {
+        [subview removeFromSuperview];
+    }
+    
     for (int i=0;i<_item.images.count;i++) {
         CGRect frame = scrollview.bounds;
         frame.origin.x = frame.size.width * i;
@@ -158,7 +161,19 @@
         [imageView addGestureRecognizer:tapOnSlider];
         
     }
-    
+    if (_item.images.count ==0) {
+        CGRect frame  = CGRectMake(scrollview.bounds.origin.x,
+                                   scrollview.bounds.origin.y,
+                                   scrollview.bounds.size.width-20,
+                                   scrollview.bounds.size.height-20);
+        
+        UIImageView *imageView =[[UIImageView alloc] initWithFrame:frame];
+        imageView.center = scrollview.center;
+        
+        imageView.contentMode = UIViewContentModeScaleAspectFit;
+        [scrollview addSubview:imageView];
+        [imageView setImage:[UIImage imageNamed:@"no_image.png"]];
+    }
 }
 
 -(NSArray*)photoBrowserPhotos{
@@ -305,8 +320,11 @@
                                       }
                                   }];
         }else{
-            NSLog(@"No image for thumbnail image");
-            [cell.thumbnail setImage:[UIImage imageNamed:@"no_image.jpg"]];
+            cell.thumbnail.contentMode = UIViewContentModeCenter;
+            UIImage* placeHolderImage = [UIImage imageWithCGImage:[UIImage imageNamed:@"no_image.png"].CGImage scale:5
+                                                      orientation:UIImageOrientationUp];
+           
+            [cell.thumbnail setImage:placeHolderImage];
         }
         return cell;
     }
@@ -338,7 +356,6 @@
         NSURL *url = [[NSURL alloc] init];
         TOWebViewController *webBrowser = [[TOWebViewController alloc] init];
         if ([rawstring rangeOfString:@"iframe"].location !=NSNotFound) {
-            NSLog(@"IFRAME FOUND");
             NSString *htmlString = [NSString stringWithFormat:@"<html><body><center><div style=\"width: 835px; margin: 0 auto;\">%@</div></center></body></html>",rawstring];
             webBrowser.HTMLString = htmlString;
             
@@ -420,14 +437,12 @@
 #pragma mark - Helpers
 -(void)addReviewAndVideo{
     _properties =[NSMutableArray array];
-    if ([_item.review rangeOfString:@"http"].location != NSNotFound) {
-        NSLog(@"item review found");
+    if ([_item.review rangeOfString:@"http"].location != NSNotFound) {;
         NSString* itemPropertyKey =[NSString stringWithFormat:@"Обзор %@",_item.title];
         NSDictionary *tmpDict =@{itemPropertyKey: _item.review};
         [_properties addObject:tmpDict];
     }
     if ([_item.video rangeOfString:@"http"].location !=NSNotFound) {
-        NSLog(@"item video link found");
         NSString* itemPropertyKey =[NSString stringWithFormat:@"Видеообзор %@",_item.title];
         NSDictionary *tmpDict =@{itemPropertyKey: _item.video};
         [_properties addObject:tmpDict];
@@ -466,7 +481,6 @@
     return availabledSpecItems;
 }
 
-
 #pragma mark - MWPhotoBrowser methods
 
 -(void)setupPhotoBrowser:(MWPhotoBrowser*)photoBrowser withCurrentPhotoIndex:(NSInteger)index{
@@ -485,8 +499,6 @@
 }
 
 -(void)tappedOnThumbnail:(UITapGestureRecognizer*)gestureRecognizer{
-    NSInteger tag = gestureRecognizer.view.tag;
-    NSLog(@"tapped on thumbnail %i",tag);
     MWPhotoBrowser *photoBrowser = [[MWPhotoBrowser alloc] initWithDelegate:self];
     [self setupPhotoBrowser:photoBrowser withCurrentPhotoIndex:0];
     [self presentViewController:[[UINavigationController alloc] initWithRootViewController:photoBrowser] animated:YES completion:nil];

@@ -337,7 +337,7 @@ int RaenAPIdefaultNewsItemsCountPerPage = 10;
     SpecItem *specItem = item.specItems[index];
     //NSLog(@"adding item in cart  %@",item);
     NSString *price =item.priceNew.length >2 ? item.priceNew : item.price;
-    NSString *bodyParams =[NSString stringWithFormat:@"name=%@ %@,%@&id=%@&price=%@&qty=1&token=%@",item.brand,item.title,specItem.color,specItem.db1cId,price,[[Socializer sharedManager] raenAPIToken]];
+    NSString *bodyParams =[NSString stringWithFormat:@"name=%@ %@, %@&id=%@&price=%@&qty=1&token=%@",item.brand,item.title,specItem.color,specItem.db1cId,price,[[Socializer sharedManager] raenAPIToken]];
     NSLog(@"parameters %@",bodyParams);
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [JSONHTTPClient JSONFromURLWithString:kRaenApiSendToCartItem
@@ -561,10 +561,6 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
                                                                       value:nil] build]];
 
            }
-           
-       }else {
-#warning TODO bad response from API server!
-          
            
        }
     }];

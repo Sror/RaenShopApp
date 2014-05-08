@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5056" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="8YX-ce-x5E">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="5053" systemVersion="13C1021" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" initialViewController="8YX-ce-x5E">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="3733"/>
     </dependencies>
@@ -13,16 +13,16 @@
                         <viewControllerLayoutGuide type="bottom" id="z77-Bh-OFO"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="031-f3-Du9">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                        <rect key="frame" x="0.0" y="64" width="320" height="372"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="338" sectionHeaderHeight="22" sectionFooterHeight="22" translatesAutoresizingMaskIntoConstraints="NO" id="j1z-7c-PF2">
-                                <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="372"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <prototypes>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="itemCardCell" rowHeight="221" id="NxM-h1-dj0" customClass="ItemCardCell">
-                                        <rect key="frame" x="0.0" y="86" width="320" height="221"/>
+                                        <rect key="frame" x="0.0" y="22" width="320" height="221"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="NxM-h1-dj0" id="Mss-eQ-lzD">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="220"/>
@@ -122,7 +122,7 @@
                                         </connections>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="defaultCell" textLabel="BLH-pm-sG5" rowHeight="44" style="IBUITableViewCellStyleDefault" id="GDa-V2-RTg">
-                                        <rect key="frame" x="0.0" y="307" width="320" height="44"/>
+                                        <rect key="frame" x="0.0" y="243" width="320" height="44"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="GDa-V2-RTg" id="e8a-7k-7kJ">
                                             <rect key="frame" x="0.0" y="0.0" width="287" height="43"/>
@@ -139,14 +139,14 @@
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                     <tableViewCell contentMode="scaleToFill" selectionStyle="none" indentationWidth="10" reuseIdentifier="availableItemCell" rowHeight="80" id="OVg-fQ-WtZ" customClass="AvailableItemCell">
-                                        <rect key="frame" x="0.0" y="351" width="320" height="80"/>
+                                        <rect key="frame" x="0.0" y="287" width="320" height="80"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="OVg-fQ-WtZ" id="IPd-Db-DXY">
                                             <rect key="frame" x="0.0" y="0.0" width="320" height="79"/>
                                             <autoresizingMask key="autoresizingMask"/>
                                             <subviews>
                                                 <imageView userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2fU-C6-jrg">
-                                                    <rect key="frame" x="4" y="2" width="76" height="76"/>
+                                                    <rect key="frame" x="5" y="5" width="70" height="70"/>
                                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 </imageView>
                                                 <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="7og-Wn-C3G">
@@ -296,7 +296,7 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="Магазин" id="gMB-ew-6za">
-                        <barButtonItem key="rightBarButtonItem" title="Контакты" id="SD0-sC-lKg">
+                        <barButtonItem key="rightBarButtonItem" title="О нас" id="SD0-sC-lKg">
                             <connections>
                                 <action selector="contactsButtonPressed:" destination="CZ4-MO-1fc" id="ndS-vD-Azb"/>
                             </connections>
@@ -542,7 +542,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ymR-Q0-4G1">
-                                        <rect key="frame" x="157" y="7" width="121" height="30"/>
+                                        <rect key="frame" x="157" y="0.0" width="121" height="44"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                         <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="14"/>
                                         <state key="normal" title="Оформить заказ">
@@ -636,7 +636,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
-                            <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="TTY-Go-3aX">
+                            <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="TTY-Go-3aX">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -694,6 +694,12 @@
                             </collectionView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="TTY-Go-3aX" firstAttribute="top" secondItem="yI7-UV-prU" secondAttribute="top" id="DIG-na-RiC"/>
+                            <constraint firstItem="TTY-Go-3aX" firstAttribute="leading" secondItem="yI7-UV-prU" secondAttribute="leading" id="aNX-Ip-2mf"/>
+                            <constraint firstAttribute="trailing" secondItem="TTY-Go-3aX" secondAttribute="trailing" id="bGt-yu-Eb5"/>
+                            <constraint firstAttribute="bottom" secondItem="TTY-Go-3aX" secondAttribute="bottom" id="me2-54-ks0"/>
+                        </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="SHk-41-pFQ"/>
                     <connections>
@@ -1390,7 +1396,7 @@
         <simulatedScreenMetrics key="destination"/>
     </simulatedMetricsContainer>
     <inferredMetricsTieBreakers>
-        <segue reference="fzf-UP-MD3"/>
+        <segue reference="mtK-23-BHk"/>
         <segue reference="puG-a6-YLo"/>
     </inferredMetricsTieBreakers>
 </document>

@@ -72,13 +72,10 @@
 }
 #pragma mark - RaenAPICOmmunicationDelegate 
 -(void)didReceiveSubcategory:(id)subcategoryModel{
-    NSLog(@"didReceiveSubcategory");
     if ([subcategoryModel isKindOfClass:[SubcategoryModel class]]) {
         SubcategoryModel *subcategory  = subcategoryModel;
         _itemsCount = subcategory.count;
-        NSLog(@"_itemsCount %i",_itemsCount);
         [_items addObjectsFromArray:subcategory.goods];
-        NSLog(@"_items.count %i",_items.count);
         [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
         [self.navigationItem setTitle:@"Товары"];
         [self.collectionView reloadData];
@@ -86,21 +83,8 @@
         
 #warning TODO move to loaded items
         
-        /*
-        if (_itemsCount/_items.count != 1)
-        {
-            NSInteger rowToScroll= _items.count-_itemsCount;
-            NSLog(@"rowToScroll %i",rowToScroll);
-            NSIndexPath *firstNewIndexPath = [NSIndexPath indexPathForRow:rowToScroll inSection:0];
-            [self.collectionView scrollToItemAtIndexPath:firstNewIndexPath
-                                        atScrollPosition:UICollectionViewScrollPositionCenteredVertically
-                                                animated:YES];
-        }
-         */
     }
-    
-    
-    NSLog(@"\n_items.count = %d\n _itemsCount=%d",_items.count,_itemsCount);
+   
 }
 
 -(void)fetchingFailedWithError:(JSONModelError *)error{
@@ -114,7 +98,6 @@
 -(void)didSelectFilter:(NSDictionary *)filterParameters{
     [MBProgressHUD showHUDAddedTo:self.view animated:YES]; 
     [_items removeAllObjects];
-#warning added default sorting as NEW items
     NSMutableDictionary* newFilterParams = filterParameters.mutableCopy;
     [newFilterParams addEntriesFromDictionary:@{@"sort":@"new"}];
     
@@ -158,9 +141,8 @@
 }
 #pragma  mark -UiCollectionViewDelegate
 -(void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    NSLog(@"didSelectItemAtIndexPath");
-    GoodModel *item = _items[indexPath.row];
     
+    GoodModel *item = _items[indexPath.row];
     [self performSegueWithIdentifier:@"toItemCardView" sender:item.id];
 }
 #pragma mark - UIScrollViewDelegate

@@ -27,7 +27,9 @@ static char operationArrayKey;
 }
 
 - (void)setImageWithURL:(NSURL *)url completed:(SDWebImageCompletedBlock)completedBlock {
+  
     [self setImageWithURL:url placeholderImage:nil options:0 progress:nil completed:completedBlock];
+    
 }
 
 - (void)setImageWithURL:(NSURL *)url placeholderImage:(UIImage *)placeholder completed:(SDWebImageCompletedBlock)completedBlock {
@@ -42,10 +44,10 @@ static char operationArrayKey;
     [self cancelCurrentImageLoad];
 
     self.image = placeholder;
-
-    if (url) {
+    if (url && ![url.absoluteString isEqualToString:@"http://raenshop.ru/img/goods/b_med/no_image.jpg"]) {
         __weak UIImageView *wself = self;
-        id <SDWebImageOperation> operation = [SDWebImageManager.sharedManager downloadWithURL:url options:options progress:progressBlock completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished) {
+        id <SDWebImageOperation> operation = [SDWebImageManager.sharedManager downloadWithURL:url options:options progress:progressBlock
+                                                                                    completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, BOOL finished) {
             if (!wself) return;
             dispatch_main_sync_safe(^{
                 if (!wself) return;
@@ -60,6 +62,20 @@ static char operationArrayKey;
         }];
         objc_setAssociatedObject(self, &operationKey, operation, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
     }
+    
+    if ([url.absoluteString isEqualToString:@"http://raenshop.ru/img/goods/b_med/no_image.jpg"]){
+        //NSString* path = [[NSBundle mainBundle] pathForResource:@"no_image" ofType:@"png"];
+        self.contentMode = UIViewContentModeCenter;
+        UIImage* placeHolderImage = [UIImage imageWithCGImage:[UIImage imageNamed:@"no_image.png"].CGImage scale:2.5
+                                                  orientation:UIImageOrientationUp];
+        //UIImage* image = [UIImage imageWithContentsOfFile:path];
+        self.image = placeHolderImage;
+        [self setNeedsLayout];
+        NSError*error;
+        SDImageCacheType cacheType = SDImageCacheTypeNone;
+        completedBlock(placeHolderImage,error,cacheType);
+    }
+   
 }
 
 - (void)setAnimationImagesWithURLs:(NSArray *)arrayOfURLs {
