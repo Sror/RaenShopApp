@@ -38,8 +38,10 @@ extern NSString *kFacebookIdentifier;
 @protocol SocializerDelegate <NSObject>
 
 - (void)shouldShowVCCaptchaVC:(VKCaptchaViewController*)viewController;
+- (void)shouldPresentVKViewController:(UIViewController*)controller;
+- (void)shouldPresentGoogleAuthViewController:(GTMOAuth2ViewControllerTouch*)controller;
 - (void)successfullyAuthorizedToSocialNetwork;
-
+ 
 - (void)successLogout;
 - (void)failureAuthorization;
 @end
@@ -59,14 +61,13 @@ extern NSString *kFacebookIdentifier;
 @property (nonatomic,strong) NSString *userPhone;
 
 @property (nonatomic,strong)  FBSession *fbSession;
-@property (nonatomic,strong)  GPPSignIn *googleSignIn;
 
 @property (nonatomic,strong) ACAccountStore *accountStore;
 @property (nonatomic,strong) ACAccount *twitterAccount;
 @property (nonatomic,strong) TWAPIManager *twitterAPIManager;
 @property (nonatomic,strong) NSArray* twitterAccounts;
 
-
+@property ACAccount* facebookAccount;
 
 //Singleton
 + (Socializer*)sharedManager;

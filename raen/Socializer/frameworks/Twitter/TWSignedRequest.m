@@ -36,7 +36,6 @@
 
 #define REQUEST_TIMEOUT_INTERVAL 8
 
-#warning 
 #define kTwitterAPIKey @"88d0daNZvrC22o3VEdIEBg"
 #define kTwitterAPISecret @"9iMEcKOFWRDkMfvZFGXUKJoOX1f172iWjYdE6ANb3lM"
 

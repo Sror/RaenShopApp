@@ -264,7 +264,8 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     _buttonSpacing = (IPAD == NO) ? NAVIGATION_BUTTON_SPACING : NAVIGATION_BUTTON_SPACING_IPAD;
     _buttonWidth = NAVIGATION_BUTTON_WIDTH;
     _showLoadingBar = YES;
-   
+
+
     //Set the initial default style as full screen (But this can be easily overwritten)
     self.modalPresentationStyle = UIModalPresentationFullScreen;
 }
@@ -275,7 +276,7 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
 {
     //Create the all-encompassing container view
     UIView *view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] applicationFrame]];
-    view.backgroundColor = (self.hideWebViewBoundaries ? [UIColor whiteColor] : BACKGROUND_COLOR);
+    view.backgroundColor = (self.hideWebViewBoundaries ? [UIColor whiteColor] : BACKGROUND_COLOR_MINIMAL);
   
     view.opaque = YES;
     view.clipsToBounds = YES;
@@ -448,12 +449,9 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     
     // Create the Done button
     if (self.beingPresentedModally && !self.onTopOfNavigationControllerStack) {
-        NSString *title = NSLocalizedStringFromTable(@"Done", @"TOWebViewControllerLocalizable", @"Modal Web View Controller Close");
-        UIBarButtonItem *doneButton = [[UIBarButtonItem alloc] initWithTitle:title style:UIBarButtonItemStyleDone target:self action:@selector(doneButtonTapped:)];
-        if (IPAD)
-            self.navigationItem.leftBarButtonItem = doneButton;
-        else
-            self.navigationItem.rightBarButtonItem = doneButton;
+        UIImage *backButtonImage = [UIImage TOWebViewControllerIcon_backButtonWithAttributes:self.buttonThemeAttributes];
+        UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithImage:backButtonImage style:UIBarButtonItemStyleBordered target:self action:@selector(doneButtonTapped:)];
+        self.navigationItem.leftBarButtonItem = backButton;
     }
     
     //Set the appropriate actions to the buttons
@@ -462,6 +460,7 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     [self.reloadStopButton  addTarget:self action:@selector(reloadStopButtonTapped:)    forControlEvents:UIControlEventTouchUpInside];
     [self.actionButton      addTarget:self action:@selector(actionButtonTapped:)        forControlEvents:UIControlEventTouchUpInside];
     
+    //[[NSNotificationCenter defaultCenter] postNotificationName:@"WEBBROWSER_STATE" object:nil userInfo:@{@"visible":@(YES)}];
     
 }
 
@@ -484,8 +483,8 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
             }
         }
         else {
-            [self.navigationController setNavigationBarHidden:NO animated:animated];
-            [self.navigationController setToolbarHidden:YES animated:animated];
+            //[self.navigationController setNavigationBarHidden:NO animated:animated];
+            //[self.navigationController setToolbarHidden:YES animated:animated];
         }
     }
     
@@ -528,12 +527,15 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
         [self.navigationController setToolbarHidden:self.hideToolbarOnClose animated:animated];
         [self.navigationController setNavigationBarHidden:self.hideNavBarOnClose animated:animated];
     }
+    
+   // [[NSNotificationCenter defaultCenter] postNotificationName:@"WEBBROWSER_STATE" object:self userInfo:@{@"visible":@(NO)}];
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:NO];
+
 }
 
 - (BOOL)shouldAutorotate
@@ -544,14 +546,6 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
     return YES;
 }
 
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation
-{
-    if (self.webViewRotationSnapshot)
-        return NO;
-    
-    return YES;
-}
 
 - (void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration
 {
@@ -876,10 +870,13 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
         }
         
         //Add Twitter
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
         if ([TWTweetComposeViewController canSendTweet]) {
             [actionSheet addButtonWithTitle:NSLocalizedStringFromTable(@"Twitter", @"TOWebViewControllerLocalizable", @"Send a Tweet")];
             numberOfButtons++;
         }
+#pragma clang diagnostic pop
         
         //Add a cancel button if on iPhone
         if (IPAD == NO) {
@@ -909,16 +906,22 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
                 [self openMailDialog];
             else if ([MFMessageComposeViewController canSendText])
                 [self openMessageDialog];
-            else if ([TWTweetComposeViewController canSendTweet])
-                [self openTwitterDialog];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                else if ([TWTweetComposeViewController canSendTweet])
+                    [self openTwitterDialog];
+#pragma clang diagnostic pop
         }
             break;
         case 3: //SMS or Twitter
         {
             if ([MFMessageComposeViewController canSendText])
                 [self openMessageDialog];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
             else if ([TWTweetComposeViewController canSendTweet])
                 [self openTwitterDialog];
+#pragma clang diagnostic pop
         }
             break;
         case 4: //Twitter (or Cancel)
@@ -1010,48 +1013,12 @@ static const float kAfterInteractiveMaxProgressValue    = 0.9f;
 
 - (void)openTwitterDialog
 {
-
-    /*
-    if([SLComposeViewController isAvailableForServiceType:SLServiceTypeTwitter]) {
-        
-        SLComposeViewController *controller = [SLComposeViewController composeViewControllerForServiceType:SLServiceTypeTwitter];
-        
-        SLComposeViewControllerCompletionHandler myBlock = ^(SLComposeViewControllerResult result){
-            if (result == SLComposeViewControllerResultCancelled) {
-                
-                NSLog(@"Cancelled");
-                
-            } else
-                
-            {
-                NSLog(@"Done");
-            }
-            
-            [controller dismissViewControllerAnimated:YES completion:Nil];
-        };
-        controller.completionHandler =myBlock;
-        
-        //Adding the Text to the facebook post value from iOS
-        [controller setInitialText:@"Test Post from РАЕН"];
-        
-        //Adding the URL to the facebook post value from iOS
-        
-        [controller addURL:self.url];
-        
-        [self presentViewController:controller animated:YES completion:Nil];
-        
-    }
-    else{
-        NSLog(@"UnAvailable");
-    }
-     */
-    /*
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     TWTweetComposeViewController *tweetComposer = [[TWTweetComposeViewController alloc] init];
     [tweetComposer addURL:self.url];
-    
     [self presentViewController:tweetComposer animated:YES completion:nil];
-    //[self presentModalViewController:tweetComposer animated:YES];
-     */
+#pragma clang diagnostic pop
 }
 
 

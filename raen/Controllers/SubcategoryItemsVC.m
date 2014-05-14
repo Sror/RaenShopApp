@@ -81,7 +81,7 @@
         [self.collectionView reloadData];
         [self.refreshControl endRefreshing];
         
-#warning TODO move to loaded items
+#warning TODO: move to loaded items
         
     }
    
@@ -130,7 +130,7 @@
         itemCell.priceLabel.text = @"";
         itemCell.oldPriceLabel.text = [NSString stringWithFormat:@"%@ Руб.",item.price];
     }
-
+    itemCell.imageView.contentMode = UIViewContentModeScaleAspectFit;
     [itemCell.imageView setImageWithURL:[NSURL URLWithString:item.imageLink] completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType) {
         [itemCell.activityIndicator stopAnimating];
         if (error) {
@@ -182,5 +182,9 @@
     
     [self performSegueWithIdentifier:@"toFiltersVC" sender:self.subcategoryID];
 }
+
+
+
+
 
 @end

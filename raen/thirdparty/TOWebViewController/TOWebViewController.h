@@ -26,7 +26,8 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TOWebViewController : UIViewController
+
+@interface TOWebViewController : UIViewController <UITabBarControllerDelegate>
 
 - (instancetype)initWithURL:(NSURL *)url;
 - (instancetype)initWithURLString:(NSString *)urlString;

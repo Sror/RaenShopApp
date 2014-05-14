@@ -126,7 +126,8 @@ typedef enum SocialButtonTags {
 -(void)fetchingFailedWithError:(JSONModelError *)error {
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     [_refreshControl endRefreshing];
-    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error" message:@"Проверьте подключение к интернету"
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Error"
+                                                    message:@"Проверьте подключение к интернету"
                                                    delegate:self
                                           cancelButtonTitle:@"OK"
                                           otherButtonTitles: nil];
@@ -192,6 +193,17 @@ typedef enum SocialButtonTags {
 -(void)shouldShowVCCaptchaVC:(VKCaptchaViewController *)viewController{
     [viewController presentIn:self];
 }
+-(void)shouldPresentVKViewController:(UIViewController *)controller{
+    [self presentViewController:controller animated:YES completion:nil];
+}
+
+-(void)shouldPresentGoogleAuthViewController:(GTMOAuth2ViewControllerTouch *)controller{
+
+//    [self presentViewController:[[UINavigationController alloc] initWithRootViewController:controller] animated:YES completion:nil];
+    [self.navigationController pushViewController:controller animated:YES];
+//   [self presentViewController:controller animated:YES completion:nil];
+}
+
 -(void)successfullyAuthorizedToSocialNetwork{
     //Step 2 - send request to RAEN API
     [_communicator authAPIVia:[Socializer sharedManager].socialIdentificator
@@ -223,14 +235,14 @@ typedef enum SocialButtonTags {
    
 }
 -(void)didFailuerAPIAuthorizationWithResponse:(NSDictionary *)response{
-    NSLog(@"didFailuerAPIAuthorizationWithResponse %@",response);
     [[Socializer sharedManager] logOutFromCurrentSocial];
     
-    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Ошибка" message:response[@"login_error"] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+    UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Ошибка"
+                                                        message:response[@"login_error"]
+                                                       delegate:nil
+                                              cancelButtonTitle:@"OK"
+                                              otherButtonTitles:nil];
     [alertView show];
-    
-    
-    
 }
 
 -(void)didReceiveCartItems:(NSArray *)items{
@@ -259,7 +271,7 @@ typedef enum SocialButtonTags {
 
 -(void)didExistEmail{
     [self rotateSignInSubviewWithCompletion:^{
-        [self showEmailAlertWithMessage:[NSString stringWithFormat:@"%@ уже занят, пожалуйста введите другой email",
+        [self showEmailAlertWithMessage:[NSString stringWithFormat:@"%@ email уже занят, пожалуйста введите другой email",
                                          [Socializer sharedManager].socialUserEmail]];
 
     }];

@@ -679,7 +679,7 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
     [[NSUserDefaults standardUserDefaults]synchronize];
 }
 -(void)saveCookies{
-    NSLog(@"saving cookies");
+  //  NSLog(@"saving cookies");
     NSMutableArray *cookieArray = [[NSMutableArray alloc] init];
     for (NSHTTPCookie *cookie in [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookies]) {
         if ([cookie.domain isEqualToString:@"raenshop.ru"]&&[cookie.name isEqualToString:@"ci_session"]) {
@@ -690,7 +690,6 @@ optionalParameters:(NSDictionary*)optionalParametersDictionary
             [cookieProperties setObject:cookie.domain forKey:NSHTTPCookieDomain];
             [cookieProperties setObject:cookie.path forKey:NSHTTPCookiePath];
             [cookieProperties setObject:[NSNumber numberWithInt:cookie.version] forKey:NSHTTPCookieVersion];
-#warning time interval?
             [cookieProperties setObject:[[NSDate date] dateByAddingTimeInterval:2629743] forKey:NSHTTPCookieExpires];
             [[NSUserDefaults standardUserDefaults] setValue:cookieProperties forKey:cookie.name];
         }

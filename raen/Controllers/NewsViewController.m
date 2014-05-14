@@ -39,7 +39,6 @@
     [tracker send:[[GAIDictionaryBuilder createAppView] build]];
 }
 
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -117,7 +116,7 @@
 //Update cart tabbar icon
 -(void)didReceiveCartItems:(NSArray *)items
 {
-    [self.tabBarController.tabBar.items[3] setBadgeValue:[NSString stringWithFormat:@"%i",items.count]];
+    [self.tabBarController.tabBar.items[3] setBadgeValue:[NSString stringWithFormat:@"%lu",(unsigned long)items.count]];
 }
 
 #pragma mark - UITableViewDataSource Methods
@@ -163,9 +162,12 @@
     NewsModel *news = _news[indexPath.row];
     
     TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:news.link]];
+    webBrowser.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
     [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
-    //webBrowser.hidesBottomBarWhenPushed = YES;
-    //[self.navigationController pushViewController:webBrowser animated:YES];
+    
+  
+//    webBrowser.hidesBottomBarWhenPushed = YES;
+//    [self.navigationController pushViewController:webBrowser animated:YES];
    
 }
 #pragma mark - UIScrollViewDelegate
@@ -242,8 +244,11 @@
 {
     SliderModel *slider = _sliderItems[tapGestureRecognizer.view.tag];
     if ([slider.action isEqualToString:@"toBrowser"]) {
+        
         TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:slider.link]];
+        webBrowser.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
         [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
+        
         
     }else if ([slider.action isEqualToString:@"toItemCardView"]){
         [self performSegueWithIdentifier:@"toItemCardView" sender:slider.id];
@@ -263,4 +268,6 @@
     [self.tableView reloadData];
     // Dispose of any resources that can be recreated.
 }
+
+
 @end

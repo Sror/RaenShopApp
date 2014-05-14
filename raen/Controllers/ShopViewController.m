@@ -162,7 +162,7 @@
 */
 #pragma mark UICollectionView delegate
 -(void)collectionView:(IndexedCV *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath{
-    NSLog(@"indexedCV #%d, did selectItem at row %d",collectionView.index,indexPath.row);
+   // NSLog(@"indexedCV #%d, did selectItem at row %d",collectionView.index,indexPath.row);
     CategoryModel *category=_categories[collectionView.index];
     ChildrenModel *subCategory = category.childrens[indexPath.row];
     [self performSegueWithIdentifier:@"toSubcategoryItemsVC" sender:subCategory.id];
@@ -205,9 +205,9 @@
 }
 - (IBAction)contactsButtonPressed:(id)sender {
     TOWebViewController *webBrowser = [[TOWebViewController alloc] initWithURL:[NSURL URLWithString:kRaenContactsLink]];
+    webBrowser.modalTransitionStyle =  UIModalTransitionStyleFlipHorizontal;
     [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
 
 }
-
 
 @end

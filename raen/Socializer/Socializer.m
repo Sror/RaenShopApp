@@ -19,7 +19,7 @@ NSString *kFacebookIdentifier = @"Facebook";
 #define kGoogleClientID @"231217279677-ebftkbl3ad5jbhdr1ha7dilcm2otvpil.apps.googleusercontent.com"
 #define kGoogleClientSecret @"vGLokxZqDzF5HgIpllGl0Hao"
 #define kShouldSaveInKeychainKey  @"shouldSaveInKeychain"
-#define kKeychainItemName  @"OAuth raenshopapp: Google+"
+#define kKeychainItemName  @"OAuth РАЁН: Google+"
 
 NSString* kVKAppId = @"4237186";
 NSString* kFacebookAppID = @"220082361532667";
@@ -33,7 +33,7 @@ NSString* kSocializerSocialUserFullName = @"SOCIALIZER_SOCIAL_USER_FULL_NAME";
 NSString* kSocializerSocialUserEmail = @"SOCIALIZER_SOCIAL_USER_EMAIL";
 NSString* kUserPhone = @"RAEN_USER_PHONE";
 
-@interface Socializer ()<VKSdkDelegate, GPPSignInDelegate>{
+@interface Socializer ()<VKSdkDelegate>{
     int mNetworkActivityCounter;
 }
 @end
@@ -53,7 +53,7 @@ NSString* kUserPhone = @"RAEN_USER_PHONE";
 {
     self = [super init];
     if (self) {
-        self.accountStore = [[ACAccountStore alloc]init];
+        self.accountStore = [[ACAccountStore alloc] init];
         self.twitterAPIManager = [[TWAPIManager alloc] init];
         [self setPropertiesFromUserDefaults];
     }
@@ -72,21 +72,12 @@ NSString* kUserPhone = @"RAEN_USER_PHONE";
     }
 }
 
-#pragma mark - Sessions initializer
--(FBSession *)fbSession{
-    if (_fbSession == nil) {
-        _fbSession = [[FBSession alloc] initWithPermissions:@[@"basic_info",
-                                                              @"email",
-                                                              @"user_likes"
-                                                              ]];
-    }else if (_fbSession.state == FBSessionStateClosed || _fbSession.state == FBSessionStateClosedLoginFailed){
-        [self handleFacebookSessionError];
-    }
-    return _fbSession;
-}
+#pragma mark - Google session initializer
+/*
 -(GPPSignIn *)googleSignIn{
     if (_googleSignIn ==nil) {
         _googleSignIn = [GPPSignIn sharedInstance];
+        _googleSignIn.attemptSSO = YES;
         _googleSignIn.shouldFetchGooglePlusUser = YES;
         _googleSignIn.shouldFetchGoogleUserEmail = YES;
         _googleSignIn.shouldFetchGoogleUserID = YES;
@@ -96,6 +87,7 @@ NSString* kUserPhone = @"RAEN_USER_PHONE";
     }
     return _googleSignIn;
 }
+*/
 
 #pragma mark - Login methods
 -(void)loginVK{
@@ -110,35 +102,90 @@ NSString* kUserPhone = @"RAEN_USER_PHONE";
         [self vkUserinfo];
     }else{
         NSArray *scope = @[VK_PER_FRIENDS,VK_PER_WALL,VK_PER_PHOTOS,VK_PER_NOHTTPS];
-        [VKSdk authorize:scope revokeAccess:YES];
-    }
-    
-    
-}
--(void)loginFacebook{
-    [self.fbSession openWithCompletionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
+        //was[VKSdk authorize:scope revokeAccess:YES];
+        //have to use internal web view for authorization
         
-        if (!error) {
-            if ([_fbSession isOpen]) {
-                _socialIdentificator = kFacebookIdentifier;
-                _socialAccessToken = _fbSession.accessTokenData.accessToken;
-                [self fbUserInfo];
-                //[self.delegate authorizedViaFaceBook];
-            }else{
-                NSLog(@"---error to open facebook session--- %@",error);
-                
-            }
+        [VKSdk authorize:scope revokeAccess:YES forceOAuth:YES inApp:YES];
+    }
+}
+
+-(void)loginFacebook{
+    NSArray *fbPermissions = @[@"basic_info",
+                               @"email",
+                               @"user_likes"
+                               ];
+    BOOL isFBSessionActive =  [FBSession openActiveSessionWithReadPermissions:fbPermissions
+                                       allowLoginUI:YES
+                                  completionHandler:^(FBSession *session, FBSessionState status, NSError *error)
+    {
+        if (!error)
+        {
+            _fbSession = session;
+                    if ([_fbSession isOpen]) {
+                        _socialIdentificator = kFacebookIdentifier;
+                       _socialAccessToken = _fbSession.accessTokenData.accessToken;
+                        [self fbUserInfo];
+                           
+                   }else{
+                       NSLog(@"---error to open facebook session--- %@",error);
+                       [self handleFacebookSessionError];
+                   }
         }
-    }];
-    
+                                                      }];
+    if (!isFBSessionActive) {
+//open new facebook sessio
+        _fbSession = [[FBSession alloc] initWithPermissions:fbPermissions];
+        [_fbSession openWithCompletionHandler:^(FBSession *session, FBSessionState status, NSError *error) {
+            if (!error) {
+                if ([_fbSession isOpen]) {
+                    _socialIdentificator = kFacebookIdentifier;
+                    _socialAccessToken = _fbSession.accessTokenData.accessToken;
+                    [self fbUserInfo];
+                }else{
+                    NSLog(@"---error to open facebook session--- %@",error);
+                }
+            }
+        }];
+    }
 }
 
 -(void)loginGoogle{
-    [self.googleSignIn authenticate];
+//    [self.googleSignIn authenticate];
+    
+GTMOAuth2ViewControllerTouch *controller = [[GTMOAuth2ViewControllerTouch alloc]
+                                            initWithScope:kGTLAuthScopePlusLogin
+                                            clientID:kGoogleClientID
+                                            clientSecret:kGoogleClientSecret
+                                            keychainItemName:kKeychainItemName
+                                                                             completionHandler:^(GTMOAuth2ViewControllerTouch *viewController, GTMOAuth2Authentication *auth, NSError *error) {
+                                                                                 if (!error) {
+                                                                                     _socialIdentificator = kGoogleIdentifier;
+                                                                                     _socialAccessToken = auth.accessToken;
+                                                                                     _socialUserEmail = viewController.signIn.userProfile[@"email"];
+                                                                                     _socialUserId = viewController.signIn.userProfile[@"sub"];
+                                                                                     _socialUsername = viewController.signIn.userProfile[@"name"];
+                                                                                     //user avatar link userProfile[@"picture"]
+
+                                                                                     _authorizedAnySocial = [auth canAuthorize];
+                                                                                     if (_authorizedAnySocial) {
+                                                                                         [self saveAuthUserDataToDefaults];
+                                                                                         [self.delegate successfullyAuthorizedToSocialNetwork];
+                                                                                     }
+                                                                                 }else{
+                                                                                     NSLog(@"--Google Authorization error %@--",error);
+                                                                                    // [self.googleSignIn disconnect];
+                                                                                     [self.delegate failureAuthorization];
+                                                                                 }
+                                                                             }];
+
+
+    controller.signIn.shouldFetchGoogleUserEmail = YES;
+    controller.signIn.shouldFetchGoogleUserProfile = YES;
+    [self.delegate shouldPresentGoogleAuthViewController:controller];
+    
 }
 
 -(void)loginTwitterAccountAtIndex:(NSInteger)index{
-    NSLog(@"login twitter account at index %i",index);
     _twitterAccount = _twitterAccounts[index];
     [[UIApplication sharedApplication] setNetworkActivityIndicatorVisible:YES];
     [_twitterAPIManager performReverseAuthForAccount:_twitterAccount
@@ -185,7 +232,7 @@ NSString* kUserPhone = @"RAEN_USER_PHONE";
     [VKSdk forceLogout];
 }
 -(void)logOutGoogle{
-    [[GPPSignIn sharedInstance] signOut];
+    [[GPPSignIn sharedInstance] disconnect];
 }
 -(void)logOutFacebook{
     [_fbSession closeAndClearTokenInformation];
@@ -301,7 +348,6 @@ NSString* kUserPhone = @"RAEN_USER_PHONE";
             if (jsonError) {
                 NSLog(@"error to json serialization! %@",jsonError);
             }else{
-                NSLog(@"json %@",json);
                 _socialUserId = json[@"id"];
                 _socialIdentificator = kTwitterIdentifier;
                 _socialUsername = json[@"name"];
@@ -316,7 +362,7 @@ NSString* kUserPhone = @"RAEN_USER_PHONE";
     }];
 }
 
-
+/* i use completion handler
 #pragma mark - Google sign In Delegate methods
 -(void)finishedWithAuth:(GTMOAuth2Authentication *)auth error:(NSError *)error{
     if (!error) {
@@ -333,10 +379,11 @@ NSString* kUserPhone = @"RAEN_USER_PHONE";
         }
     }else{
         NSLog(@"--Google Authorization error %@--",error);
+        [self.googleSignIn disconnect];
         [self.delegate failureAuthorization];
     }
 }
-
+*/
 
 #pragma mark - VKDelegate methods
 -(void)vkSdkAcceptedUserToken:(VKAccessToken *)token{
@@ -386,6 +433,7 @@ NSString* kUserPhone = @"RAEN_USER_PHONE";
 
 -(void)vkSdkShouldPresentViewController:(UIViewController *)controller{
     NSLog(@"vkSdkShouldPresentViewController");
+    [self.delegate shouldPresentVKViewController:controller];
 }
 #pragma mark - FaceBook Delegation methods
 -(void)handleFacebookSessionError{

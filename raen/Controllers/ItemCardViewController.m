@@ -12,6 +12,7 @@
 #import "MWPhotoBrowser.h"
 #import "TOWebViewController.h"
 
+#import "NSString+Additions.h"
 //models
 #import "JSONModelLib.h"
 #import "ItemModel.h"
@@ -26,6 +27,8 @@
 #import "GAI.h"
 #import "GAIFields.h"
 #import "GAIDictionaryBuilder.h"
+
+
 
 #define IS_IPHONE_5 ( fabs( ( double )[ [ UIScreen mainScreen ] bounds ].size.height - ( double )568 ) < DBL_EPSILON )
 
@@ -315,7 +318,7 @@
                                       [cell.spinner stopAnimating];
                                       if (!error) {
                                          
-                                      }else{
+                                       }else{
                                           NSLog(@"error to load image");
                                       }
                                   }];
@@ -355,8 +358,18 @@
         NSString *rawstring = [tmpDict allValues][0];
         NSURL *url = [[NSURL alloc] init];
         TOWebViewController *webBrowser = [[TOWebViewController alloc] init];
+        webBrowser.modalTransitionStyle = UIModalTransitionStyleFlipHorizontal;
+
         if ([rawstring rangeOfString:@"iframe"].location !=NSNotFound) {
-            NSString *htmlString = [NSString stringWithFormat:@"<html><body><center><div style=\"width: 835px; margin: 0 auto;\">%@</div></center></body></html>",rawstring];
+            
+            NSString* widthValue =[rawstring stringBetweenString:@"width=\"" andString:@"\""];
+            NSString* heightValue =[rawstring stringBetweenString:@"height=\"" andString:@"\""];
+
+//          NSLog(@"current iframe width=%@, height=%@",widthValue,heightValue);
+            rawstring = [rawstring stringByReplacingOccurrencesOfString:widthValue withString:@"640"];
+            rawstring = [rawstring stringByReplacingOccurrencesOfString:heightValue withString:@"480"];
+            
+            NSString *htmlString = [NSString stringWithFormat:@"<html><body><center><div style=\"width: auto; height:auto; margin: 20px;\">%@</div></center></body></html>",rawstring];
             webBrowser.HTMLString = htmlString;
             
         }
@@ -365,8 +378,8 @@
             webBrowser.url = url;
         }
         [self presentViewController:[[UINavigationController alloc] initWithRootViewController:webBrowser] animated:YES completion:nil];
-//        [webBrowser setHidesBottomBarWhenPushed:YES];
-//        [self.navigationController pushViewController:webBrowser animated:YES];
+        //[webBrowser setHidesBottomBarWhenPushed:YES];
+        //[self.navigationController pushViewController:webBrowser animated:YES];
     }
 }
 #pragma mark - prepare for segue
@@ -515,4 +528,7 @@
     }
     return nil;
 }
+
+
+
 @end

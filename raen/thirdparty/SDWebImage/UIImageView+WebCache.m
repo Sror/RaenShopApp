@@ -64,11 +64,9 @@ static char operationArrayKey;
     }
     
     if ([url.absoluteString isEqualToString:@"http://raenshop.ru/img/goods/b_med/no_image.jpg"]){
-        //NSString* path = [[NSBundle mainBundle] pathForResource:@"no_image" ofType:@"png"];
         self.contentMode = UIViewContentModeCenter;
-        UIImage* placeHolderImage = [UIImage imageWithCGImage:[UIImage imageNamed:@"no_image.png"].CGImage scale:2.5
-                                                  orientation:UIImageOrientationUp];
-        //UIImage* image = [UIImage imageWithContentsOfFile:path];
+        UIImage* placeHolderImage = [UIImage imageWithCGImage:[UIImage imageNamed:@"no_image.png"].CGImage scale:2.5 orientation:UIImageOrientationUp];
+        //UIImage* placeHolderImage = [UIImage imageNamed:@"no_image"];
         self.image = placeHolderImage;
         [self setNeedsLayout];
         NSError*error;

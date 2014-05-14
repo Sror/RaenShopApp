@@ -124,6 +124,7 @@
 		6CBB386418C5C8050097AFD0 /* SaleOfDayDescriptionModel.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB386318C5C8050097AFD0 /* SaleOfDayDescriptionModel.m */; };
 		6CBB386B18C5CB880097AFD0 /* SaleOfDayViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB386A18C5CB880097AFD0 /* SaleOfDayViewController.m */; };
 		6CBB386E18C5F7100097AFD0 /* NewsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 6CBB386D18C5F7100097AFD0 /* NewsViewController.m */; };
+		6CBDF93D1920CB4200D9AE4E /* GTMOAuth2ViewTouch.xib in Resources */ = {isa = PBXBuildFile; fileRef = 6CBDF93C1920CB4200D9AE4E /* GTMOAuth2ViewTouch.xib */; };
 		6CBF68A718913097003ED717 /* ImageIO.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CBF68A618913097003ED717 /* ImageIO.framework */; };
 		6CC7FB9718E03A0E00AB0278 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC7FB9618E03A0E00AB0278 /* AddressBook.framework */; };
 		6CC7FB9918E03A1600AB0278 /* AssetsLibrary.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6CC7FB9818E03A1600AB0278 /* AssetsLibrary.framework */; };
@@ -434,6 +435,7 @@
 		6CBB386A18C5CB880097AFD0 /* SaleOfDayViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SaleOfDayViewController.m; sourceTree = "<group>"; };
 		6CBB386C18C5F7100097AFD0 /* NewsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NewsViewController.h; sourceTree = "<group>"; };
 		6CBB386D18C5F7100097AFD0 /* NewsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NewsViewController.m; sourceTree = "<group>"; };
+		6CBDF93C1920CB4200D9AE4E /* GTMOAuth2ViewTouch.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = GTMOAuth2ViewTouch.xib; sourceTree = "<group>"; };
 		6CBF68A618913097003ED717 /* ImageIO.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ImageIO.framework; path = System/Library/Frameworks/ImageIO.framework; sourceTree = SDKROOT; };
 		6CC7FB9618E03A0E00AB0278 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		6CC7FB9818E03A1600AB0278 /* AssetsLibrary.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AssetsLibrary.framework; path = System/Library/Frameworks/AssetsLibrary.framework; sourceTree = SDKROOT; };
@@ -625,6 +627,7 @@
 		33C4606C1904F33C00AFDDCE /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				6CBDF93C1920CB4200D9AE4E /* GTMOAuth2ViewTouch.xib */,
 				6CBAF2D118AB3FFE00426647 /* Cells */,
 			);
 			name = Views;
@@ -1382,6 +1385,7 @@
 				6C5473E7188405130069E62B /* Images.xcassets in Resources */,
 				6C5473DC188405130069E62B /* Main_iPhone.storyboard in Resources */,
 				6C41FB3A18FF11B10082ACC5 /* Localizable.strings in Resources */,
+				6CBDF93D1920CB4200D9AE4E /* GTMOAuth2ViewTouch.xib in Resources */,
 				6C5473D3188405130069E62B /* InfoPlist.strings in Resources */,
 				6CBAD99C18FEFE44002C72D0 /* MWPhotoBrowser.bundle in Resources */,
 			);
@@ -1688,8 +1692,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Alexey Ivanov (5Q43686JYM)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Alexey Ivanov (5Q43686JYM)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/raen/Socializer/frameworks",
@@ -1698,13 +1702,14 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "raen/raenapp-Prefix.pch";
 				INFOPLIST_FILE = "raen/raenapp-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/raen/thirdparty/GoogleAnalytics",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = raenapp;
-				PROVISIONING_PROFILE = "72CE39A9-D5A2-46E3-8D67-6B875673CEEF";
+				PROVISIONING_PROFILE = "B6892547-BB5F-4500-88CC-4E95F56A4785";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};
@@ -1715,8 +1720,8 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = LaunchImage;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Alexey Ivanov (657GC2CXLB)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Alexey Ivanov (657GC2CXLB)";
+				CODE_SIGN_IDENTITY = "iPhone Developer: Alexey Ivanov (5Q43686JYM)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Alexey Ivanov (5Q43686JYM)";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/raen/Socializer/frameworks",
@@ -1725,13 +1730,14 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "raen/raenapp-Prefix.pch";
 				INFOPLIST_FILE = "raen/raenapp-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)/raen/thirdparty/GoogleAnalytics",
 				);
 				OTHER_LDFLAGS = "-ObjC";
 				PRODUCT_NAME = raenapp;
-				PROVISIONING_PROFILE = "72CE39A9-D5A2-46E3-8D67-6B875673CEEF";
+				PROVISIONING_PROFILE = "B6892547-BB5F-4500-88CC-4E95F56A4785";
 				TARGETED_DEVICE_FAMILY = 1;
 				WRAPPER_EXTENSION = app;
 			};

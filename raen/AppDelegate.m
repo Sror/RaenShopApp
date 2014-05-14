@@ -20,7 +20,7 @@
 
 NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 
-@implementation AppDelegate 
+@implementation AppDelegate
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -55,8 +55,14 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
    // [self updateCartBadge];
     return YES;
 }
+- (NSUInteger)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window
+// iOS 6 autorotation fix
+{
+    return UIInterfaceOrientationMaskAllButUpsideDown;
+}
 
 -(BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation{
+    NSLog(@"app open URL %@",url);
     BOOL wasHandled = NO;
     //VK.com
     if ([[url absoluteString] rangeOfString:@"vk4237186"].location !=NSNotFound) {
@@ -68,7 +74,7 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
         wasHandled = [FBAppCall handleOpenURL:url sourceApplication:sourceApplication withSession:[Socializer sharedManager].fbSession];
     }
     //Google
-    if ([[url absoluteString] rangeOfString:@"ru.raen.raenapp"].location !=NSNotFound) {
+    if ([[url absoluteString] rangeOfString:@"ru.alexeyivanov.raenapp"].location !=NSNotFound) {
         wasHandled = [GPPURLHandler handleURL:url sourceApplication:sourceApplication annotation:annotation];
     }
     
@@ -90,6 +96,7 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 - (void)applicationWillEnterForeground:(UIApplication *)application
 {
     // Called as part of the transition from the background to the inactive state; here you can undo many of the changes made on entering the background.
+    
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application
@@ -97,6 +104,7 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
     // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     [FBAppCall handleDidBecomeActive];
     [FBAppCall handleDidBecomeActiveWithSession:[Socializer sharedManager].fbSession];
+    
 
                             
 }
@@ -105,6 +113,7 @@ NSString *RAENSHOP_CART_ITEMS = @"RAENSHOP_CART_ITEMS";
 {
 
     [[Socializer sharedManager].fbSession close];
+
 }
 
 - (void)application:(UIApplication *)application
@@ -125,7 +134,6 @@ didReceiveRemoteNotification:(NSDictionary *)userInfo {
 
 
 #pragma mark -UITabBarController Delegate
-
 -(NSUInteger)tabBarControllerSupportedInterfaceOrientations:(UITabBarController *)tabBarController{
     return  UIInterfaceOrientationMaskPortrait;
 }
